@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Toolkit 3 · Wind en klimaat</title>
+<style>
+:root{--navy:#343F58;--orange:#FCB031;--cream:#F6F2EA;--paper:#fff;--ink:#232323;--muted:#667085;--line:#DCE1E8;--green:#2FAE7B}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--cream);color:var(--ink);line-height:1.6}.top{background:var(--navy);color:#fff;padding:44px 24px}.wrap{max-width:1050px;margin:auto}.top h1{font-size:48px;margin:0 0 8px}.top b{color:var(--orange)}main{max-width:1050px;margin:auto;padding:28px 24px 70px}section{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:26px;margin:0 0 20px}h2{margin-top:0}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid var(--line);border-radius:14px;padding:15px}.callout{border-left:5px solid var(--orange);background:#fff7e7;padding:14px;border-radius:12px}.danger{border-color:#c94b4b;background:#fff1f1}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line)}code,pre{font-family:ui-monospace,monospace}pre{background:#20293B;color:white;padding:16px;border-radius:14px;overflow:auto}@media(max-width:700px){.grid{grid-template-columns:1fr}.top h1{font-size:38px}}@media print{body{background:#fff}section{break-inside:avoid}}</style>
+</head><body><header class="top"><div class="wrap"><b>DataLab · Minor FuturCity</b><h1>Toolkit 3 · Wind & klimaat</h1><p>Arduino UNO R4 WiFi + JL-FS2 + temperatuur/luchtvochtigheid + GPS + RTC + SD</p></div></header>
+<main>
+<section><h2>Doel</h2><p>Toolkit 3 registreert windsnelheid, temperatuur en relatieve luchtvochtigheid. Tijd en GPS-locatie worden aan ieder meetpunt toegevoegd.</p>
+<div class="grid"><div class="card"><b>Wind</b><br>0–30 m/s</div><div class="card"><b>JL-FS2 uitgang</b><br>0–5 V analoog</div><div class="card"><b>Standaard interval</b><br>1 s</div><div class="card"><b>WiFi</b><br>Arduino-Logger-03</div></div></section>
+<section><h2>JL-FS2 aansluiten</h2><table><tr><th>Draad</th><th>Aansluiting</th><th>Functie</th></tr><tr><td>Rood</td><td>externe +9–24 V</td><td>Voeding</td></tr><tr><td>Zwart</td><td>externe GND én Arduino GND</td><td>Gemeenschappelijke massa</td></tr><tr><td>Geel</td><td>A0</td><td>0–5 V spanningsuitgang</td></tr><tr><td>Blauw</td><td>niet aansluiten</td><td>stroomuitgang, niet gebruikt</td></tr></table>
+<div class="danger callout"><b>Voed de JL-FS2 niet uit de Arduino 5V-pin.</b><br>De anemometer vereist externe 9–24 V voeding. Bij gebruik van twee powerbanks moeten de GND-lijnen wel gemeenschappelijk worden verbonden voor de analoge meting.</div></section>
+<section><h2>Temperatuur/luchtvochtigheid</h2><p>De bestaande SHT31/SEN0385-sensor blijft op de standaard I²C-bus aangesloten en wordt door de firmware op adres 0x44 uitgelezen.</p></section>
+<section><h2>Omrekening wind</h2><p>De JL-FS2 geeft 0–5 V voor 0–30 m/s. De firmware gebruikt daarom:</p><pre>windsnelheid [m/s] = uitgangsspanning [V] × 6</pre></section>
+<section><h2>Firmware</h2><pre>DataLab/
+└── Minor_FuturCity_dataloggers/
+    └── DataLogger_Toolkit_3/
+        └── DataLogger_Toolkit_3.ino</pre></section>
+<section><h2>CSV</h2><pre>measurement_id
+rtc_datetime_local
+elapsed_ms
+temperature_C
+humidity_pct
+wind_speed_ms
+wind_voltage_V
+latitude
+longitude
+satellites
+gps_fix
+gps_speed_kmh
+gps_utc
+location_source</pre></section>
+<section><h2>Gebruik</h2><p>Verbind met <b>Arduino-Logger-03</b> en open <b>192.168.4.1</b>. Controleer eerst sensor, SD en GPS-status. Start daarna de meetsessie. In de grafieken kun je wind, temperatuur en luchtvochtigheid bekijken.</p></section>
+</main></body></html>
