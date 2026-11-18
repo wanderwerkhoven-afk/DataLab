@@ -40,6 +40,515 @@ uint32_t sessionId=0, measurementCount=0, intervalMs=100;
 uint32_t runStartedMs=0, accumulatedRunMs=0, lastMeasureMs=0, lastFlushMs=0;
 File sessionFile;
 
+static const char MANUAL_HTML[] = R"MANUALHTML(<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#343F58">
+  <title>Toolkit 1 · Geluid meten met de DataLogger</title>
+  <style>
+    :root{
+      --navy:#343F58;
+      --navy-deep:#273247;
+      --orange:#FCB031;
+      --cream:#F6F2EA;
+      --paper:#FFFFFF;
+      --ink:#232323;
+      --muted:#667085;
+      --line:#DCE1E8;
+      --green:#2FAE7B;
+      --red:#C94B4B;
+      --blue:#4B7BEC;
+      --shadow:0 12px 34px rgba(32,42,61,.10);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      background:var(--cream);
+      color:var(--ink);
+      line-height:1.6;
+    }
+    .topbar{
+      position:sticky;top:0;z-index:20;
+      background:rgba(52,63,88,.96);
+      color:#fff;
+      backdrop-filter:blur(12px);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .topbar-inner{
+      max-width:1120px;margin:auto;
+      display:flex;align-items:center;justify-content:space-between;
+      gap:24px;padding:14px 24px;
+    }
+    .brand{font-weight:800;font-size:20px;letter-spacing:-.02em}
+    .brand span{color:var(--orange)}
+    .topnav{display:flex;gap:8px;flex-wrap:wrap}
+    .topnav a{
+      color:#fff;text-decoration:none;font-size:13px;font-weight:700;
+      padding:8px 11px;border-radius:10px;
+    }
+    .topnav a:hover{background:rgba(255,255,255,.08)}
+    .hero{
+      background:
+        radial-gradient(circle at 82% 15%, rgba(252,176,49,.28), transparent 26%),
+        linear-gradient(135deg,var(--navy-deep),var(--navy));
+      color:#fff;
+    }
+    .hero-inner{
+      max-width:1120px;margin:auto;padding:64px 24px 56px;
+      display:grid;grid-template-columns:1.25fr .75fr;gap:42px;align-items:center;
+    }
+    .eyebrow{
+      display:inline-flex;align-items:center;gap:8px;
+      font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+      color:#F8D995;margin-bottom:12px;
+    }
+    h1{font-size:clamp(38px,6vw,68px);line-height:1.02;letter-spacing:-.045em;margin:0 0 20px}
+    .lead{font-size:19px;max-width:720px;color:#E9EDF5;margin:0}
+    .hero-card{
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:24px;padding:24px;box-shadow:var(--shadow)
+    }
+    .hero-card h3{margin:0 0 14px;font-size:16px}
+    .spec-row{
+      display:flex;justify-content:space-between;gap:18px;
+      padding:10px 0;border-bottom:1px solid rgba(255,255,255,.12);
+      font-size:14px;
+    }
+    .spec-row:last-child{border-bottom:0}
+    .spec-row span:first-child{color:#CBD3E4}
+    .spec-row strong{font-weight:800;text-align:right}
+    main{max-width:1120px;margin:auto;padding:34px 24px 80px}
+    section{
+      background:var(--paper);border:1px solid rgba(52,63,88,.08);
+      border-radius:var(--radius);padding:30px;margin:0 0 24px;box-shadow:var(--shadow)
+    }
+    h2{font-size:28px;letter-spacing:-.03em;margin:0 0 10px}
+    h3{font-size:19px;margin:24px 0 10px}
+    p{margin:8px 0 14px}
+    .section-intro{color:var(--muted);max-width:850px;margin-bottom:22px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .grid.two{grid-template-columns:repeat(2,1fr)}
+    .card{
+      border:1px solid var(--line);border-radius:18px;padding:18px;background:#fff;
+    }
+    .card .num{
+      width:36px;height:36px;border-radius:11px;background:var(--orange);
+      display:flex;align-items:center;justify-content:center;font-weight:900;margin-bottom:12px;
+    }
+    .card h3{margin:0 0 6px;font-size:17px}
+    .card p{font-size:14px;color:var(--muted);margin:0}
+    .hardware-list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .hardware{
+      display:flex;gap:14px;align-items:flex-start;
+      border:1px solid var(--line);border-radius:16px;padding:16px;
+    }
+    .icon{
+      flex:0 0 42px;width:42px;height:42px;border-radius:13px;
+      background:#F4F6F9;display:grid;place-items:center;color:var(--navy);
+    }
+    .icon svg{width:23px;height:23px}
+    .hardware strong{display:block}
+    .hardware small{display:block;color:var(--muted);margin-top:3px}
+    .wiring{
+      background:#F8FAFC;border:1px solid var(--line);
+      border-radius:18px;padding:20px;overflow:auto;
+    }
+    .wire-table{width:100%;border-collapse:collapse;min-width:560px}
+    .wire-table th,.wire-table td{padding:13px 14px;border-bottom:1px solid var(--line);text-align:left}
+    .wire-table th{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .wire-table tr:last-child td{border-bottom:0}
+    .pin{
+      display:inline-block;padding:4px 9px;border-radius:8px;background:#EEF1F6;
+      color:var(--navy);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:800
+    }
+    .callout{
+      border-left:5px solid var(--orange);background:#FFF8E8;
+      border-radius:14px;padding:16px 18px;margin:18px 0;
+    }
+    .callout.good{border-color:var(--green);background:#EFFAF6}
+    .callout.warn{border-color:#C98516;background:#FFF7E6}
+    .callout.danger{border-color:var(--red);background:#FFF1F1}
+    .callout strong{display:block;margin-bottom:4px}
+    .flow{
+      display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:stretch;
+    }
+    .flow-step{
+      background:#F7F8FA;border:1px solid var(--line);border-radius:16px;padding:14px;
+      font-size:13px;font-weight:700;text-align:center;display:flex;align-items:center;justify-content:center;
+    }
+    .flow-arrow{display:none}
+    code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    pre{
+      background:#20293B;color:#F7F9FC;border-radius:16px;padding:18px;
+      overflow:auto;font-size:13px;line-height:1.55;
+    }
+    .app-preview{
+      display:grid;grid-template-columns:repeat(2,1fr);gap:14px;
+    }
+    .tile{
+      min-height:136px;border-radius:20px;padding:18px;
+      border:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between;
+    }
+    .tile.primary{background:var(--orange);border-color:transparent}
+    .tile.dark{background:var(--navy);color:#fff;border-color:transparent}
+    .tile .label{font-size:13px;color:var(--muted)}
+    .tile.dark .label{color:#D5DCEA}
+    .tile .value{font-size:30px;font-weight:900;letter-spacing:-.03em}
+    .tile .sub{font-size:12px;color:var(--muted)}
+    .tile.dark .sub{color:#CBD3E4}
+    .checklist{display:grid;gap:10px;margin-top:14px}
+    .check{
+      display:flex;gap:11px;align-items:flex-start;padding:12px 14px;
+      border:1px solid var(--line);border-radius:14px;background:#fff
+    }
+    .box{width:19px;height:19px;border:2px solid var(--navy);border-radius:5px;flex:0 0 19px;margin-top:2px}
+    .csv{font-size:12px}
+    .meta{
+      color:var(--muted);font-size:13px;margin-top:28px;text-align:center
+    }
+    .footer{
+      background:var(--navy-deep);color:#fff;padding:28px 24px;text-align:center
+    }
+    .footer strong{color:var(--orange)}
+    @media(max-width:850px){
+      .hero-inner{grid-template-columns:1fr}
+      .grid,.grid.two,.hardware-list,.app-preview{grid-template-columns:1fr}
+      .flow{grid-template-columns:1fr}
+      .topnav{display:none}
+    }
+    @media print{
+      .topbar{position:static}
+      body{background:#fff}
+      section{box-shadow:none;break-inside:avoid}
+      .hero{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+      .topbar,.footer{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+      main{padding-bottom:20px}
+    }
+  </style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">Data<span>Logger</span> · Toolkit 1</div>
+    <nav class="topnav">
+      <a href="#doel">Doel</a>
+      <a href="#hardware">Hardware</a>
+      <a href="#aansluiten">Aansluiten</a>
+      <a href="#software">Software</a>
+      <a href="#meten">Meten</a>
+      <a href="#grafiek">Grafiek</a>
+      <a href="#problemen">Problemen</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="eyebrow">DataLab · Hogeschool van Amsterdam</div>
+      <h1>Toolkit 1<br>Geluid meten</h1>
+      <p class="lead">Handleiding voor het opbouwen, aansluiten en gebruiken van de DataLogger met een MAX4466 microfoonmodule, GPS, RTC en SD-opslag.</p>
+    </div>
+    <div class="hero-card">
+      <h3>Toolkit-configuratie</h3>
+      <div class="spec-row"><span>DataLogger</span><strong>Arduino UNO R4 WiFi</strong></div>
+      <div class="spec-row"><span>Sensor</span><strong>MAX4466</strong></div>
+      <div class="spec-row"><span>Analoge ingang</span><strong>A0</strong></div>
+      <div class="spec-row"><span>WiFi</span><strong>Arduino-Logger-01</strong></div>
+      <div class="spec-row"><span>Webapp</span><strong>192.168.4.1</strong></div>
+      <div class="spec-row"><span>Standaard interval</span><strong>0,1 s (10 Hz)</strong></div>
+      <div class="spec-row"><span>Minimum interval</span><strong>0,05 s (20 Hz)</strong></div>
+      <div class="spec-row"><span>Meetvenster</span><strong>50 ms</strong></div>
+    </div>
+  </div>
+</div>
+
+<main>
+<section id="doel">
+  <h2>1. Wat meet Toolkit 1?</h2>
+  <p class="section-intro">Toolkit 1 registreert de amplitude van geluid met een MAX4466 microfoonversterker. De DataLogger koppelt deze geluidsmeting aan tijd en GPS-locatie en slaat iedere meting op de SD-kaart op.</p>
+
+  <div class="grid">
+    <div class="card">
+      <div class="num">1</div>
+      <h3>Geluidsamplitude</h3>
+      <p>Piek-tot-piek amplitude van het analoge microfoonsignaal in millivolt.</p>
+    </div>
+    <div class="card">
+      <div class="num">2</div>
+      <h3>Ruwe meetwaarde</h3>
+      <p>Piek-tot-piek verschil in ADC-counts. Handig voor controle en verdere analyse.</p>
+    </div>
+    <div class="card">
+      <div class="num">3</div>
+      <h3>Tijd & locatie</h3>
+      <p>RTC-tijd, verstreken tijd, GPS-positie en het aantal gevonden satellieten worden aan de meetdata toegevoegd.</p>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <strong>Geen gekalibreerde dB-meter</strong>
+    De MAX4466 levert een analoog audiosignaal. Zonder akoestische kalibratie mogen de waarden niet als dB(A) of een officieel geluidsniveau worden geïnterpreteerd. De ruwe waarden worden wel opgeslagen als mV p-p en ADC p-p, maar tijdens het meten toont de app alleen of de geluidssensor <em>Actief</em> is.
+  </div>
+</section>
+
+<section id="hardware">
+  <h2>2. Benodigde hardware</h2>
+  <p class="section-intro">De standaard DataLogger blijft intact. Alleen de temperatuur-/luchtvochtigheidssensor wordt voor Toolkit 1 vervangen door de MAX4466.</p>
+
+  <div class="hardware-list">
+    <div class="hardware">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 7h8M8 11h8M8 15h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <div><strong>Arduino UNO R4 WiFi</strong><small>Draait firmware, webapp en lokaal WiFi-netwerk.</small></div>
+    </div>
+    <div class="hardware">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 6h14v12H5z" stroke="currentColor" stroke-width="1.8"/><path d="M8 9h8M8 13h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <div><strong>Data Logging Shield V1.0</strong><small>RTC-klok en microSD-opslag.</small></div>
+    </div>
+    <div class="hardware">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 15a4 4 0 0 0 4-4V7a4 4 0 1 0-8 0v4a4 4 0 0 0 4 4Z" stroke="currentColor" stroke-width="1.8"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <div><strong>MAX4466 microfoonmodule</strong><small>Analoge geluidsensor met versterker.</small></div>
+    </div>
+    <div class="hardware">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 17 9 8l4 5 2-3 5 7H4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="17" cy="6" r="2" stroke="currentColor" stroke-width="1.8"/></svg></div>
+      <div><strong>Air530Z GPS</strong><small>GPS via Serial1/UART, zoals bij de standaard DataLogger.</small></div>
+    </div>
+    <div class="hardware">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 3h9l3 3v15H6V3Z" stroke="currentColor" stroke-width="1.8"/><path d="M9 3v6h6V3" stroke="currentColor" stroke-width="1.8"/></svg></div>
+      <div><strong>microSD-kaart</strong><small>Slaat de meetsessies op als CSV-bestanden.</small></div>
+    </div>
+    <div class="hardware">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M7 12h10M12 7v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/></svg></div>
+      <div><strong>3 verbindingsdraden</strong><small>Voor 3.3V, GND en analoge uitgang naar A0.</small></div>
+    </div>
+  </div>
+</section>
+
+<section id="aansluiten">
+  <h2>3. MAX4466 aansluiten</h2>
+  <p class="section-intro">Schakel de Arduino volledig uit voordat je de bedrading aansluit. De MAX4466 gebruikt geen I2C; het audiosignaal wordt rechtstreeks analoog op A0 ingelezen.</p>
+
+  <div class="wiring">
+    <table class="wire-table">
+      <thead>
+        <tr><th>MAX4466</th><th>Arduino / Logging Shield</th><th>Functie</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="pin">VCC</span></td><td><span class="pin">3.3V</span></td><td>Voeding sensor</td></tr>
+        <tr><td><span class="pin">GND</span></td><td><span class="pin">GND</span></td><td>Gemeenschappelijke massa</td></tr>
+        <tr><td><span class="pin">OUT</span></td><td><span class="pin">A0</span></td><td>Analoog audiosignaal</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout danger">
+    <strong>Niet op een I2C-poort aansluiten</strong>
+    De MAX4466 heeft een analoge uitgang. OUT moet naar A0. SDA en SCL worden voor deze sensor niet gebruikt.
+  </div>
+
+  <h3>Overige onderdelen</h3>
+  <p>De RTC en SD-kaart blijven op het Data Logging Shield werken. De Air530Z GPS blijft aangesloten zoals bij de standaard DataLogger en wordt via <code>Serial1</code> uitgelezen.</p>
+</section>
+
+<section id="software">
+  <h2>4. Firmware installeren</h2>
+  <p class="section-intro">Gebruik de Toolkit 1 firmware uit de DataLab-repository. Deze versie bevat zowel de sensormeting als de volledige webapp.</p>
+
+  <pre>DataLab/
+└── Minor_FuturCity_dataloggers/
+    └── DataLogger_Toolkit_1/
+        └── DataLogger_Toolkit_1.ino</pre>
+
+  <div class="grid two">
+    <div class="card">
+      <div class="num">1</div>
+      <h3>Arduino IDE</h3>
+      <p>Open <code>DataLogger_Toolkit_1.ino</code>, kies Arduino UNO R4 WiFi en selecteer de juiste COM-poort.</p>
+    </div>
+    <div class="card">
+      <div class="num">2</div>
+      <h3>Upload</h3>
+      <p>Upload de sketch. Open daarna de Serial Monitor op <strong>115200 baud</strong>.</p>
+    </div>
+  </div>
+
+  <div class="callout good">
+    <strong>Firmwareconfiguratie</strong>
+    De huidige firmware gebruikt <code>A0</code> voor de MAX4466, een 12-bit ADC en een meetvenster van 50 ms per geluidsmeting. Het standaard opslaginterval is 0,1 s. De kortste instelbare interval is 0,05 s; daarbij sluiten de 50 ms meetvensters direct op elkaar aan zonder extra ingestelde wachttijd.
+  </div>
+</section>
+
+<section id="app">
+  <h2>5. Verbinden met de webapp</h2>
+  <div class="flow">
+    <div class="flow-step">1. DataLogger inschakelen</div>
+    <div class="flow-step">2. WiFi openen</div>
+    <div class="flow-step">3. Arduino-Logger-01 kiezen</div>
+    <div class="flow-step">4. Logger2026! invoeren</div>
+    <div class="flow-step">5. 192.168.4.1 openen</div>
+  </div>
+
+  <h3>Status in de webapp</h3>
+  <p>Om de gebruiker tijdens een geluidsmeting niet af te leiden met snel wisselende ruwe waarden, toont de app op het dashboard vooral de meetstatus. De geluidswaarden zelf blijven volledig beschikbaar in de CSV-bestanden en grafieken.</p>
+  <div class="app-preview">
+    <div class="tile primary">
+      <div class="label">Geluidssensor</div>
+      <div class="value">Actief</div>
+      <div class="sub">MAX4466 · meetstatus</div>
+    </div>
+    <div class="tile dark">
+      <div class="label">GPS status</div>
+      <div class="value">Satelliet gevonden</div>
+      <div class="sub">of: Geen satelliet gevonden</div>
+    </div>
+    <div class="tile">
+      <div class="label">SD-kaart</div>
+      <div class="value">Gereed</div>
+      <div class="sub">meetsessie wordt opgeslagen</div>
+    </div>
+    <div class="tile">
+      <div class="label">Tijd</div>
+      <div class="value">RTC</div>
+      <div class="sub">tijdstempel per meting</div>
+    </div>
+  </div>
+</section>
+
+<section id="meten">
+  <h2>6. Een meting uitvoeren</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="num">1</div>
+      <h3>Controleer de status</h3>
+      <p>Controleer vóór het starten of de geluidssensor als <strong>Actief</strong> wordt weergegeven, de SD-kaart gereed is en indien nodig een GPS-satelliet is gevonden.</p>
+    </div>
+    <div class="card">
+      <div class="num">2</div>
+      <h3>Start de sessie</h3>
+      <p>Open <strong>Meten</strong>, kies het gewenste meetinterval en druk op <strong>START MET METEN</strong>. Beschikbare intervallen zijn 0,05 s, 0,1 s, 0,25 s, 0,5 s, 1 s, 2 s en 5 s. Standaard staat Toolkit 1 op 0,1 s.</p>
+    </div>
+    <div class="card">
+      <div class="num">3</div>
+      <h3>Stop & analyseer</h3>
+      <p>Stop de sessie. Open daarna Data of Grafieken om de opgeslagen meetreeks te bekijken.</p>
+    </div>
+  </div>
+
+  <h3>Meetprincipe</h3>
+  <div class="flow">
+    <div class="flow-step">A0 snel bemonsteren</div>
+    <div class="flow-step">50 ms meetvenster</div>
+    <div class="flow-step">minimum & maximum bepalen</div>
+    <div class="flow-step">piek-tot-piek berekenen</div>
+    <div class="flow-step">direct opslaan in CSV</div>
+  </div>
+</section>
+
+<section id="data">
+  <h2>7. Opgeslagen data</h2>
+  <p class="section-intro">Iedere meetsessie wordt als afzonderlijk CSV-bestand opgeslagen. Toolkit 1 gebruikt de volgende kolommen:</p>
+
+  <pre class="csv">measurement_id,
+rtc_datetime_local,
+elapsed_ms,
+sound_p2p_mV,
+sound_p2p_adc,
+sound_bias_V,
+latitude,
+longitude,
+satellites,
+gps_fix,
+gps_speed_kmh,
+gps_utc,
+location_source</pre>
+
+  <div class="callout">
+    <strong>Grafieken</strong>
+    De opgeslagen geluidsamplitude wordt uitgezet tegen de verstreken tijd. Het zichtbare venster is 20 seconden breed met een tijd-as per 5 seconden. Bij langere metingen kun je horizontaal door de grafiek swipen of scrollen. De y-as blijft daarbij vast staan, zodat de schaal altijd leesbaar blijft en korte geluidspieken niet worden samengedrukt.
+  </div>
+</section>
+
+<section id="grafiek">
+  <h2>8. Grafiek gebruiken</h2>
+  <p class="section-intro">Toolkit 1 is ingericht om korte geluidspieken ook tijdens langere sessies zichtbaar te houden.</p>
+  <div class="grid two">
+    <div class="card"><div class="num">1</div><h3>20 seconden per venster</h3><p>De x-as toont steeds ongeveer 20 seconden meettijd. Tijdmarkeringen staan iedere 5 seconden.</p></div>
+    <div class="card"><div class="num">2</div><h3>Horizontaal scrollen</h3><p>Duurt de meting langer dan 20 seconden, swipe of scroll dan naar rechts. De meetlijn wordt niet samengeperst.</p></div>
+    <div class="card"><div class="num">3</div><h3>Vaste y-as</h3><p>De schaal links blijft op zijn plaats tijdens horizontaal scrollen, zodat amplitudes altijd afleesbaar blijven.</p></div>
+    <div class="card"><div class="num">4</div><h3>Pieken behouden</h3><p>Omdat de tijd-as breder wordt bij langere sessies blijven korte pieken zichtbaar in plaats van samen te vallen.</p></div>
+  </div>
+</section>
+
+<section id="controle">
+  <h2>9. Controle vóór gebruik</h2>
+  <div class="checklist">
+    <div class="check"><div class="box"></div><div>Arduino UNO R4 WiFi en Data Logging Shield correct gemonteerd.</div></div>
+    <div class="check"><div class="box"></div><div>microSD-kaart geplaatst.</div></div>
+    <div class="check"><div class="box"></div><div>MAX4466 VCC aangesloten op 3.3V.</div></div>
+    <div class="check"><div class="box"></div><div>MAX4466 GND aangesloten op GND.</div></div>
+    <div class="check"><div class="box"></div><div>MAX4466 OUT aangesloten op A0.</div></div>
+    <div class="check"><div class="box"></div><div>Air530Z GPS aangesloten.</div></div>
+    <div class="check"><div class="box"></div><div>Toolkit 1 firmware geüpload.</div></div>
+    <div class="check"><div class="box"></div><div>Serial Monitor ingesteld op 115200 baud.</div></div>
+    <div class="check"><div class="box"></div><div>Verbonden met Arduino-Logger-01.</div></div>
+    <div class="check"><div class="box"></div><div>De webapp toont de geluidssensor als <strong>Actief</strong>.</div></div>
+    <div class="check"><div class="box"></div><div>Standaard meetinterval staat op 0,1 s; 0,05 s is beschikbaar voor de hoogste tijdsresolutie.</div></div>
+  </div>
+</section>
+
+<section id="problemen">
+  <h2>10. Problemen oplossen</h2>
+
+  <div class="grid two">
+    <div class="card">
+      <h3>Geluidssensor niet actief</h3>
+      <p>Controleer eerst OUT → A0, daarna 3.3V en GND. De webapp hoeft geen live amplitude te tonen; de status moet wel <strong>Actief</strong> worden.</p>
+    </div>
+    <div class="card">
+      <h3>Webapp opent niet</h3>
+      <p>Controleer of je verbonden bent met <strong>Arduino-Logger-01</strong> en open <strong>192.168.4.1</strong>.</p>
+    </div>
+    <div class="card">
+      <h3>SD niet beschikbaar</h3>
+      <p>Schakel de DataLogger uit, plaats de microSD volledig en start opnieuw.</p>
+    </div>
+    <div class="card">
+      <h3>Geen satelliet gevonden</h3>
+      <p>Ga naar buiten of naar een plek met vrij zicht op de lucht en geef de GPS tijd om satellieten te vinden. Zodra een geldige positie beschikbaar is verandert de melding naar <strong>Satelliet gevonden</strong>.</p>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <strong>Waarde lijkt constant of extreem</strong>
+    Controleer de aansluiting van A0 en de positie van de gain-instelling op de MAX4466. Een verkeerde of zeer hoge gain kan het signaal laten clippen.
+  </div>
+</section>
+
+<p class="meta">Toolkit 1 · Minor FuturCity · DataLab · Hogeschool van Amsterdam</p>
+</main>
+
+<footer class="footer">
+  <strong>DataLab</strong> · Toolkit 1 · DataLogger
+</footer>
+
+<script>
+(function(){
+  try{
+    if(new URLSearchParams(location.search).get('print')==='1'){
+      window.addEventListener('load',function(){setTimeout(function(){window.print()},300)});
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>)MANUALHTML";
+
 static const char INDEX_HTML[] = R"DATALOGGER(
 <!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" id="browserThemeColor" content="#343F58"><meta name="application-name" content="DataLogger"><meta name="apple-mobile-web-app-title" content="DataLogger"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,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"><link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,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"><title>DataLogger</title><style>
 :root{--navy:#253044;--orange:#ffb333;--bg:#f2f5fa;--ink:#263348;--muted:#647087;--green:#31a268;--red:#dc393e;--white:#fff}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Helvetica,sans-serif}button,select{font:inherit}button{cursor:pointer;border:0}button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid #398bdc;outline-offset:2px}.app{max-width:540px;margin:auto;min-height:100dvh;background:var(--bg)}.top{background:var(--navy);color:white;padding:calc(env(safe-area-inset-top) + 18px) 18px 18px;display:flex;justify-content:space-between;align-items:center;min-height:75px}.brand{font-size:23px;font-weight:800}.brand span{color:var(--orange)}.top button{background:transparent;color:white;font-size:27px;padding:3px 9px}.page{display:none;padding-bottom:calc(115px + env(safe-area-inset-bottom))}.page.current{display:block}.hero{height:175px;position:relative;overflow:hidden;background:linear-gradient(130deg,#253044 20%,#657a90 65%,#f3d2b6);color:white;padding:23px 18px}.hero:after{content:' ';position:absolute;right:-10%;bottom:20px;width:80%;height:80px;background:#384a5c;clip-path:polygon(0 100%,25% 40%,39% 70%,55% 10%,72% 60%,85% 30%,100% 100%);opacity:.85}.hero h1{margin:0;font-size:25px;position:relative;z-index:1}.hero p{position:relative;z-index:1}.system{position:absolute;bottom:0;left:14px;right:14px;background:white;color:var(--ink);border-radius:13px 13px 0 0;display:flex;justify-content:space-between;gap:8px;padding:12px;font-size:12px;z-index:2}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--green);margin-right:7px}.content{background:white;padding:14px;border-radius:13px 13px 0 0}.homeactions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.action{border-radius:13px;padding:17px 8px;min-height:132px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-size:15px;box-shadow:0 3px 9px #1b2d4120}.action small{font-size:11px}.action.start{background:var(--orange);color:var(--ink)}.action.data{background:var(--navy);color:white}.action .bigicon{width:38px;height:38px;display:flex;align-items:center;justify-content:center}
@@ -47,7 +556,8 @@ static const char INDEX_HTML[] = R"DATALOGGER(
 .playIconSvg{width:31px;height:31px;display:block}
 .nav .playIconSvg{width:30px;height:30px}
 .sectiontitle{display:flex;justify-content:space-between;align-items:end;margin:22px 2px 14px}.sectiontitle h2{margin:0;font-size:18px;letter-spacing:-.2px}.live{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}.sensors{display:grid;grid-template-columns:1fr 1fr;gap:14px}.sensor{position:relative;border:1px solid #e4e9f1;border-radius:18px;padding:0;background:white;box-shadow:0 8px 20px #27374b10;display:grid;grid-template-columns:32% 68%;align-items:stretch;min-height:146px;overflow:hidden}.sensor.compact{min-height:132px}.sensoricon{display:flex;align-items:center;justify-content:center;padding:18px}.sensoricon .iconwrap{width:64px;height:64px;flex:0 0 64px;border-radius:16px;background:rgba(37,48,68,.05);display:flex;align-items:center;justify-content:center}.sensorcontent{display:flex;flex-direction:column;justify-content:center;padding:18px 18px 18px 8px}.symbol{font-size:26px;display:flex;align-items:center;justify-content:center;line-height:1}.symbol svg{width:30px;height:30px;display:block}.measuregrid .tile .symbol svg{width:29px;height:29px}.label{font-size:12px;color:#627188;margin-bottom:6px}.value{font-size:18px;font-weight:800;line-height:1.12;margin:0;color:var(--ink)}.sensor.emphasis .value{font-size:20px}.sensor.compact .value{font-size:16px}.sub{color:var(--muted);font-size:12px;line-height:1.35;margin-top:10px}.sd{width:100%;margin-top:14px;background:white;border:1px solid #e4e9f1;border-radius:18px;text-align:left;padding:0;display:grid;grid-template-columns:22% 1fr auto;align-items:center;box-shadow:0 8px 20px #27374b10;overflow:hidden}.sd .sensoricon{padding:18px 12px}.sd .sensoricon .iconwrap{width:56px;height:56px}.sd .sensorcontent{padding:18px 8px 18px 0}.sd .arrow{margin-right:18px;font-size:30px;color:#738199}.sd .value{font-size:16px;margin-top:2px}.sd .label{margin-bottom:2px}@media (max-width:380px){.sensors{grid-template-columns:1fr}.sensor{min-height:118px}.sd{grid-template-columns:26% 1fr auto}}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,540px);display:grid;grid-template-columns:repeat(4,1fr);background:var(--navy);border-radius:16px 16px 0 0;padding:10px 0 calc(24px + env(safe-area-inset-bottom));z-index:10}.nav button{color:#bac3d1;background:none;display:flex;align-items:center;justify-content:center;gap:0;flex-direction:column;font-size:0;min-height:56px;padding:6px 0}.nav button span{font-size:31px;line-height:1;display:block}.nav button .homeNavIcon{font-size:36px}.nav button .chartNavIcon{display:flex;align-items:flex-end;justify-content:center;gap:4px;height:30px;width:34px}.nav button .chartNavIcon i{display:block;width:6px;border-radius:6px;background:currentColor;opacity:.98}.nav button .chartNavIcon i:nth-child(1){height:15px}.nav button .chartNavIcon i:nth-child(2){height:25px}.nav button .chartNavIcon i:nth-child(3){height:20px}.nav button.selected{color:var(--orange)}.sheet{background:white;border-radius:17px;padding:18px 14px;margin:0 3px;box-shadow:0 2px 12px #22314a15}.heading{display:flex;justify-content:space-between;align-items:start;gap:9px}.heading h1{font-size:19px;margin:3px 0 5px}.heading p{font-size:13px;color:var(--muted);margin:0}.pill{border-radius:20px;background:#d8f5e3;color:#238651;padding:7px 13px;font-size:13px}.clock{display:flex;flex-direction:column;align-items:center;gap:4px;margin:16px 0 21px;text-align:center}.clock .metric{border:0;background:transparent;box-shadow:none;padding:0;min-width:0;width:100%;text-align:center}.clock .metric:first-child{padding:7px 0 2px}.clock .metric:first-child .metric-label{font-size:13px;margin-bottom:7px}.clock .metric:first-child strong{display:block;font-size:clamp(39px,10vw,52px);line-height:1.05;letter-spacing:-1.5px;font-weight:800;font-variant-numeric:tabular-nums}.clock .metric:last-child{display:flex;justify-content:center;align-items:baseline;gap:6px;padding:2px 0 0}.clock .metric:last-child .metric-label{font-size:13px;margin:0;color:var(--muted)}.clock .metric #count{font-size:16px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}.clock strong{overflow-wrap:anywhere}
-.measuregrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.measuregrid .tile{position:relative;border:1px solid #e4e9f1;border-radius:18px;padding:0;background:white;box-shadow:0 8px 20px #27374b10;display:grid;grid-template-columns:32% 68%;align-items:stretch;min-height:146px;overflow:hidden}.measuregrid .tileicon{display:flex;align-items:center;justify-content:center;padding:18px}.measuregrid .tileicon .iconwrap{width:64px;height:64px;flex:0 0 64px;border-radius:16px;background:rgba(37,48,68,.05);display:flex;align-items:center;justify-content:center}.measuregrid .tilecontent{display:flex;flex-direction:column;justify-content:center;padding:18px 18px 18px 8px}.measuregrid .tile .label{font-size:12px;color:#627188;margin-bottom:6px}.measuregrid .tile .value{font-size:20px;font-weight:800;line-height:1.12;margin:0;color:var(--ink)}.measuregrid .tile .sub{color:var(--muted);font-size:12px;line-height:1.35;margin-top:10px}.measuregrid .tile .symbol{font-size:26px;display:flex;align-items:center;justify-content:center;line-height:1}.measuregrid .tile .symbol svg{width:30px;height:30px;display:block}.settingrow{border-radius:12px;background:#f5f7fa;display:flex;justify-content:space-between;align-items:center;padding:12px;margin-top:10px;gap:8px}.settingrow small{display:block;color:var(--muted);margin-top:4px}.settingrow button{border-radius:9px;background:#e5eaf0;padding:10px;font-size:13px}.measureactions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 8px}.measureactions button,.stop,.startbtn{border-radius:11px;padding:15px 8px;font-weight:700}.continue{background:var(--navy);color:white}.pause{background:var(--orange);color:var(--ink)}.stop{background:var(--red);color:white;width:100%}.startbtn{background:var(--orange);width:100%}.hidden{display:none!important}.location{display:grid;grid-template-columns:1fr 45%;border-radius:14px;overflow:hidden;border:1px solid #e1e8ef;margin-top:13px;min-height:128px}.map{background:linear-gradient(140deg,#dcf7e8 0%,#edf6eb 45%,#bee4ef 46%,#d7eeff 70%,#e5f5e8 71%);position:relative;overflow:hidden}.map:before{content:'';position:absolute;top:44%;left:46%;width:19px;height:19px;border-radius:50%;background:#267ddb;border:3px solid white;box-shadow:0 2px 6px #173e6b44;z-index:2;transform:translate(-50%,-50%);animation:mapDot 2s ease-in-out infinite}.map:after{content:'';position:absolute;top:44%;left:46%;width:24px;height:24px;border-radius:50%;background:#1e5fa84a;z-index:1;transform:translate(-50%,-50%) scale(.65);animation:mapPulse 2s ease-out infinite}@keyframes mapDot{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.12)}}@keyframes mapPulse{0%{transform:translate(-50%,-50%) scale(.65);opacity:.78}70%{opacity:.24}100%{transform:translate(-50%,-50%) scale(3.2);opacity:0}}@media (prefers-reduced-motion:reduce){.map:before,.map:after{animation:none}}.locationaside{padding:13px;font-size:12px}.locationaside p{color:#438dde;font-weight:700;line-height:1.6}.locationaside small{color:var(--muted)}.meta{font-size:11px;color:var(--muted);margin-top:15px}.datawrap{padding:17px}.datatop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}.datatop h1{font-size:18px;margin:0 0 3px}.periodpill{background:var(--soft);border:1px solid #e4e9f1;border-radius:10px;padding:9px 12px;font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap}.overviewgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}.overviewcard{background:white;border:1px solid #e4e9f1;border-radius:14px;padding:12px 11px;box-shadow:0 1px 6px #24344a0f}.overviewiconrow{display:flex;align-items:center;gap:8px;color:var(--ink);margin-bottom:7px;min-height:20px}.miniicon{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;color:var(--navy)}.miniicon svg{width:18px;height:18px;display:block}.overviewvalue{font-size:28px;font-weight:800;line-height:1;margin-bottom:4px}.overviewlabel{font-size:12px;color:var(--muted)}.sectionhead{font-size:18px;font-weight:800;margin:0 0 12px}.filetoolbar{display:flex;gap:10px;align-items:center;margin-bottom:12px}.searchbox{flex:1;display:flex;align-items:center;gap:8px;background:var(--soft);border:1px solid #e4e9f1;border-radius:12px;padding:0 12px;height:44px;color:var(--muted)}.searchbox input{border:0;background:transparent;outline:none;width:100%;font-size:14px;color:var(--ink)}.filterbtn{height:44px;border-radius:12px;padding:0 14px;background:var(--soft);border:1px solid #e4e9f1;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px}.sessionlist{background:white;border:1px solid #e4e9f1;border-radius:16px;overflow:hidden;box-shadow:0 1px 6px #24344a0f}.sessionrow{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px 16px;border-bottom:1px solid #edf1f6}.sessionrow:last-child{border-bottom:0}.fileicon{width:38px;height:38px;border-radius:11px;background:var(--soft);display:flex;align-items:center;justify-content:center;color:var(--navy)}.fileicon svg{width:20px;height:20px;display:block}.sessiontitle{font-size:14px;font-weight:800;margin:0 0 5px;line-height:1.25}.sessionmeta,.sessionsub{font-size:12px;color:var(--muted);line-height:1.3}.sessionactions{display:flex;align-items:center;gap:6px}.sessionmenubtn{width:40px;height:40px;border-radius:12px;background:var(--surface-alt);border:1px solid var(--border);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;font-size:22px;line-height:1}.sessionmenubtn:active{transform:scale(.98)}.sessionactionsheet{display:grid;gap:8px}.sessionaction{width:100%;min-height:52px;border-radius:12px;background:var(--surface-alt);color:var(--ink);display:grid;grid-template-columns:36px 1fr;align-items:center;gap:10px;padding:0 14px;text-align:left;font-weight:800}.sessionaction .saicon{width:36px;height:36px;border-radius:10px;background:var(--surface);display:flex;align-items:center;justify-content:center;border:1px solid var(--border)}.sessionaction.danger{color:#c83238}.sessionaction.danger .saicon{color:#c83238}.sessionaction small{display:block;font-size:12px;color:var(--muted);font-weight:500;margin-top:2px}.sessionmore{background:none;color:var(--muted);font-size:20px;line-height:1;padding:7px 3px}.filterbtn.active{border-color:var(--orange);background:#fff5de}.filterpanel{background:white;border:1px solid #e4e9f1;border-radius:14px;padding:12px;margin:-2px 0 12px;box-shadow:0 6px 18px #24344a12}.filterpanel[hidden]{display:none}.filterlabel{display:block;font-size:12px;font-weight:700;margin-bottom:7px}.filteroptions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.filteroption{border:1px solid #dfe5ed;background:var(--soft);border-radius:10px;padding:10px 7px;font-size:12px;color:var(--ink);font-weight:700}.filteroption.active{border-color:var(--orange);background:#fff5de}.emptyhint{padding:14px;font-size:13px;color:var(--muted)}@media(max-width:380px){.measuregrid{grid-template-columns:1fr}.measuregrid .tile{min-height:122px}.measuregrid .tilecontent{padding-right:16px}}.settingswrap{padding:22px 18px 130px}.settingswrap>h1{font-size:28px;margin:5px 0 22px}.settingssection{margin-bottom:22px}.settingssection h2{font-size:15px;margin:0 0 9px;color:var(--muted);font-weight:800;letter-spacing:.2px}.settingscard{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px var(--shadow)}.settingitem{width:100%;min-height:64px;padding:12px 14px;display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:12px;background:transparent;color:var(--ink);text-align:left;border-bottom:1px solid var(--border)}.settingitem:last-child{border-bottom:0}.settingicon{width:38px;height:38px;border-radius:11px;background:var(--surface-alt);display:flex;align-items:center;justify-content:center;color:var(--navy);font-size:20px}.settingcopy{min-width:0}.settingtitle{display:block;font-size:14px;font-weight:800;line-height:1.25}.settingdesc{display:block;margin-top:4px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.settingright{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;white-space:nowrap}.chevron{font-size:20px;line-height:1}.statusok{display:inline-flex;align-items:center;gap:5px}.statusok:before{content:'';width:7px;height:7px;border-radius:50%;background:var(--green)}.themebuttons{padding:12px}.themeswitch{position:relative;display:grid;grid-template-columns:1fr 1fr;align-items:center;background:var(--navy);border:1px solid color-mix(in srgb,var(--navy) 72%,white 28%);border-radius:999px;padding:5px;min-height:62px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}.themeswitch::before{content:"";position:absolute;top:5px;bottom:5px;left:5px;width:calc(50% - 5px);border-radius:999px;background:var(--orange);box-shadow:0 5px 16px rgba(252,176,49,.34);transition:left .42s cubic-bezier(.22,1,.36,1),box-shadow .3s ease}.themeswitch[data-active="dark"]::before{left:50%}.themeswitch button{position:relative;z-index:1;min-height:52px;border-radius:999px;border:0;background:transparent;color:#d8deea;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;transition:color .25s ease,transform .18s ease}.themeswitch button[aria-pressed="true"]{color:#202838}.themeswitch button:active{transform:scale(.97)}.themeglyph{font-size:17px;line-height:1;transition:transform .35s cubic-bezier(.22,1,.36,1)}.themeswitch button[aria-pressed="true"] .themeglyph{transform:rotate(12deg) scale(1.12)}.walkthroughbtn{width:100%;min-height:54px;border-radius:12px;background:var(--orange);color:var(--ink);font-weight:800;font-size:15px}.guidehero{padding:2px 0 6px}.guideeyebrow{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--orange);letter-spacing:.2px;margin-bottom:10px}.guidehero h3{font-size:24px;line-height:1.15;margin:0 0 8px}.guidehero p{font-size:14px;line-height:1.55;color:var(--muted);margin:0}.guidecard{background:var(--surface-alt);border:1px solid var(--border);border-radius:16px;padding:14px 14px 12px;margin-top:14px}.guidecard h4{margin:0 0 6px;font-size:15px}.guidecard p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}.guidelist{display:grid;gap:10px;margin-top:14px}.guideitem{display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:start;padding:12px;border:1px solid var(--border);border-radius:14px;background:var(--surface)}.guideitemicon{width:36px;height:36px;border-radius:12px;background:var(--surface-alt);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--navy)}.guideitem b{display:block;font-size:14px;margin-bottom:4px}.guideitem small{display:block;font-size:12px;line-height:1.45;color:var(--muted)}.guideprogress{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}.guideprogress small{font-size:12px;color:var(--muted);font-weight:700}.guidedots{display:flex;gap:6px;align-items:center}.guidedot{width:8px;height:8px;border-radius:999px;background:#d9dfeb;transition:all .22s ease}.guidedot.active{width:24px;background:var(--orange)}.guideactions{display:flex;justify-content:flex-end;gap:10px;align-items:center;margin-top:18px}.guidebtn{min-height:46px;padding:0 14px;border-radius:12px;font-weight:800}.guidebtn.secondary{background:var(--surface-alt);color:var(--ink);border:1px solid var(--border)}.guidebtn.primary{background:var(--orange);color:var(--ink)}.guidebtn.ghost{background:transparent;color:var(--muted)}.guideactionstack{display:flex;justify-content:flex-end;gap:10px}.guideinline{display:grid;gap:10px;margin-top:14px}.guidethemeinline{position:relative;display:grid;grid-template-columns:1fr 1fr;background:var(--navy);border:1px solid var(--border);border-radius:999px;padding:5px;min-height:62px;overflow:hidden;margin-top:14px}.guidethemeinline::before{content:"";position:absolute;top:5px;bottom:5px;left:5px;width:calc(50% - 5px);border-radius:999px;background:var(--orange);box-shadow:0 5px 16px rgba(252,176,49,.32);transform:translateX(0);transition:transform .38s cubic-bezier(.22,1,.36,1)}.guidethemeinline[data-active="dark"]::before{transform:translateX(100%)}.guidethemeinline button{position:relative;z-index:1;min-height:52px;border:0;border-radius:999px;background:transparent;font-weight:800;color:#d8deea;display:flex;align-items:center;justify-content:center;gap:8px}.guidethemeinline button.active{color:#202838}.guidecallout{margin-top:14px;padding:12px 14px;border-radius:14px;background:#fff8e8;border:1px solid #f3d182;color:#5d4a15;font-size:12px;line-height:1.5}.modalaction{width:100%;margin-top:12px;min-height:48px;border-radius:11px;background:var(--orange);color:var(--ink);font-weight:800}.modalinfo{display:grid;gap:10px;margin-top:10px}.modalinforow{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);font-size:13px}.modalinforow:last-child{border-bottom:0}.modalinforow span:last-child{font-weight:800;text-align:right}
+.measuregrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.measuregrid .tile{position:relative;border:1px solid #e4e9f1;border-radius:18px;padding:0;background:white;box-shadow:0 8px 20px #27374b10;display:grid;grid-template-columns:32% 68%;align-items:stretch;min-height:146px;overflow:hidden}.measuregrid .tileicon{display:flex;align-items:center;justify-content:center;padding:18px}.measuregrid .tileicon .iconwrap{width:64px;height:64px;flex:0 0 64px;border-radius:16px;background:rgba(37,48,68,.05);display:flex;align-items:center;justify-content:center}.measuregrid .tilecontent{display:flex;flex-direction:column;justify-content:center;padding:18px 18px 18px 8px}.measuregrid .tile .label{font-size:12px;color:#627188;margin-bottom:6px}.measuregrid .tile .value{font-size:20px;font-weight:800;line-height:1.12;margin:0;color:var(--ink)}.measuregrid .tile .sub{color:var(--muted);font-size:12px;line-height:1.35;margin-top:10px}.measuregrid .tile .symbol{font-size:26px;display:flex;align-items:center;justify-content:center;line-height:1}.measuregrid .tile .symbol svg{width:30px;height:30px;display:block}.settingrow{border-radius:12px;background:#f5f7fa;display:flex;justify-content:space-between;align-items:center;padding:12px;margin-top:10px;gap:8px}.settingrow small{display:block;color:var(--muted);margin-top:4px}.settingrow button{border-radius:9px;background:#e5eaf0;padding:10px;font-size:13px}.measureactions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 8px}.measureactions button,.stop,.startbtn{border-radius:11px;padding:15px 8px;font-weight:700}.continue{background:var(--navy);color:white}.pause{background:var(--orange);color:var(--ink)}.stop{background:var(--red);color:white;width:100%}.startbtn{background:var(--orange);width:100%}.hidden{display:none!important}.location{display:grid;grid-template-columns:1fr 45%;border-radius:14px;overflow:hidden;border:1px solid #e1e8ef;margin-top:13px;min-height:128px}.map{background:linear-gradient(140deg,#dcf7e8 0%,#edf6eb 45%,#bee4ef 46%,#d7eeff 70%,#e5f5e8 71%);position:relative;overflow:hidden}.map:before{content:'';position:absolute;top:44%;left:46%;width:19px;height:19px;border-radius:50%;background:#267ddb;border:3px solid white;box-shadow:0 2px 6px #173e6b44;z-index:2;transform:translate(-50%,-50%);animation:mapDot 2s ease-in-out infinite}.map:after{content:'';position:absolute;top:44%;left:46%;width:24px;height:24px;border-radius:50%;background:#1e5fa84a;z-index:1;transform:translate(-50%,-50%) scale(.65);animation:mapPulse 2s ease-out infinite}@keyframes mapDot{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.12)}}@keyframes mapPulse{0%{transform:translate(-50%,-50%) scale(.65);opacity:.78}70%{opacity:.24}100%{transform:translate(-50%,-50%) scale(3.2);opacity:0}}.manualviewer{position:fixed;inset:0;z-index:120;background:var(--surface);display:none;flex-direction:column}.manualviewer.open{display:flex}.manualviewerbar{height:58px;flex:0 0 58px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;background:var(--navy);color:#fff;padding-top:max(8px,env(safe-area-inset-top))}.manualviewerbar strong{font-size:14px}.manualvieweractions{display:flex;gap:8px}.manualviewerbar button{min-height:38px;border-radius:10px;padding:0 12px;font-weight:800}.manualviewerpdf{background:var(--orange);color:#232323}.manualviewerclose{background:rgba(255,255,255,.12);color:#fff}.manualviewer iframe{width:100%;height:100%;border:0;background:#fff;flex:1 1 auto}
+@media (prefers-reduced-motion:reduce){.map:before,.map:after{animation:none}}.locationaside{padding:13px;font-size:12px}.locationaside p{color:#438dde;font-weight:700;line-height:1.6}.locationaside small{color:var(--muted)}.meta{font-size:11px;color:var(--muted);margin-top:15px}.datawrap{padding:17px}.datatop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}.datatop h1{font-size:18px;margin:0 0 3px}.periodpill{background:var(--soft);border:1px solid #e4e9f1;border-radius:10px;padding:9px 12px;font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap}.overviewgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}.overviewcard{background:white;border:1px solid #e4e9f1;border-radius:14px;padding:12px 11px;box-shadow:0 1px 6px #24344a0f}.overviewiconrow{display:flex;align-items:center;gap:8px;color:var(--ink);margin-bottom:7px;min-height:20px}.miniicon{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;color:var(--navy)}.miniicon svg{width:18px;height:18px;display:block}.overviewvalue{font-size:28px;font-weight:800;line-height:1;margin-bottom:4px}.overviewlabel{font-size:12px;color:var(--muted)}.sectionhead{font-size:18px;font-weight:800;margin:0 0 12px}.filetoolbar{display:flex;gap:10px;align-items:center;margin-bottom:12px}.searchbox{flex:1;display:flex;align-items:center;gap:8px;background:var(--soft);border:1px solid #e4e9f1;border-radius:12px;padding:0 12px;height:44px;color:var(--muted)}.searchbox input{border:0;background:transparent;outline:none;width:100%;font-size:14px;color:var(--ink)}.filterbtn{height:44px;border-radius:12px;padding:0 14px;background:var(--soft);border:1px solid #e4e9f1;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px}.sessionlist{background:white;border:1px solid #e4e9f1;border-radius:16px;overflow:hidden;box-shadow:0 1px 6px #24344a0f}.sessionrow{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px 16px;border-bottom:1px solid #edf1f6}.sessionrow:last-child{border-bottom:0}.fileicon{width:38px;height:38px;border-radius:11px;background:var(--soft);display:flex;align-items:center;justify-content:center;color:var(--navy)}.fileicon svg{width:20px;height:20px;display:block}.sessiontitle{font-size:14px;font-weight:800;margin:0 0 5px;line-height:1.25}.sessionmeta,.sessionsub{font-size:12px;color:var(--muted);line-height:1.3}.sessionactions{display:flex;align-items:center;gap:6px}.sessionmenubtn{width:40px;height:40px;border-radius:12px;background:var(--surface-alt);border:1px solid var(--border);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;font-size:22px;line-height:1}.sessionmenubtn:active{transform:scale(.98)}.sessionactionsheet{display:grid;gap:8px}.sessionaction{width:100%;min-height:52px;border-radius:12px;background:var(--surface-alt);color:var(--ink);display:grid;grid-template-columns:36px 1fr;align-items:center;gap:10px;padding:0 14px;text-align:left;font-weight:800}.sessionaction .saicon{width:36px;height:36px;border-radius:10px;background:var(--surface);display:flex;align-items:center;justify-content:center;border:1px solid var(--border)}.sessionaction.danger{color:#c83238}.sessionaction.danger .saicon{color:#c83238}.sessionaction small{display:block;font-size:12px;color:var(--muted);font-weight:500;margin-top:2px}.sessionmore{background:none;color:var(--muted);font-size:20px;line-height:1;padding:7px 3px}.filterbtn.active{border-color:var(--orange);background:#fff5de}.filterpanel{background:white;border:1px solid #e4e9f1;border-radius:14px;padding:12px;margin:-2px 0 12px;box-shadow:0 6px 18px #24344a12}.filterpanel[hidden]{display:none}.filterlabel{display:block;font-size:12px;font-weight:700;margin-bottom:7px}.filteroptions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.filteroption{border:1px solid #dfe5ed;background:var(--soft);border-radius:10px;padding:10px 7px;font-size:12px;color:var(--ink);font-weight:700}.filteroption.active{border-color:var(--orange);background:#fff5de}.emptyhint{padding:14px;font-size:13px;color:var(--muted)}@media(max-width:380px){.measuregrid{grid-template-columns:1fr}.measuregrid .tile{min-height:122px}.measuregrid .tilecontent{padding-right:16px}}.settingswrap{padding:22px 18px 130px}.settingswrap>h1{font-size:28px;margin:5px 0 22px}.settingssection{margin-bottom:22px}.settingssection h2{font-size:15px;margin:0 0 9px;color:var(--muted);font-weight:800;letter-spacing:.2px}.settingscard{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px var(--shadow)}.settingitem{width:100%;min-height:64px;padding:12px 14px;display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:12px;background:transparent;color:var(--ink);text-align:left;border-bottom:1px solid var(--border)}.settingitem:last-child{border-bottom:0}.settingicon{width:38px;height:38px;border-radius:11px;background:var(--surface-alt);display:flex;align-items:center;justify-content:center;color:var(--navy);font-size:20px}.settingcopy{min-width:0}.settingtitle{display:block;font-size:14px;font-weight:800;line-height:1.25}.settingdesc{display:block;margin-top:4px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.settingright{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;white-space:nowrap}.chevron{font-size:20px;line-height:1}.statusok{display:inline-flex;align-items:center;gap:5px}.statusok:before{content:'';width:7px;height:7px;border-radius:50%;background:var(--green)}.themebuttons{padding:12px}.themeswitch{position:relative;display:grid;grid-template-columns:1fr 1fr;align-items:center;background:var(--navy);border:1px solid color-mix(in srgb,var(--navy) 72%,white 28%);border-radius:999px;padding:5px;min-height:62px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}.themeswitch::before{content:"";position:absolute;top:5px;bottom:5px;left:5px;width:calc(50% - 5px);border-radius:999px;background:var(--orange);box-shadow:0 5px 16px rgba(252,176,49,.34);transition:left .42s cubic-bezier(.22,1,.36,1),box-shadow .3s ease}.themeswitch[data-active="dark"]::before{left:50%}.themeswitch button{position:relative;z-index:1;min-height:52px;border-radius:999px;border:0;background:transparent;color:#d8deea;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;transition:color .25s ease,transform .18s ease}.themeswitch button[aria-pressed="true"]{color:#202838}.themeswitch button:active{transform:scale(.97)}.themeglyph{font-size:17px;line-height:1;transition:transform .35s cubic-bezier(.22,1,.36,1)}.themeswitch button[aria-pressed="true"] .themeglyph{transform:rotate(12deg) scale(1.12)}.walkthroughbtn{width:100%;min-height:54px;border-radius:12px;background:var(--orange);color:var(--ink);font-weight:800;font-size:15px}.guidehero{padding:2px 0 6px}.guideeyebrow{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--orange);letter-spacing:.2px;margin-bottom:10px}.guidehero h3{font-size:24px;line-height:1.15;margin:0 0 8px}.guidehero p{font-size:14px;line-height:1.55;color:var(--muted);margin:0}.guidecard{background:var(--surface-alt);border:1px solid var(--border);border-radius:16px;padding:14px 14px 12px;margin-top:14px}.guidecard h4{margin:0 0 6px;font-size:15px}.guidecard p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}.guidelist{display:grid;gap:10px;margin-top:14px}.guideitem{display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:start;padding:12px;border:1px solid var(--border);border-radius:14px;background:var(--surface)}.guideitemicon{width:36px;height:36px;border-radius:12px;background:var(--surface-alt);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--navy)}.guideitem b{display:block;font-size:14px;margin-bottom:4px}.guideitem small{display:block;font-size:12px;line-height:1.45;color:var(--muted)}.guideprogress{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}.guideprogress small{font-size:12px;color:var(--muted);font-weight:700}.guidedots{display:flex;gap:6px;align-items:center}.guidedot{width:8px;height:8px;border-radius:999px;background:#d9dfeb;transition:all .22s ease}.guidedot.active{width:24px;background:var(--orange)}.guideactions{display:flex;justify-content:flex-end;gap:10px;align-items:center;margin-top:18px}.guidebtn{min-height:46px;padding:0 14px;border-radius:12px;font-weight:800}.guidebtn.secondary{background:var(--surface-alt);color:var(--ink);border:1px solid var(--border)}.guidebtn.primary{background:var(--orange);color:var(--ink)}.guidebtn.ghost{background:transparent;color:var(--muted)}.guideactionstack{display:flex;justify-content:flex-end;gap:10px}.guideinline{display:grid;gap:10px;margin-top:14px}.guidethemeinline{position:relative;display:grid;grid-template-columns:1fr 1fr;background:var(--navy);border:1px solid var(--border);border-radius:999px;padding:5px;min-height:62px;overflow:hidden;margin-top:14px}.guidethemeinline::before{content:"";position:absolute;top:5px;bottom:5px;left:5px;width:calc(50% - 5px);border-radius:999px;background:var(--orange);box-shadow:0 5px 16px rgba(252,176,49,.32);transform:translateX(0);transition:transform .38s cubic-bezier(.22,1,.36,1)}.guidethemeinline[data-active="dark"]::before{transform:translateX(100%)}.guidethemeinline button{position:relative;z-index:1;min-height:52px;border:0;border-radius:999px;background:transparent;font-weight:800;color:#d8deea;display:flex;align-items:center;justify-content:center;gap:8px}.guidethemeinline button.active{color:#202838}.guidecallout{margin-top:14px;padding:12px 14px;border-radius:14px;background:#fff8e8;border:1px solid #f3d182;color:#5d4a15;font-size:12px;line-height:1.5}.modalaction{width:100%;margin-top:12px;min-height:48px;border-radius:11px;background:var(--orange);color:var(--ink);font-weight:800}.modalinfo{display:grid;gap:10px;margin-top:10px}.modalinforow{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);font-size:13px}.modalinforow:last-child{border-bottom:0}.modalinforow span:last-child{font-weight:800;text-align:right}
 .dataviewmeta{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
 .dataviewchip{font-size:12px;color:var(--muted);background:var(--surface-alt);border:1px solid var(--border);border-radius:999px;padding:7px 10px}
 .datatablewrap{width:100%;overflow:auto;border:1px solid var(--border);border-radius:14px;background:var(--surface);max-height:52dvh;-webkit-overflow-scrolling:touch}
@@ -858,11 +1368,12 @@ body::before{
 </div></div>
 <div class="settingssection"><h2>Weergave</h2><div class="settingscard"><div class="themebuttons"><div class="themeswitch" id="themeSwitch" data-active="light" role="tablist" aria-label="Thema kiezen"><button id="themeLight" type="button" aria-pressed="false" onclick="theme('light')"><span class="themeglyph">☀</span><span>Licht</span></button><button id="themeDark" type="button" aria-pressed="false" onclick="theme('dark')"><span class="themeglyph">☾</span><span>Donker</span></button></div></div></div></div>
 <div class="settingssection"><h2>Help</h2><div class="settingscard">
-<button class="settingitem" onclick="openModal('manual')"><span class="settingicon">?</span><span class="settingcopy"><span class="settingtitle">Handleiding Toolkit 1</span><span class="settingdesc">Aansluiten, meten, grafieken en problemen oplossen</span></span><span class="settingright"><span class="chevron">›</span></span></button>
+<button class="settingitem" onclick="openManualPage()"><span class="settingicon">?</span><span class="settingcopy"><span class="settingtitle">Handleiding Toolkit 1</span><span class="settingdesc">Aansluiten, meten, grafieken en problemen oplossen</span></span><span class="settingright"><span class="chevron">›</span></span></button>
 </div><button class="walkthroughbtn" onclick="openModal('guide')">▶ &nbsp; Speel Walkthrough af</button></div>
 </div></section>
 <nav class="nav" aria-label="Hoofdnavigatie"><button class="selected" data-page="home" aria-label="Home" onclick="navigate('home')"><span class="navIconWrap"><svg class="navSvgIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20H14v-5h-4v5H4v-9.5Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg></span></button><button data-page="measure" aria-label="Meten" onclick="navigate('measure')"><span aria-hidden="true"><svg class="playIconSvg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.5 6.8v10.4c0 .8.9 1.3 1.6.9l8-5.2a1.05 1.05 0 0 0 0-1.8l-8-5.2c-.7-.4-1.6.1-1.6.9Z" fill="currentColor"/></svg></span></button><button data-page="data" aria-label="Data" onclick="navigate('data')"><span class="navIconWrap"><svg class="navSvgIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="2.3" stroke="currentColor" stroke-width="1.8"/><path d="M8 8h8M8 12h8M8 16h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span></button><button data-page="charts" aria-label="Grafieken" onclick="navigate('charts')"><span class="chartNavIcon" aria-hidden="true"><i></i><i></i><i></i></span></button></nav></div>
 
+<div class="manualviewer" id="manualViewer" aria-hidden="true"><div class="manualviewerbar"><strong>Toolkit 1 handleiding</strong><div class="manualvieweractions"><button class="manualviewerpdf" onclick="downloadManualPdf()">PDF</button><button class="manualviewerclose" onclick="closeManualPage()">Sluiten</button></div></div><iframe id="manualFrame" title="Toolkit 1 handleiding" loading="lazy"></iframe></div>
 <div class="connectionlost" id="connectionLost" role="dialog" aria-modal="true" aria-labelledby="connectionLostTitle">
   <div class="connectionlost-inner">
     <div class="connectionlost-brand">Data<span>Logger</span></div>
@@ -940,6 +1451,10 @@ function confirmDeleteSession(n){const f=sessionByNumber(n);if(!f)return;$('moda
 async function deleteSession(n){try{await api('/api/delete?id='+encodeURIComponent(n));sessionCsvCache.delete(n);closeModal();await loadSessions();notify('Meetsessie verwijderd')}catch(e){notify('Verwijderen mislukt: '+e.message)}}
 function changeInterval(){openModal('interval')}
 function closeModal(){$('modal').classList.remove('open')}
+function openManualPage(){const v=$('manualViewer'),f=$('manualFrame');if(f&&!f.src)f.src='/handleiding';if(v){v.classList.add('open');v.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}}
+function closeManualPage(){const v=$('manualViewer');if(v){v.classList.remove('open');v.setAttribute('aria-hidden','true');document.body.style.overflow=''}}
+function downloadManualPdf(){window.open('/handleiding?print=1','_blank')}
+
 const GUIDE_STEPS=[
 {title:'Welkom bij DataLogger',eyebrow:'Stap 1 van 5',body:`<div class="guidehero"><span class="guideeyebrow">◉ Klaar om te starten</span><h3>We helpen je in een paar stappen op weg.</h3><p>Deze walkthrough laat zien hoe je de tijd synchroniseert, navigeert in de app en een meetsessie correct uitvoert.</p></div><div class="guidelist"><div class="guideitem"><div class="guideitemicon">⌂</div><div><b>Home</b><small>Bekijk live sensordata en start snel een sessie.</small></div></div><div class="guideitem"><div class="guideitemicon">▶</div><div><b>Meten</b><small>Voer je meetsessie uit, pauzeer of stop en sla op.</small></div></div><div class="guideitem"><div class="guideitemicon">▤</div><div><b>Data & grafieken</b><small>Download CSV-bestanden en bekijk trends van opgeslagen sessies.</small></div></div></div>`},
 {title:'Synchroniseer de tijd',eyebrow:'Stap 2 van 5',body:`<div class="guidehero"><span class="guideeyebrow">◷ Tijd is belangrijk</span><h3>Zorg eerst voor correcte tijdsafhankelijke metingen.</h3><p>Synchroniseer de tijd van je DataLogger met deze telefoon voordat je een nieuwe sessie start.</p></div><div class="guidecard"><h4>Waarom dit nodig is</h4><p>Alle metingen en CSV-bestanden krijgen een tijdstempel. Een correcte klok voorkomt verwarring tijdens analyse.</p></div><div class="guideinline"><button class="modalaction" onclick="syncTimeFromPhone()">Synchroniseer tijd</button></div>`},
@@ -957,64 +1472,8 @@ function chooseInterval(n){window.pendingInterval=n;$('customSeconds').value='';
 function customIntervalChanged(){const input=$('customSeconds'),raw=input.value.trim().replace(',','.'),n=Number(raw),valid=/^\d+(?:\.\d{1,3})?$/.test(raw)&&n>=0.05&&n<=2147483&&Number.isInteger(Math.round(n*1000));document.querySelectorAll('.interval-choice').forEach(b=>b.setAttribute('aria-pressed','false'));$('intervalCustom').classList.toggle('selected',valid);$('intervalError').textContent=raw&&!valid?'Vul minimaal 0,05 seconde in, met maximaal drie decimalen.':'';window.pendingInterval=valid?n:null;$('intervalHelp').textContent=valid?'Iedere '+String(n).replace('.',',')+' '+(n<=1?'seconde':'seconden')+' een geluidsmeetpunt.':'Vul zelf je interval in, bijvoorbeeld 0,05, 0,1 of 0,25.'}
 async function saveInterval(){const n=window.pendingInterval;if(!Number.isFinite(n)||n<0.05){$('intervalError').textContent='Kies minimaal 0,05 seconde.';return}try{await api('/api/interval?ms='+Math.round(n*1000));closeModal();await pollStatus();notify('Meetinterval gewijzigd naar '+String(n).replace('.',',')+' s')}catch(e){notify('Interval opslaan mislukt')}}
 
-function toolkit1ManualContent(){
-return '<div class="manualdoc">'+
-'<div class="manualhero"><b>Toolkit 1 · Geluid meten</b><small>Arduino UNO R4 WiFi · MAX4466 · GPS · RTC · SD</small></div>'+
-'<h3>1. Doel</h3><p>Toolkit 1 registreert geluidsamplitude met de MAX4466. De ruwe meetwaarden worden opgeslagen als mV p-p en ADC p-p. Zonder akoestische kalibratie zijn dit geen officiële dB(A)-waarden.</p>'+
-'<div class="manualgrid">'+
-'<div class="manualcard"><b>Standaard interval</b><small>0,1 s · 10 meetpunten per seconde</small></div>'+
-'<div class="manualcard"><b>Minimum interval</b><small>0,05 s · 20 meetpunten per seconde</small></div>'+
-'<div class="manualcard"><b>Meetvenster</b><small>50 ms per geluidsmeting</small></div>'+
-'<div class="manualcard"><b>Webapp</b><small>192.168.4.1 · Arduino-Logger-01</small></div>'+
-'</div>'+
-'<h3>2. MAX4466 aansluiten</h3>'+
-'<table class="manualtable"><tr><th>MAX4466</th><th>Arduino</th><th>Functie</th></tr><tr><td>VCC</td><td>3.3V</td><td>Voeding</td></tr><tr><td>GND</td><td>GND</td><td>Massa</td></tr><tr><td>OUT</td><td>A0</td><td>Analoog audiosignaal</td></tr></table>'+
-'<div class="manualcallout"><b>Let op</b><br>De MAX4466 is een analoge sensor. OUT gaat naar A0; SDA en SCL worden niet gebruikt.</div>'+
-'<h3>3. Opstarten</h3><div class="manualsteps">'+
-'<div class="manualstep"><span class="manualnum">1</span><span>Schakel de DataLogger in en controleer dat de microSD-kaart geplaatst is.</span></div>'+
-'<div class="manualstep"><span class="manualnum">2</span><span>Verbind met <b>Arduino-Logger-01</b> met wachtwoord <b>Logger2026!</b>.</span></div>'+
-'<div class="manualstep"><span class="manualnum">3</span><span>Open <b>192.168.4.1</b> in de browser.</span></div>'+
-'<div class="manualstep"><span class="manualnum">4</span><span>Controleer dat Geluidssensor <b>Actief</b> en SD-kaart <b>Gereed</b> toont.</span></div>'+
-'</div>'+
-'<h3>4. GPS-status</h3><p>De app gebruikt de teksten <b>Satelliet gevonden</b> en <b>Geen satelliet gevonden</b>. Het aantal satellieten staat eronder. Voor een GPS-positie is vrij zicht op de lucht meestal nodig.</p>'+
-'<h3>5. Meten</h3><p>Open Meten, kies het interval en druk op <b>START MET METEN</b>. Beschikbaar: 0,05 s, 0,1 s, 0,25 s, 0,5 s, 1 s, 2 s en 5 s. Bij 0,05 s sluiten de 50 ms meetvensters direct op elkaar aan; er is geen extra ingestelde wachttijd.</p>'+
-'<h3>6. Opgeslagen gegevens</h3><p>Elke sessie wordt als CSV opgeslagen met onder andere <b>measurement_id</b>, <b>rtc_datetime_local</b>, <b>elapsed_ms</b>, <b>sound_p2p_mV</b>, <b>sound_p2p_adc</b>, <b>sound_bias_V</b> en GPS-velden.</p>'+
-'<h3>7. Grafiek</h3><p>De grafiek gebruikt een venster van ongeveer <b>20 seconden</b>. De x-as toont tijdmarkeringen per 5 seconden. Langere metingen zijn horizontaal te swipen of scrollen. De <b>y-as blijft vast staan</b>, zodat de schaal zichtbaar blijft en korte pieken niet worden samengedrukt.</p>'+
-'<h3>8. Tijdens de meting</h3><p>De app toont bewust geen snel wisselende live amplitude. Je ziet vooral of de geluidssensor actief is, of GPS beschikbaar is en of de SD-kaart schrijft. De echte amplitudes staan volledig in de CSV en grafiek.</p>'+
-'<h3>9. Problemen oplossen</h3><div class="manualsteps">'+
-'<div class="manualstep"><span class="manualnum">1</span><span><b>Sensor niet actief:</b> controleer OUT → A0, 3.3V en GND.</span></div>'+
-'<div class="manualstep"><span class="manualnum">2</span><span><b>Geen satelliet gevonden:</b> ga naar buiten of naar een plek met vrij zicht op de lucht.</span></div>'+
-'<div class="manualstep"><span class="manualnum">3</span><span><b>SD fout:</b> schakel uit, plaats de microSD opnieuw en start opnieuw.</span></div>'+
-'<div class="manualstep"><span class="manualnum">4</span><span><b>Webapp niet bereikbaar:</b> controleer WiFi Arduino-Logger-01 en open opnieuw 192.168.4.1.</span></div>'+
-'</div>'+
-'<div class="manualactions"><button class="manualpdf" onclick="downloadManualPdf()">Download als PDF</button><button class="manualclose" onclick="closeModal()">Sluiten</button></div>'+
-'</div>';
-}
-function manualPrintHtml(){
-return '<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Toolkit 1 DataLogger Handleiding</title><style>'+
-'body{font-family:Arial,sans-serif;color:#232323;margin:28px;line-height:1.5}h1{color:#343F58}h2{margin-top:24px;color:#343F58}p,li{font-size:11pt}table{width:100%;border-collapse:collapse;margin:12px 0}th,td{border:1px solid #d9dde5;padding:7px;text-align:left}.hero{background:#343F58;color:#fff;padding:18px;border-radius:12px}.note{border-left:4px solid #FCB031;background:#fff7e7;padding:10px}.specs{display:grid;grid-template-columns:1fr 1fr;gap:8px}.spec{border:1px solid #d9dde5;padding:9px;border-radius:8px}@media print{body{margin:12mm}.noprint{display:none}}'+
-'</style></head><body><div class="hero"><h1 style="color:#fff;margin:0">Toolkit 1 · Geluid meten</h1><p>DataLab · Arduino UNO R4 WiFi · MAX4466</p></div>'+
-'<h2>Configuratie</h2><div class="specs"><div class="spec"><b>Standaard interval</b><br>0,1 s (10 Hz)</div><div class="spec"><b>Minimum interval</b><br>0,05 s (20 Hz)</div><div class="spec"><b>Meetvenster</b><br>50 ms</div><div class="spec"><b>Webapp</b><br>192.168.4.1</div></div>'+
-'<h2>Aansluiten</h2><table><tr><th>MAX4466</th><th>Arduino</th><th>Functie</th></tr><tr><td>VCC</td><td>3.3V</td><td>Voeding</td></tr><tr><td>GND</td><td>GND</td><td>Massa</td></tr><tr><td>OUT</td><td>A0</td><td>Analoog audiosignaal</td></tr></table>'+
-'<div class="note"><b>Geen dB(A)-meter.</b> De MAX4466 wordt zonder akoestische kalibratie gebruikt. De logger bewaart mV p-p en ADC p-p.</div>'+
-'<h2>Gebruik</h2><ol><li>Schakel de DataLogger in en plaats de microSD.</li><li>Verbind met Arduino-Logger-01, wachtwoord Logger2026!.</li><li>Open 192.168.4.1.</li><li>Controleer Geluidssensor: Actief en SD-kaart: Gereed.</li><li>Kies 0,05 s, 0,1 s, 0,25 s, 0,5 s, 1 s, 2 s of 5 s.</li><li>Druk START MET METEN.</li><li>Stop de sessie en open Data of Grafieken.</li></ol>'+
-'<h2>GPS</h2><p>De app toont Satelliet gevonden of Geen satelliet gevonden. Het aantal satellieten wordt apart weergegeven.</p>'+
-'<h2>Data</h2><p>CSV: measurement_id, rtc_datetime_local, elapsed_ms, sound_p2p_mV, sound_p2p_adc, sound_bias_V, latitude, longitude, satellites, gps_fix, gps_speed_kmh, gps_utc, location_source.</p>'+
-'<h2>Grafieken</h2><p>De x-as gebruikt een venster van 20 seconden met tijdmarkeringen per 5 seconden. Bij langere sessies is de grafiek horizontaal scrollbaar. De y-as blijft vast zichtbaar.</p>'+
-'<h2>Problemen oplossen</h2><ul><li>Sensor niet actief: controleer OUT → A0, 3.3V en GND.</li><li>Geen satelliet gevonden: gebruik de logger bij vrij zicht op de lucht.</li><li>SD fout: plaats de microSD opnieuw na uitschakelen.</li><li>Webapp niet bereikbaar: verbind opnieuw met Arduino-Logger-01.</li></ul>'+
-'<script>window.onload=function(){setTimeout(function(){window.print()},250)}<\/script></body></html>';
-}
-function downloadManualPdf(){
-  const w=window.open('','_blank');
-  if(!w){notify('Sta pop-ups toe om de PDF te maken');return}
-  w.document.open();
-  w.document.write(manualPrintHtml());
-  w.document.close();
-}
-
 function openModal(which){const title=$('modaltitle'),body=$('modalbody');body.replaceChildren();if(which==='stop'){title.textContent='Meetsessie stoppen?';body.innerHTML='<p>Je sluit deze meetsessie definitief af en bewaart de gegevens. Pauzeren houdt dezelfde sessie open.</p><div class="measureactions"><button class="continue" onclick="closeModal()">Annuleren</button><button class="stop" onclick="finish()">Stop en bewaar</button></div>'}
 else if(which==='interval'){title.textContent='Meetinterval';body.innerHTML='<p class="interval-intro">Kies hoe vaak je DataLogger een nieuw meetpunt opslaat.</p><div class="interval-choices" id="intervalChoices" role="group" aria-label="Meetinterval kiezen"></div><div class="interval-custom" id="intervalCustom"><label for="customSeconds">Zelf aantal seconden invullen<small>Ook decimalen mogelijk, bijvoorbeeld 0,1 of 0,25 seconde</small></label><input id="customSeconds" type="text" inputmode="decimal" autocomplete="off" placeholder="bijv. 0,05" oninput="customIntervalChanged()"></div><p class="interval-error" id="intervalError" role="alert"></p><div class="interval-help" id="intervalHelp"></div><button class="startbtn interval-save" onclick="saveInterval()">Interval opslaan</button>';window.pendingInterval=interval;[0.05,0.1,0.25,0.5,1,2,5].forEach(n=>{const b=document.createElement('button');b.className='interval-choice';b.type='button';b.setAttribute('aria-pressed',String(n===interval));b.innerHTML='<span>'+n+'</span><small>'+(n===1?'seconde':'seconden')+'</small>';b.onclick=()=>chooseInterval(n);$('intervalChoices').appendChild(b)});if(![0.05,0.1,0.25,0.5,1,2,5].includes(interval)){$('customSeconds').value=String(interval).replace('.',',');customIntervalChanged()}else chooseInterval(interval)}
-else if(which==='manual'){title.textContent='Handleiding Toolkit 1';body.innerHTML=toolkit1ManualContent()}
 else if(which==='system'){title.textContent='Systeemstatus';const s=statusData;body.innerHTML='<div class="modalinfo"><div class="modalinforow"><span>MAX4466 geluid</span><span>'+(s.sensorReady?'Actief':'Niet gevonden')+'</span></div><div class="modalinforow"><span>Air530Z GPS</span><span>'+(s.gpsSeen?'NMEA actief':'Geen data')+'</span></div><div class="modalinforow"><span>SD-kaart</span><span>'+(s.sdReady?'Gereed':'Fout')+'</span></div><div class="modalinforow"><span>DS1307 tijd</span><span>'+(s.rtcReady?'Actief':'Niet gevonden')+'</span></div><div class="modalinforow"><span>WiFi</span><span>Arduino-Logger-01</span></div></div>'}
 else if(which==='timesync'){title.textContent='Synchroniseer de tijd';body.innerHTML='<p style="font-size:13px;color:var(--muted);line-height:1.5">Synchroniseer de tijd van je DataLogger met de actuele tijd van deze telefoon. Dit is belangrijk voor tijdsafhankelijke metingen.</p><div class="modalinfo"><div class="modalinforow"><span>Status</span><span id="modalTimeState">'+(statusData.rtcSynced?'Gesynchroniseerd':'Nog synchroniseren')+'</span></div><div class="modalinforow"><span>Telefoontijd</span><span id="phoneTimePreview">'+new Date().toLocaleTimeString('nl-NL')+'</span></div></div><button class="modalaction" onclick="syncTimeFromPhone()">Synchroniseer tijd</button>'}
 else if(which==='about'){title.textContent='Over je DataLogger';body.innerHTML='<section><b>Arduino UNO R4 WiFi</b><p>Microcontroller en lokaal WiFi-netwerk.</p></section><section><b>Grove Air530Z</b><p>GPS-positie, snelheid en UTC-tijd via UART.</p></section><section><b>MAX4466 microfoonversterker</b><p>Analoge geluidsamplitude via A0. De waarde is piek-tot-piek en niet gekalibreerd in dB(A).</p></section><section><b>Keyes Logging Shield</b><p>SD-kaart en DS1307-klok met reservebatterij.</p></section>'}
@@ -1299,6 +1758,12 @@ void sendDownload(WiFiClient &c,uint32_t id){
   String disposition="Content-Disposition: attachment; filename=\"DataLogger_meetsessie_"+String(id)+".csv\"";sendHeaders(c,200,"text/csv; charset=utf-8",f.size(),disposition.c_str());uint8_t buf[256];while(f.available()){int n=f.read(buf,sizeof(buf));if(n>0)c.write(buf,n);readGps();}f.close();
 }
 
+void serveManual(WiFiClient &c){
+  const size_t total=sizeof(MANUAL_HTML)-1;
+  sendHeaders(c,200,"text/html; charset=utf-8",(int32_t)total,nullptr,"public, max-age=300");
+  size_t sent=0;const size_t CHUNK=768;
+  while(sent<total&&c.connected()){size_t n=min(CHUNK,total-sent);size_t w=c.write(reinterpret_cast<const uint8_t*>(MANUAL_HTML)+sent,n);if(!w){delay(2);continue;}sent+=w;readGps();delay(1);}c.flush();
+}
 void serveHome(WiFiClient &c){
   const size_t total = sizeof(INDEX_HTML) - 1;
   sendHeaders(c,200,"text/html; charset=utf-8",(int32_t)total,nullptr,
@@ -1330,7 +1795,7 @@ void serveHome(WiFiClient &c){
 }
 
 void handleRequest(WiFiClient &c,const String &url,const String &method){
-  String route=routeOnly(url);
+  String route=routeOnly(url);if(route=="/handleiding"){serveManual(c);return;}
   if(route=="/"){serveHome(c);return;}
   if(route=="/ping"){sendText(c,200,"DataLogger OK");return;}
   if(route=="/api/status" || route=="/status"){sendStatus(c);return;}
