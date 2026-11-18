@@ -200,6 +200,7 @@
       <a href="#aansluiten">Aansluiten</a>
       <a href="#software">Software</a>
       <a href="#meten">Meten</a>
+      <a href="#grafiek">Grafiek</a>
       <a href="#problemen">Problemen</a>
     </nav>
   </div>
@@ -219,7 +220,9 @@
       <div class="spec-row"><span>Analoge ingang</span><strong>A0</strong></div>
       <div class="spec-row"><span>WiFi</span><strong>Arduino-Logger-01</strong></div>
       <div class="spec-row"><span>Webapp</span><strong>192.168.4.1</strong></div>
-      <div class="spec-row"><span>Standaard interval</span><strong>5 s</strong></div>
+      <div class="spec-row"><span>Standaard interval</span><strong>0,1 s (10 Hz)</strong></div>
+      <div class="spec-row"><span>Minimum interval</span><strong>0,05 s (20 Hz)</strong></div>
+      <div class="spec-row"><span>Meetvenster</span><strong>50 ms</strong></div>
     </div>
   </div>
 </div>
@@ -243,13 +246,13 @@
     <div class="card">
       <div class="num">3</div>
       <h3>Tijd & locatie</h3>
-      <p>RTC-tijd, GPS-positie, GPS-fix en aantal satellieten worden aan de meetdata toegevoegd.</p>
+      <p>RTC-tijd, verstreken tijd, GPS-positie en het aantal gevonden satellieten worden aan de meetdata toegevoegd.</p>
     </div>
   </div>
 
   <div class="callout warn">
     <strong>Geen gekalibreerde dB-meter</strong>
-    De MAX4466 levert een analoog audiosignaal. Zonder akoestische kalibratie mogen de waarden niet als dB(A) of een officieel geluidsniveau worden geïnterpreteerd. Toolkit 1 toont daarom mV p-p en ADC p-p.
+    De MAX4466 levert een analoog audiosignaal. Zonder akoestische kalibratie mogen de waarden niet als dB(A) of een officieel geluidsniveau worden geïnterpreteerd. De ruwe waarden worden wel opgeslagen als mV p-p en ADC p-p, maar tijdens het meten toont de app alleen of de geluidssensor <em>Actief</em> is.
   </div>
 </section>
 
@@ -317,7 +320,8 @@
 
   <pre>DataLab/
 └── Minor_FuturCity_dataloggers/
-    └── DataLogger_Toolkit_1.ino</pre>
+    └── DataLogger_Toolkit_1/
+        └── DataLogger_Toolkit_1.ino</pre>
 
   <div class="grid two">
     <div class="card">
@@ -334,7 +338,7 @@
 
   <div class="callout good">
     <strong>Firmwareconfiguratie</strong>
-    De huidige firmware gebruikt <code>A0</code> voor de MAX4466, een 12-bit ADC en een meetvenster van 50 ms per geluidsmeting.
+    De huidige firmware gebruikt <code>A0</code> voor de MAX4466, een 12-bit ADC en een meetvenster van 50 ms per geluidsmeting. Het standaard opslaginterval is 0,1 s. De kortste instelbare interval is 0,05 s; daarbij sluiten de 50 ms meetvensters direct op elkaar aan zonder extra ingestelde wachttijd.
   </div>
 </section>
 
@@ -348,22 +352,23 @@
     <div class="flow-step">5. 192.168.4.1 openen</div>
   </div>
 
-  <h3>Live gegevens</h3>
+  <h3>Status in de webapp</h3>
+  <p>Om de gebruiker tijdens een geluidsmeting niet af te leiden met snel wisselende ruwe waarden, toont de app op het dashboard vooral de meetstatus. De geluidswaarden zelf blijven volledig beschikbaar in de CSV-bestanden en grafieken.</p>
   <div class="app-preview">
     <div class="tile primary">
-      <div class="label">Geluidsamplitude</div>
-      <div class="value">184 mV</div>
-      <div class="sub">piek-tot-piek</div>
+      <div class="label">Geluidssensor</div>
+      <div class="value">Actief</div>
+      <div class="sub">MAX4466 · meetstatus</div>
     </div>
     <div class="tile dark">
-      <div class="label">Ruwe amplitude</div>
-      <div class="value">231 ADC</div>
-      <div class="sub">12-bit meetwaarde</div>
+      <div class="label">GPS status</div>
+      <div class="value">Satelliet gevonden</div>
+      <div class="sub">of: Geen satelliet gevonden</div>
     </div>
     <div class="tile">
-      <div class="label">GPS status</div>
-      <div class="value">Fix</div>
-      <div class="sub">locatie en satellieten</div>
+      <div class="label">SD-kaart</div>
+      <div class="value">Gereed</div>
+      <div class="sub">meetsessie wordt opgeslagen</div>
     </div>
     <div class="tile">
       <div class="label">Tijd</div>
@@ -378,13 +383,13 @@
   <div class="grid">
     <div class="card">
       <div class="num">1</div>
-      <h3>Controleer live data</h3>
-      <p>Praat of klap bij de microfoon. De geluidsamplitude moet zichtbaar veranderen.</p>
+      <h3>Controleer de status</h3>
+      <p>Controleer vóór het starten of de geluidssensor als <strong>Actief</strong> wordt weergegeven, de SD-kaart gereed is en indien nodig een GPS-satelliet is gevonden.</p>
     </div>
     <div class="card">
       <div class="num">2</div>
       <h3>Start de sessie</h3>
-      <p>Open <strong>Meten</strong>, kies het gewenste meetinterval en druk op <strong>START MET METEN</strong>.</p>
+      <p>Open <strong>Meten</strong>, kies het gewenste meetinterval en druk op <strong>START MET METEN</strong>. Beschikbare intervallen zijn 0,05 s, 0,1 s, 0,25 s, 0,5 s, 1 s, 2 s en 5 s. Standaard staat Toolkit 1 op 0,1 s.</p>
     </div>
     <div class="card">
       <div class="num">3</div>
@@ -399,7 +404,7 @@
     <div class="flow-step">50 ms meetvenster</div>
     <div class="flow-step">minimum & maximum bepalen</div>
     <div class="flow-step">piek-tot-piek berekenen</div>
-    <div class="flow-step">CSV + webapp bijwerken</div>
+    <div class="flow-step">direct opslaan in CSV</div>
   </div>
 </section>
 
@@ -409,6 +414,7 @@
 
   <pre class="csv">measurement_id,
 rtc_datetime_local,
+elapsed_ms,
 sound_p2p_mV,
 sound_p2p_adc,
 sound_bias_V,
@@ -422,12 +428,23 @@ location_source</pre>
 
   <div class="callout">
     <strong>Grafieken</strong>
-    In de webapp wordt de opgeslagen geluidsamplitude als tijdreeks weergegeven. Daarmee kun je veranderingen in geluid tijdens de meetsessie direct terugzien.
+    De opgeslagen geluidsamplitude wordt uitgezet tegen de verstreken tijd. Het zichtbare venster is 20 seconden breed met een tijd-as per 5 seconden. Bij langere metingen kun je horizontaal door de grafiek swipen of scrollen. De y-as blijft daarbij vast staan, zodat de schaal altijd leesbaar blijft en korte geluidspieken niet worden samengedrukt.
+  </div>
+</section>
+
+<section id="grafiek">
+  <h2>8. Grafiek gebruiken</h2>
+  <p class="section-intro">Toolkit 1 is ingericht om korte geluidspieken ook tijdens langere sessies zichtbaar te houden.</p>
+  <div class="grid two">
+    <div class="card"><div class="num">1</div><h3>20 seconden per venster</h3><p>De x-as toont steeds ongeveer 20 seconden meettijd. Tijdmarkeringen staan iedere 5 seconden.</p></div>
+    <div class="card"><div class="num">2</div><h3>Horizontaal scrollen</h3><p>Duurt de meting langer dan 20 seconden, swipe of scroll dan naar rechts. De meetlijn wordt niet samengeperst.</p></div>
+    <div class="card"><div class="num">3</div><h3>Vaste y-as</h3><p>De schaal links blijft op zijn plaats tijdens horizontaal scrollen, zodat amplitudes altijd afleesbaar blijven.</p></div>
+    <div class="card"><div class="num">4</div><h3>Pieken behouden</h3><p>Omdat de tijd-as breder wordt bij langere sessies blijven korte pieken zichtbaar in plaats van samen te vallen.</p></div>
   </div>
 </section>
 
 <section id="controle">
-  <h2>8. Controle vóór gebruik</h2>
+  <h2>9. Controle vóór gebruik</h2>
   <div class="checklist">
     <div class="check"><div class="box"></div><div>Arduino UNO R4 WiFi en Data Logging Shield correct gemonteerd.</div></div>
     <div class="check"><div class="box"></div><div>microSD-kaart geplaatst.</div></div>
@@ -438,17 +455,18 @@ location_source</pre>
     <div class="check"><div class="box"></div><div>Toolkit 1 firmware geüpload.</div></div>
     <div class="check"><div class="box"></div><div>Serial Monitor ingesteld op 115200 baud.</div></div>
     <div class="check"><div class="box"></div><div>Verbonden met Arduino-Logger-01.</div></div>
-    <div class="check"><div class="box"></div><div>Live geluidswaarde reageert op geluid.</div></div>
+    <div class="check"><div class="box"></div><div>De webapp toont de geluidssensor als <strong>Actief</strong>.</div></div>
+    <div class="check"><div class="box"></div><div>Standaard meetinterval staat op 0,1 s; 0,05 s is beschikbaar voor de hoogste tijdsresolutie.</div></div>
   </div>
 </section>
 
 <section id="problemen">
-  <h2>9. Problemen oplossen</h2>
+  <h2>10. Problemen oplossen</h2>
 
   <div class="grid two">
     <div class="card">
-      <h3>Geen verandering in geluidswaarde</h3>
-      <p>Controleer eerst OUT → A0, daarna 3.3V en GND. Test door dicht bij de microfoon te klappen of te spreken.</p>
+      <h3>Geluidssensor niet actief</h3>
+      <p>Controleer eerst OUT → A0, daarna 3.3V en GND. De webapp hoeft geen live amplitude te tonen; de status moet wel <strong>Actief</strong> worden.</p>
     </div>
     <div class="card">
       <h3>Webapp opent niet</h3>
@@ -459,8 +477,8 @@ location_source</pre>
       <p>Schakel de DataLogger uit, plaats de microSD volledig en start opnieuw.</p>
     </div>
     <div class="card">
-      <h3>GPS heeft geen fix</h3>
-      <p>Ga naar buiten of naar een plek met vrij zicht op de lucht en geef de GPS tijd om satellieten te vinden.</p>
+      <h3>Geen satelliet gevonden</h3>
+      <p>Ga naar buiten of naar een plek met vrij zicht op de lucht en geef de GPS tijd om satellieten te vinden. Zodra een geldige positie beschikbaar is verandert de melding naar <strong>Satelliet gevonden</strong>.</p>
     </div>
   </div>
 
