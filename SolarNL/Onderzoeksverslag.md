@@ -1,7 +1,7 @@
-# SolarNL — openbare samenvatting
+# SolarNL — openbare onderzoeksweergave
 
-De projectwebsite (`index.html`, resultatenpagina) toont nu de voor publicatie vrijgegeven afgeleide analyse en interactieve Plotly-figuren. Deze repositorykopie bevat geen ruwe meetexport en de onderzoeksnotebooks zijn vrij van opgeslagen meetuitvoer.
+De projectwebsite (`index.html`) bevat de vrijgegeven SolarNL-analyse in acht interne onderdelen: inleiding, theorie, methode, data en aannames, resultaten, conclusie en bronnen. De resultatenpagina bevat zes interactieve Plotly-figuren en een correlatiematrix.
 
-De publieke figuren zijn exploratief. KNMI-station 240 (Schiphol) is een regionale bron; er zijn aanwijzingen voor gedeelde elektrische meetkanalen en de kalibratiegegevens ontbreken. Daarom worden regressies en correlaties niet als causaal effect of als betrouwbare rangschikking van acht panelen geïnterpreteerd.
+De website legt uit hoe de waarden zijn opgeschoond en gekoppeld, wat Pearson-correlaties betekenen, hoe de regressies zijn opgebouwd en waarom de uitkomsten geen causaal temperatuureffect aantonen. De ruwe meetexport wordt niet als los bestand verspreid; de openbare notebooks bevatten geen opgeslagen meetuitvoer.
 
-De volledige reproduceerbare analyse-notebook en het uitgebreide onderzoeksverslag staan voorlopig in de onderzoekswerkmap.
+De resultaten zijn verkennend. KNMI-station 240 is een regionale proxy; Pt100-kanaalherkomst en kalibratie zijn onvolledig vastgesteld en elektrische kanalen tonen mogelijke duplicatie. Daarom worden regressies niet als temperatuurcoëfficiënten of als rangschikking van acht onafhankelijke panelen geïnterpreteerd.
