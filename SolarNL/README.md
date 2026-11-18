@@ -1,5 +1,5 @@
 # SolarNL
 
-Projectmap voor de exploratieve data-analyse (EDA) van de SolarNL-dataset.
+This project contains confidential measurement data. Raw measurements and derived results are not published here.
 
-Hier kunnen notebooks, documentatie en bijbehorende analysebestanden worden opgeslagen.
+Research analysis and reporting are maintained in a private working copy until publication is authorized by the project owners.
