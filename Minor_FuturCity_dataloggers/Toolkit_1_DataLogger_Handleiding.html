@@ -82,6 +82,18 @@
     .spec-row span:first-child{color:#CBD3E4}
     .spec-row strong{font-weight:800;text-align:right}
     main{max-width:1120px;margin:auto;padding:34px 24px 80px}
+    .print-button{border:0;border-radius:10px;background:var(--orange);color:var(--navy-deep);padding:9px 13px;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
+    .print-button:hover{filter:brightness(1.06)}
+    .toc{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 24px}
+    .toc a{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--navy);font-weight:750;text-decoration:none}
+    .toc a:hover{border-color:var(--orange)}
+    ol.steps{counter-reset:step;list-style:none;padding:0;display:grid;gap:10px}
+    ol.steps li{counter-increment:step;display:grid;grid-template-columns:38px 1fr;gap:12px;align-items:start;border:1px solid var(--line);border-radius:14px;padding:14px}
+    ol.steps li::before{content:counter(step);width:32px;height:32px;border-radius:10px;background:var(--orange);display:grid;place-items:center;font-weight:900}
+    ol.steps strong{display:block;margin-bottom:3px}
+    .contents{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .contents a{color:var(--navy);font-weight:700}
+    .note{font-size:13px;color:var(--muted)}
     section{
       background:var(--paper);border:1px solid rgba(52,63,88,.08);
       border-radius:var(--radius);padding:30px;margin:0 0 24px;box-shadow:var(--shadow)
@@ -176,17 +188,31 @@
     .footer strong{color:var(--orange)}
     @media(max-width:850px){
       .hero-inner{grid-template-columns:1fr}
-      .grid,.grid.two,.hardware-list,.app-preview{grid-template-columns:1fr}
+      .grid,.grid.two,.hardware-list,.app-preview,.contents{grid-template-columns:1fr}
+      .toc{grid-template-columns:repeat(2,1fr)}
       .flow{grid-template-columns:1fr}
       .topnav{display:none}
     }
+    @page{size:A4;margin:14mm}
     @media print{
+      html{scroll-behavior:auto}
+      body{background:#fff;font-size:10.5pt;line-height:1.45}
       .topbar{position:static}
-      body{background:#fff}
-      section{box-shadow:none;break-inside:avoid}
-      .hero{print-color-adjust:exact;-webkit-print-color-adjust:exact}
-      .topbar,.footer{print-color-adjust:exact;-webkit-print-color-adjust:exact}
-      main{padding-bottom:20px}
+      .topnav,.print-button{display:none!important}
+      .topbar-inner{padding:0}
+      .hero{break-after:avoid}
+      .hero-inner{padding:24px 18px;grid-template-columns:1.2fr .8fr;gap:18px}
+      h1{font-size:34pt}
+      .lead{font-size:12pt}
+      main{padding:14px 0 20px}
+      section{box-shadow:none;border:1px solid #d6dbe3;border-radius:10px;padding:18px;margin-bottom:12px;break-inside:auto}
+      h2,h3{break-after:avoid}
+      .card,.hardware,.callout,.check,.flow-step,.toc a{break-inside:avoid}
+      .toc{grid-template-columns:repeat(4,1fr)}
+      .footer,.hero,.topbar{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+      .footer{padding:14px}
+      a{color:inherit;text-decoration:none}
+      pre{white-space:pre-wrap}
     }
   </style>
 </head>
@@ -196,12 +222,15 @@
     <div class="brand">Data<span>Logger</span> · Toolkit 1</div>
     <nav class="topnav">
       <a href="#doel">Doel</a>
+      <a href="#opbouw">Opbouw</a>
       <a href="#hardware">Hardware</a>
       <a href="#aansluiten">Aansluiten</a>
-      <a href="#software">Software</a>
+      <a href="#opstarten">Opstarten</a>
+      <a href="#app">Webapp</a>
       <a href="#meten">Meten</a>
-      <a href="#grafiek">Grafiek</a>
+      <a href="#data">Data</a>
       <a href="#problemen">Problemen</a>
+      <button class="print-button" type="button" onclick="window.print()">Print / opslaan als PDF</button>
     </nav>
   </div>
 </header>
@@ -211,7 +240,7 @@
     <div>
       <div class="eyebrow">DataLab · Hogeschool van Amsterdam</div>
       <h1>Toolkit 1<br>Geluid meten</h1>
-      <p class="lead">Handleiding voor het opbouwen, aansluiten en gebruiken van de DataLogger met een MAX4466 microfoonmodule, GPS, RTC en SD-opslag.</p>
+      <p class="lead">Van onderdelen monteren tot een geluidsmeting opslaan en analyseren. Deze Toolkit 1-handleiding combineert de praktische stappen uit het DataLogger-handboek met de MAX4466-configuratie.</p>
     </div>
     <div class="hero-card">
       <h3>Toolkit-configuratie</h3>
@@ -228,6 +257,18 @@
 </div>
 
 <main>
+<nav class="toc" aria-label="Inhoud van de handleiding">
+  <a href="#doel">1. Wat doet Toolkit 1?</a>
+  <a href="#opbouw">2. Opstelling opbouwen</a>
+  <a href="#hardware">3. Onderdelen herkennen</a>
+  <a href="#aansluiten">4. Sensor aansluiten</a>
+  <a href="#software">5. Firmware installeren</a>
+  <a href="#opstarten">6. Eerste keer opstarten</a>
+  <a href="#app">7. Webapp gebruiken</a>
+  <a href="#meten">8. Meten</a>
+  <a href="#data">9. Data terugvinden</a>
+  <a href="#problemen">10. Problemen oplossen</a>
+</nav>
 <section id="doel">
   <h2>1. Wat meet Toolkit 1?</h2>
   <p class="section-intro">Toolkit 1 registreert de amplitude van geluid met een MAX4466 microfoonversterker. De DataLogger koppelt deze geluidsmeting aan tijd en GPS-locatie en slaat iedere meting op de SD-kaart op.</p>
@@ -256,8 +297,22 @@
   </div>
 </section>
 
+<section id="opbouw">
+  <h2>2. De meetopstelling opbouwen</h2>
+  <p class="section-intro">Bouw de boardstack eerst op en sluit daarna de sensor, GPS en opslag aan. Monteer onderdelen alleen wanneer de DataLogger niet op de stroom is aangesloten.</p>
+  <ol class="steps">
+    <li><div><strong>Leg de onderdelen klaar</strong>Controleer de Arduino UNO R4 WiFi, Keyes Data Logging Shield, Grove Shield, MAX4466, Air530Z GPS, microSD-kaart en USB-C-voeding.</div></li>
+    <li><div><strong>Monteer het Keyes Logging Shield</strong>Houd de headers recht boven de Arduino-pinnen. Druk het shield voorzichtig en gelijkmatig aan; controleer dat er geen pinnen naast een aansluiting vallen.</div></li>
+    <li><div><strong>Plaats het Grove Shield</strong>Richt de headers goed uit op het Logging Shield en druk het voorzichtig aan. Vermijd herhaald loshalen en buigen van pinnen.</div></li>
+    <li><div><strong>Sluit sensor en GPS aan</strong>Sluit de MAX4466 met losse jumperdraden aan op voeding, massa en analoge ingang A0. Sluit de Air530Z aan op de UART/Serial1-aansluiting en klik de antenne op de GPS-module.</div></li>
+    <li><div><strong>Plaats de microSD-kaart</strong>Schuif de kaart volledig in de houder van het Keyes Logging Shield.</div></li>
+    <li><div><strong>Controleer vóór inschakelen</strong>Controleer alle headers en draden nogmaals. Sluit daarna pas een powerbank of laptop via USB-C aan.</div></li>
+  </ol>
+  <div class="callout danger"><strong>Werk spanningsloos</strong>Haal de USB-C-voeding los voordat je shields monteert, bedrading wijzigt of de microSD-kaart plaatst of verwijdert.</div>
+</section>
+
 <section id="hardware">
-  <h2>2. Benodigde hardware</h2>
+  <h2>3. Benodigde hardware</h2>
   <p class="section-intro">De standaard DataLogger blijft intact. Alleen de temperatuur-/luchtvochtigheidssensor wordt voor Toolkit 1 vervangen door de MAX4466.</p>
 
   <div class="hardware-list">
@@ -289,7 +344,7 @@
 </section>
 
 <section id="aansluiten">
-  <h2>3. MAX4466 aansluiten</h2>
+  <h2>4. MAX4466 aansluiten</h2>
   <p class="section-intro">Schakel de Arduino volledig uit voordat je de bedrading aansluit. De MAX4466 gebruikt geen I2C; het audiosignaal wordt rechtstreeks analoog op A0 ingelezen.</p>
 
   <div class="wiring">
@@ -315,7 +370,7 @@
 </section>
 
 <section id="software">
-  <h2>4. Firmware installeren</h2>
+  <h2>5. Firmware installeren</h2>
   <p class="section-intro">Gebruik de Toolkit 1 firmware uit de DataLab-repository. Deze versie bevat zowel de sensormeting als de volledige webapp.</p>
 
   <pre>DataLab/
@@ -342,8 +397,19 @@
   </div>
 </section>
 
+<section id="opstarten">
+  <h2>6. De DataLogger voor het eerst opstarten</h2>
+  <ol class="steps">
+    <li><div><strong>Sluit de voeding aan</strong>Gebruik USB-C via een powerbank of laptop. Wacht ongeveer 10 tot 30 seconden tot de Arduino en de webserver zijn gestart.</div></li>
+    <li><div><strong>Verbind met de WiFi-hotspot</strong>Open WiFi-instellingen op je telefoon, tablet of laptop en kies <code>Arduino-Logger-01</code>. Blijf verbonden als je apparaat meldt dat het netwerk geen internet heeft.</div></li>
+    <li><div><strong>Open de webapp</strong>Open een browser en ga naar <code>http://192.168.4.1</code>. De webapp wordt door de DataLogger aangeboden; internet of een losse app-installatie is niet nodig.</div></li>
+    <li><div><strong>Optioneel: zet de webapp op je beginscherm</strong>Gebruik in je browser het menu of de deelknop en kies 'Toevoegen aan beginscherm' als die optie beschikbaar is.</div></li>
+  </ol>
+  <div class="callout warn"><strong>De webapp laadt niet meteen?</strong>Wacht nog even; de eerste keer kan het enkele seconden duren. Controleer daarna of je met het DataLogger-netwerk bent verbonden en laad <code>192.168.4.1</code> opnieuw.</div>
+</section>
+
 <section id="app">
-  <h2>5. Verbinden met de webapp</h2>
+  <h2>7. De webapp gebruiken</h2>
   <div class="flow">
     <div class="flow-step">1. DataLogger inschakelen</div>
     <div class="flow-step">2. WiFi openen</div>
@@ -352,6 +418,15 @@
     <div class="flow-step">5. 192.168.4.1 openen</div>
   </div>
 
+  <h3>Onderdelen van de webapp</h3>
+  <div class="grid">
+    <div class="card"><h3>Home</h3><p>Controleer live systeeminformatie en ga snel naar meten of opgeslagen data.</p></div>
+    <div class="card"><h3>Meten</h3><p>Start, pauzeer, hervat of stop een sessie en kies het meetinterval.</p></div>
+    <div class="card"><h3>Data</h3><p>Bekijk sessies en open, download, deel of verwijder opgeslagen bestanden.</p></div>
+    <div class="card"><h3>Grafieken</h3><p>Bekijk de opgeslagen geluidsmetingen als grafiek en onderzoek veranderingen tijdens de sessie.</p></div>
+    <div class="card"><h3>Instellingen</h3><p>Controleer de systeemstatus en instellingen voor tijd, locatie, opslag en weergave.</p></div>
+  </div>
+  <div class="callout"><strong>Verbinding valt weg</strong>Controleer de voeding en WiFi-verbinding. Verbind zo nodig opnieuw met <code>Arduino-Logger-01</code> en herlaad de pagina. Een korte onderbreking van de webpagina stopt een lopende meting niet automatisch.</div>
   <h3>Status in de webapp</h3>
   <p>Om de gebruiker tijdens een geluidsmeting niet af te leiden met snel wisselende ruwe waarden, toont de app op het dashboard vooral de meetstatus. De geluidswaarden zelf blijven volledig beschikbaar in de CSV-bestanden en grafieken.</p>
   <div class="app-preview">
@@ -379,7 +454,7 @@
 </section>
 
 <section id="meten">
-  <h2>6. Een meting uitvoeren</h2>
+  <h2>8. Een meting uitvoeren</h2>
   <div class="grid">
     <div class="card">
       <div class="num">1</div>
@@ -394,10 +469,12 @@
     <div class="card">
       <div class="num">3</div>
       <h3>Stop & analyseer</h3>
-      <p>Stop de sessie. Open daarna Data of Grafieken om de opgeslagen meetreeks te bekijken.</p>
+      <p>Stop de sessie en bevestig dit als de app daarom vraagt. De DataLogger sluit het CSV-bestand af. Open daarna Data of Grafieken om de meetreeks te bekijken.</p>
     </div>
   </div>
 
+  <h3>Pauzeren en hervatten</h3>
+  <p>Tik op <strong>PAUZE</strong> om tijdelijk geen nieuwe meetpunten toe te voegen. De sessie blijft open. Tik op <strong>VERDER METEN</strong> om dezelfde sessie te hervatten. Gebruik <strong>STOP SESSIE</strong> wanneer je klaar bent; na bevestiging wordt het bestand afgesloten.</p>
   <h3>Meetprincipe</h3>
   <div class="flow">
     <div class="flow-step">A0 snel bemonsteren</div>
@@ -409,7 +486,7 @@
 </section>
 
 <section id="data">
-  <h2>7. Opgeslagen data</h2>
+  <h2>9. Data bekijken, downloaden en analyseren</h2>
   <p class="section-intro">Iedere meetsessie wordt als afzonderlijk CSV-bestand opgeslagen. Toolkit 1 gebruikt de volgende kolommen:</p>
 
   <pre class="csv">measurement_id,
@@ -426,6 +503,7 @@ gps_speed_kmh,
 gps_utc,
 location_source</pre>
 
+  <p>Open in de webapp het tabblad <strong>Data</strong> om de sessies te bekijken. Selecteer een bestand om de inhoud te bekijken of gebruik de beschikbare acties om het CSV-bestand te downloaden of te delen. Verwijder een sessie alleen als je het bestand niet meer nodig hebt. CSV-bestanden kun je openen in Excel, Python of andere data-analysetools.</p>
   <div class="callout">
     <strong>Grafieken</strong>
     De opgeslagen geluidsamplitude wordt uitgezet tegen de verstreken tijd. Het zichtbare venster is 20 seconden breed met een tijd-as per 5 seconden. Bij langere metingen kun je horizontaal door de grafiek swipen of scrollen. De y-as blijft daarbij vast staan, zodat de schaal altijd leesbaar blijft en korte geluidspieken niet worden samengedrukt.
@@ -433,7 +511,7 @@ location_source</pre>
 </section>
 
 <section id="grafiek">
-  <h2>8. Grafiek gebruiken</h2>
+  <h2>10. Grafiek gebruiken</h2>
   <p class="section-intro">Toolkit 1 is ingericht om korte geluidspieken ook tijdens langere sessies zichtbaar te houden.</p>
   <div class="grid two">
     <div class="card"><div class="num">1</div><h3>20 seconden per venster</h3><p>De x-as toont steeds ongeveer 20 seconden meettijd. Tijdmarkeringen staan iedere 5 seconden.</p></div>
@@ -444,7 +522,7 @@ location_source</pre>
 </section>
 
 <section id="controle">
-  <h2>9. Controle vóór gebruik</h2>
+  <h2>11. Controle vóór gebruik</h2>
   <div class="checklist">
     <div class="check"><div class="box"></div><div>Arduino UNO R4 WiFi en Data Logging Shield correct gemonteerd.</div></div>
     <div class="check"><div class="box"></div><div>microSD-kaart geplaatst.</div></div>
@@ -461,7 +539,7 @@ location_source</pre>
 </section>
 
 <section id="problemen">
-  <h2>10. Problemen oplossen</h2>
+  <h2>12. Problemen oplossen</h2>
 
   <div class="grid two">
     <div class="card">
@@ -478,7 +556,7 @@ location_source</pre>
     </div>
     <div class="card">
       <h3>Geen satelliet gevonden</h3>
-      <p>Ga naar buiten of naar een plek met vrij zicht op de lucht en geef de GPS tijd om satellieten te vinden. Zodra een geldige positie beschikbaar is verandert de melding naar <strong>Satelliet gevonden</strong>.</p>
+      <p>Ga naar buiten of naar een plek met vrij zicht op de lucht en geef de GPS tijd om satellieten te vinden. Een eerste GPS-fix kan enkele minuten duren. Zodra een geldige positie beschikbaar is verandert de melding naar <strong>Satelliet gevonden</strong>.</p>
     </div>
   </div>
 
@@ -488,7 +566,7 @@ location_source</pre>
   </div>
 </section>
 
-<p class="meta">Toolkit 1 · Minor FuturCity · DataLab · Hogeschool van Amsterdam</p>
+<p class="meta">Toolkit 1 · Minor FuturCity · DataLab · Hogeschool van Amsterdam<br>Deze handleiding beschrijft de MAX4466-uitvoering; de standaard SHT31-sensor uit het algemene DataLogger-handboek is voor Toolkit 1 vervangen door de geluidssensor.</p>
 </main>
 
 <footer class="footer">
