@@ -13,7 +13,7 @@
   body{margin:0;background:#e7eaf0;color:var(--ink);font-family:Arial,Helvetica,sans-serif;line-height:1.42}
   .toolbar{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px max(16px,calc((100vw - 820px)/2));background:var(--navy);color:#fff;box-shadow:0 3px 16px #17243b33}
   .toolbar strong{font-size:15px}.toolbar small{display:block;color:#d4dbea;font-size:11px;margin-top:2px}
-  .toolbar button{border:0;border-radius:7px;padding:10px 14px;background:var(--orange);color:var(--navy);font-weight:800;font-size:13px;cursor:pointer}
+  .toolbar button{border:0;border-radius:7px;padding:10px 14px;background:var(--orange);color:var(--navy);font-weight:800;font-size:13px;cursor:pointer}\n  .toolbar-actions{display:flex;align-items:center;gap:8px}\n  .toolbar .pdf-download{display:inline-block;border:1px solid #d5ddec;border-radius:7px;padding:9px 13px;color:#fff;text-decoration:none;font-size:13px;font-weight:800;white-space:nowrap}\n  .toolbar .pdf-download:hover{background:#ffffff16}
   main{padding:22px 12px 40px}
   .sheet{position:relative;width:min(148mm,100%);height:210mm;min-height:210mm;margin:0 auto 22px;overflow:hidden;background:#fff;box-shadow:0 5px 24px #1c2b4426;break-after:page;page-break-after:always;padding:13mm 12mm 12mm}
   .sheet:last-child{break-after:auto;page-break-after:auto}
@@ -99,7 +99,7 @@
   .endmark{position:absolute;bottom:20mm;left:12mm;right:12mm;padding:4mm;background:var(--navy);border-radius:3mm;color:#fff;font-size:8pt}
   .endmark strong{color:var(--orange)}
   .s2 .signature{margin-top:8mm;border-top:1px solid var(--line);padding-top:3mm;color:var(--muted);font-size:7pt}
-  @media(max-width:620px){.toolbar small{display:none}.sheet{width:calc(100vw - 20px);height:auto;min-height:calc((100vw - 20px)*1.414);padding:10mm 8mm 11mm}.page-brand{left:8mm;right:8mm}.folio{right:8mm}.cover .cover-art{top:73mm;height:62mm}.cover-tagline{top:144mm;left:8mm;right:8mm}.cover-band{padding-left:8mm;padding-right:8mm}}
+  @media(max-width:620px){.toolbar{padding:10px}.toolbar small{display:none}.toolbar-actions{gap:5px}.toolbar .pdf-download,.toolbar button{font-size:11px;padding:9px 8px}.sheet{width:calc(100vw - 20px);height:auto;min-height:calc((100vw - 20px)*1.414);padding:10mm 8mm 11mm}.page-brand{left:8mm;right:8mm}.folio{right:8mm}.cover .cover-art{top:73mm;height:62mm}.cover-tagline{top:144mm;left:8mm;right:8mm}.cover-band{padding-left:8mm;padding-right:8mm}}
   @page{size:148mm 210mm;margin:0}
   @media print{
     html,body{width:148mm;margin:0;background:#fff}
@@ -113,7 +113,7 @@
 </style>
 </head>
 <body>
-<header class="toolbar"><div><strong>DataLogger · Toolkit 1</strong><small>A5-handleiding · gebruik afdrukken om als PDF op te slaan</small></div><button type="button" onclick="window.print()">Afdrukken / opslaan als PDF</button></header>
+<header class="toolbar"><div><strong>DataLogger · Toolkit 1</strong><small>A5-handleiding · gebruik afdrukken om als PDF op te slaan</small></div><div class="toolbar-actions"><a class="pdf-download" href="Toolkit_1_DataLogger_Handleiding.pdf" download>PDF downloaden</a><button type="button" onclick="window.print()">Afdrukken</button></div></header>
 <main>
 
 <section class="sheet cover" aria-label="Omslag">
