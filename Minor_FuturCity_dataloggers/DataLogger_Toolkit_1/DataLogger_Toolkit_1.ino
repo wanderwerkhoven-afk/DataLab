@@ -7,6 +7,7 @@
 
 // =========================
 // DataLogger Toolkit 1 - UNO R4 WiFi
+// Full source restored 2026-11-18
 // Hardware: Keyes Logging Shield + GPS + MAX4466
 // GPS: Air530Z on Serial1 (UART)
 // MAX4466: analoge uitgang op A0, voeding 3.3V
