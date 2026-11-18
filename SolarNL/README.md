@@ -1,5 +1,5 @@
 # SolarNL
 
-This project contains confidential measurement data. Raw measurements and derived results are not published here.
+The raw measurement file has been removed from the current public branch. The public notebooks retain code only; saved outputs and result narratives have been cleared.
 
-Research analysis and reporting are maintained in a private working copy until publication is authorized by the project owners.
+The full analysis remains private until the project owners authorize publication.
