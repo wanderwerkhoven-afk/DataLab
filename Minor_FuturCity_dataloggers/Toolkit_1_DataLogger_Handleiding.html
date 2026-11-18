@@ -1,367 +1,586 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#263650">
-<meta name="description" content="Toolkit 1 handleiding: geluidsmetingen uitvoeren met de HvA DataLogger en MAX4466.">
-<title>Toolkit 1 — Geluid meten met de DataLogger</title>
-<style>
-  :root{--navy:#263650;--navy2:#334563;--orange:#f7a928;--cream:#f6f2ea;--ink:#202c3d;--muted:#677387;--line:#d9e0e9;--pale:#eef2f7;--green:#38876b;--red:#c9534b;--white:#fff}
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{margin:0;background:#e7eaf0;color:var(--ink);font-family:Arial,Helvetica,sans-serif;line-height:1.42}
-  .toolbar{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px max(16px,calc((100vw - 820px)/2));background:var(--navy);color:#fff;box-shadow:0 3px 16px #17243b33}
-  .toolbar strong{font-size:15px}.toolbar small{display:block;color:#d4dbea;font-size:11px;margin-top:2px}
-  .toolbar button{border:0;border-radius:7px;padding:10px 14px;background:var(--orange);color:var(--navy);font-weight:800;font-size:13px;cursor:pointer}\n  .toolbar-actions{display:flex;align-items:center;gap:8px}\n  .toolbar .pdf-download{display:inline-block;border:1px solid #d5ddec;border-radius:7px;padding:9px 13px;color:#fff;text-decoration:none;font-size:13px;font-weight:800;white-space:nowrap}\n  .toolbar .pdf-download:hover{background:#ffffff16}
-  main{padding:22px 12px 40px}
-  .sheet{position:relative;width:min(148mm,100%);height:210mm;min-height:210mm;margin:0 auto 22px;overflow:hidden;background:#fff;box-shadow:0 5px 24px #1c2b4426;break-after:page;page-break-after:always;padding:13mm 12mm 12mm}
-  .sheet:last-child{break-after:auto;page-break-after:auto}
-  .sheet::before{content:"";position:absolute;left:0;right:0;top:0;height:7mm;background:var(--navy)}
-  .folio{position:absolute;right:12mm;top:9mm;color:var(--orange);font-weight:800;font-size:9pt;letter-spacing:.04em}
-  .page-brand{position:absolute;bottom:5mm;left:12mm;right:12mm;display:flex;justify-content:space-between;align-items:end;color:#718097;font-size:6.7pt}
-  .page-brand b{font-size:10pt;color:var(--navy);letter-spacing:-.04em}.page-brand b span{color:var(--orange)}
-  .eyebrow{margin:0 0 4mm;color:var(--muted);font-size:7.3pt;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
-  h1,h2,h3,p{margin-top:0}
-  h1{color:var(--navy);font-size:29pt;line-height:1.01;letter-spacing:-.045em;margin-bottom:4mm}
-  h2{color:var(--navy);font-size:18pt;line-height:1.05;letter-spacing:-.03em;margin-bottom:2mm}
-  h2::after{content:"";display:block;width:14mm;height:1.3mm;background:var(--orange);margin-top:2.5mm;border-radius:2px}
-  h3{font-size:10.3pt;line-height:1.15;color:var(--navy);margin-bottom:1.2mm}
-  p{font-size:8.2pt;margin-bottom:2.5mm}
-  .intro{font-size:8.7pt;color:#536177;margin-bottom:4mm}
-  .small{font-size:7.1pt;color:var(--muted)}
-  .label{font-size:6.5pt;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-  .cover{padding:0;background:var(--navy);color:white}
-  .cover::before{height:9mm;background:#1e2a40}
-  .cover .folio{display:none}
-  .cover-inner{position:absolute;inset:9mm 0 0;padding:11mm 11mm 9mm;background:linear-gradient(145deg,#fff 0 67%,#f5f2eb 67%);color:var(--navy)}
-  .cover .eyebrow{margin-bottom:5mm}
-  .cover h1{font-size:33pt;margin-bottom:1mm}
-  .cover .subtitle{font-size:13pt;letter-spacing:.12em;font-weight:500;margin:0 0 3mm}
-  .cover .lead{max-width:76mm;color:#46556d;font-size:9pt}
-  .cover-art{position:absolute;left:11mm;right:11mm;top:77mm;height:72mm;border-radius:4mm;background:#e7edf4;display:grid;place-items:center;overflow:hidden}
-  .cover-art svg{width:100%;height:100%}
-  .cover-band{position:absolute;left:0;right:0;bottom:0;height:31mm;padding:5mm 11mm;background:var(--navy);color:#fff;display:flex;justify-content:space-between;align-items:center}
-  .cover-band .version{font-size:8pt;line-height:1.5;letter-spacing:.08em}.cover-band .version b{font-size:11pt;color:var(--orange)}
-  .cover-band .hva{font-size:9pt;font-weight:800;max-width:35mm;text-align:right;line-height:1.15}
-  .cover-tagline{position:absolute;left:11mm;right:11mm;top:156mm;display:flex;justify-content:space-between;gap:3mm}
-  .cover-tagline div{width:25%;font-size:7pt;font-weight:800;color:var(--navy)}
-  .cover-tagline i{display:block;width:5mm;height:1mm;background:var(--orange);margin-bottom:1.5mm}
-  .cover .page-brand{display:none}
-  .columns{display:grid;grid-template-columns:1fr 1fr;gap:3mm}
-  .card{border:1px solid var(--line);border-radius:3mm;padding:3mm;background:#fff}
-  .card p:last-child{margin-bottom:0}
-  .icon-card{display:flex;gap:3mm;align-items:flex-start}
-  .icon{width:9mm;height:9mm;border-radius:2mm;background:#fff3db;display:grid;place-items:center;flex:0 0 9mm;color:var(--navy);font-size:13pt;font-weight:900}
-  .icon svg{width:5mm;height:5mm}
-  .stack-art{background:#f2f5f9;border-radius:3mm;padding:3mm;margin:3mm 0;display:grid;place-items:center}
-  .stack-art svg{width:100%;height:48mm}
-  .step-list{display:grid;gap:2mm;margin:3mm 0 0}
-  .step{display:grid;grid-template-columns:8mm 1fr;gap:2.5mm;align-items:start}
-  .step-no{width:7mm;height:7mm;border-radius:50%;background:var(--orange);color:var(--navy);font-size:8pt;font-weight:900;display:grid;place-items:center}
-  .step p{margin-bottom:0;font-size:7.5pt}.step strong{color:var(--navy)}
-  .callout{border:1px solid #f2d18b;border-left:3px solid var(--orange);border-radius:2.5mm;padding:3mm;background:#fff7e5;margin:3mm 0}
-  .callout p{margin:0;font-size:7.5pt}.callout strong{display:block;color:var(--navy);margin-bottom:1mm;font-size:8pt}
-  .callout.cool{background:#f1f4f8;border-color:#dce3ec;border-left-color:#93a3b8}
-  .callout.danger{background:#fff1ef;border-color:#f1c9c5;border-left-color:var(--red)}
-  .callout.good{background:#eff8f3;border-color:#cfe7d9;border-left-color:var(--green)}
-  .part-grid{display:grid;grid-template-columns:1fr 1fr;gap:2mm;margin-top:3mm}
-  .part{display:grid;grid-template-columns:8mm 1fr;gap:2mm;align-items:start;padding:2.5mm;border:1px solid var(--line);border-radius:2.5mm}
-  .part .num{width:6.5mm;height:6.5mm;border-radius:50%;background:var(--orange);display:grid;place-items:center;font-size:8pt;font-weight:900;color:var(--navy)}
-  .part b{display:block;color:var(--navy);font-size:7.8pt}.part small{font-size:6.6pt;color:var(--muted)}
-  .wire-table{width:100%;border-collapse:collapse;margin:3mm 0;font-size:7.5pt}
-  .wire-table th{background:var(--navy);color:#fff;text-align:left;font-size:6pt;letter-spacing:.06em;padding:2.2mm}
-  .wire-table td{border-bottom:1px solid var(--line);padding:2.4mm}
-  .wire-table td:first-child{font-weight:800;color:var(--navy)}
-  code{font-family:Consolas,monospace;color:#233d63;background:#eef2f7;border-radius:1mm;padding:.3mm 1mm;font-size:.94em}
-  .terminal{background:#263650;color:#fff;border-radius:2.5mm;padding:3mm;font-family:Consolas,monospace;font-size:7pt;line-height:1.5;margin:3mm 0}
-  .terminal .accent{color:#ffd27d}
-  .toc-list{list-style:none;padding:0;margin:4mm 0}
-  .toc-list li{display:flex;align-items:baseline;gap:3mm;padding:2.8mm 0;border-bottom:1px solid var(--line);font-size:8.2pt}
-  .toc-list .toc-num{width:5mm;color:var(--orange);font-weight:900}
-  .toc-list .toc-page{margin-left:auto;color:var(--navy);font-weight:800}
-  .toc-note{margin-top:7mm;border-radius:3mm;padding:4mm;background:#eef2f7;color:#536177;font-size:7.5pt}
-  .app-phone{border:2px solid var(--navy);border-radius:5mm;padding:3mm;background:#fff;max-width:52mm;margin:3mm auto}
-  .phone-head{background:var(--navy);color:#fff;border-radius:3mm 3mm 1mm 1mm;padding:3mm;font-size:7pt;font-weight:800}
-  .phone-stat{display:grid;grid-template-columns:1fr 1fr;gap:2mm;padding:2mm}
-  .phone-stat div{background:#f3f5f8;border-radius:2mm;padding:2mm;font-size:6.5pt}
-  .phone-stat b{display:block;font-size:8pt;color:var(--navy)}
-  .phone-nav{display:grid;grid-template-columns:repeat(4,1fr);padding:2mm;text-align:center;color:var(--muted);font-size:5.7pt;border-top:1px solid var(--line)}
-  .phone-nav b{display:block;color:var(--navy);font-size:7pt}
-  .checklist{display:grid;gap:2mm;margin-top:3mm}
-  .check{display:flex;gap:2mm;align-items:flex-start;border-bottom:1px solid var(--line);padding:1.7mm 0;font-size:7.4pt}
-  .check i{width:4mm;height:4mm;border:1.2px solid var(--navy);border-radius:1mm;flex:0 0 4mm}
-  .chart{background:#f4f6fa;border:1px solid var(--line);border-radius:3mm;padding:3mm;margin:3mm 0}
-  .chart svg{width:100%;height:42mm;display:block}
-  .chart-caption{display:flex;justify-content:space-between;font-size:6.5pt;color:var(--muted)}
-  .trouble{display:grid;grid-template-columns:1fr 1fr;gap:2mm;margin-top:3mm}
-  .trouble .card{padding:2.5mm}.trouble h3{font-size:8pt}.trouble p{font-size:6.8pt}
-  .endmark{position:absolute;bottom:20mm;left:12mm;right:12mm;padding:4mm;background:var(--navy);border-radius:3mm;color:#fff;font-size:8pt}
-  .endmark strong{color:var(--orange)}
-  .s2 .signature{margin-top:8mm;border-top:1px solid var(--line);padding-top:3mm;color:var(--muted);font-size:7pt}
-  @media(max-width:620px){.toolbar{padding:10px}.toolbar small{display:none}.toolbar-actions{gap:5px}.toolbar .pdf-download,.toolbar button{font-size:11px;padding:9px 8px}.sheet{width:calc(100vw - 20px);height:auto;min-height:calc((100vw - 20px)*1.414);padding:10mm 8mm 11mm}.page-brand{left:8mm;right:8mm}.folio{right:8mm}.cover .cover-art{top:73mm;height:62mm}.cover-tagline{top:144mm;left:8mm;right:8mm}.cover-band{padding-left:8mm;padding-right:8mm}}
-  @page{size:148mm 210mm;margin:0}
-  @media print{
-    html,body{width:148mm;margin:0;background:#fff}
-    body{font-size:9pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    .toolbar{display:none!important}
-    main{padding:0;margin:0}
-    .sheet{width:148mm;height:210mm;min-height:210mm;margin:0;padding:13mm 12mm 12mm;box-shadow:none;overflow:hidden;break-after:page;page-break-after:always}
-    .sheet:last-child{break-after:auto;page-break-after:auto}
-    a{color:inherit;text-decoration:none}
-  }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#343F58">
+  <title>Toolkit 1 · Geluid meten met de DataLogger</title>
+  <style>
+    :root{
+      --navy:#343F58;
+      --navy-deep:#273247;
+      --orange:#FCB031;
+      --cream:#F6F2EA;
+      --paper:#FFFFFF;
+      --ink:#232323;
+      --muted:#667085;
+      --line:#DCE1E8;
+      --green:#2FAE7B;
+      --red:#C94B4B;
+      --blue:#4B7BEC;
+      --shadow:0 12px 34px rgba(32,42,61,.10);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      background:var(--cream);
+      color:var(--ink);
+      line-height:1.6;
+    }
+    .topbar{
+      position:sticky;top:0;z-index:20;
+      background:rgba(52,63,88,.96);
+      color:#fff;
+      backdrop-filter:blur(12px);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .topbar-inner{
+      max-width:1120px;margin:auto;
+      display:flex;align-items:center;justify-content:space-between;
+      gap:24px;padding:14px 24px;
+    }
+    .brand{font-weight:800;font-size:20px;letter-spacing:-.02em}
+    .brand span{color:var(--orange)}
+    .topnav{display:flex;gap:8px;flex-wrap:wrap}
+    .topnav a{
+      color:#fff;text-decoration:none;font-size:13px;font-weight:700;
+      padding:8px 11px;border-radius:10px;
+    }
+    .topnav a:hover{background:rgba(255,255,255,.08)}\n    .topnav .print-button{background:var(--orange);color:var(--navy);border-radius:10px;padding:8px 12px;white-space:nowrap}
+    .hero{
+      background:
+        radial-gradient(circle at 82% 15%, rgba(252,176,49,.28), transparent 26%),
+        linear-gradient(135deg,var(--navy-deep),var(--navy));
+      color:#fff;
+    }
+    .hero-inner{
+      max-width:1120px;margin:auto;padding:64px 24px 56px;
+      display:grid;grid-template-columns:1.25fr .75fr;gap:42px;align-items:center;
+    }
+    .eyebrow{
+      display:inline-flex;align-items:center;gap:8px;
+      font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+      color:#F8D995;margin-bottom:12px;
+    }
+    h1{font-size:clamp(38px,6vw,68px);line-height:1.02;letter-spacing:-.045em;margin:0 0 20px}
+    .lead{font-size:19px;max-width:720px;color:#E9EDF5;margin:0}
+    .hero-card{
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:24px;padding:24px;box-shadow:var(--shadow)
+    }
+    .hero-card h3{margin:0 0 14px;font-size:16px}
+    .spec-row{
+      display:flex;justify-content:space-between;gap:18px;
+      padding:10px 0;border-bottom:1px solid rgba(255,255,255,.12);
+      font-size:14px;
+    }
+    .spec-row:last-child{border-bottom:0}
+    .spec-row span:first-child{color:#CBD3E4}
+    .spec-row strong{font-weight:800;text-align:right}
+    main{max-width:1120px;margin:auto;padding:34px 24px 80px}
+    .print-button{border:0;border-radius:10px;background:var(--orange);color:var(--navy-deep);padding:9px 13px;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
+    .print-button:hover{filter:brightness(1.06)}
+    .toc{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 24px}
+    .toc a{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--navy);font-weight:750;text-decoration:none}
+    .toc a:hover{border-color:var(--orange)}
+    ol.steps{counter-reset:step;list-style:none;padding:0;display:grid;gap:10px}
+    ol.steps li{counter-increment:step;display:grid;grid-template-columns:38px 1fr;gap:12px;align-items:start;border:1px solid var(--line);border-radius:14px;padding:14px}
+    ol.steps li::before{content:counter(step);width:32px;height:32px;border-radius:10px;background:var(--orange);display:grid;place-items:center;font-weight:900}
+    ol.steps strong{display:block;margin-bottom:3px}
+    .contents{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .contents a{color:var(--navy);font-weight:700}
+    .note{font-size:13px;color:var(--muted)}
+    section{
+      background:var(--paper);border:1px solid rgba(52,63,88,.08);
+      border-radius:var(--radius);padding:30px;margin:0 0 24px;box-shadow:var(--shadow)
+    }
+    h2{font-size:28px;letter-spacing:-.03em;margin:0 0 10px}
+    h3{font-size:19px;margin:24px 0 10px}
+    p{margin:8px 0 14px}
+    .section-intro{color:var(--muted);max-width:850px;margin-bottom:22px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .grid.two{grid-template-columns:repeat(2,1fr)}
+    .card{
+      border:1px solid var(--line);border-radius:18px;padding:18px;background:#fff;
+    }
+    .card .num{
+      width:36px;height:36px;border-radius:11px;background:var(--orange);
+      display:flex;align-items:center;justify-content:center;font-weight:900;margin-bottom:12px;
+    }
+    .card h3{margin:0 0 6px;font-size:17px}
+    .card p{font-size:14px;color:var(--muted);margin:0}
+    .hardware-list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .hardware{
+      display:flex;gap:14px;align-items:flex-start;
+      border:1px solid var(--line);border-radius:16px;padding:16px;
+    }
+    .icon{
+      flex:0 0 42px;width:42px;height:42px;border-radius:13px;
+      background:#F4F6F9;display:grid;place-items:center;color:var(--navy);
+    }
+    .icon svg{width:23px;height:23px}
+    .hardware strong{display:block}
+    .hardware small{display:block;color:var(--muted);margin-top:3px}
+    .wiring{
+      background:#F8FAFC;border:1px solid var(--line);
+      border-radius:18px;padding:20px;overflow:auto;
+    }
+    .wire-table{width:100%;border-collapse:collapse;min-width:560px}
+    .wire-table th,.wire-table td{padding:13px 14px;border-bottom:1px solid var(--line);text-align:left}
+    .wire-table th{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .wire-table tr:last-child td{border-bottom:0}
+    .pin{
+      display:inline-block;padding:4px 9px;border-radius:8px;background:#EEF1F6;
+      color:var(--navy);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:800
+    }
+    .callout{
+      border-left:5px solid var(--orange);background:#FFF8E8;
+      border-radius:14px;padding:16px 18px;margin:18px 0;
+    }
+    .callout.good{border-color:var(--green);background:#EFFAF6}
+    .callout.warn{border-color:#C98516;background:#FFF7E6}
+    .callout.danger{border-color:var(--red);background:#FFF1F1}
+    .callout strong{display:block;margin-bottom:4px}
+    .flow{
+      display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:stretch;
+    }
+    .flow-step{
+      background:#F7F8FA;border:1px solid var(--line);border-radius:16px;padding:14px;
+      font-size:13px;font-weight:700;text-align:center;display:flex;align-items:center;justify-content:center;
+    }
+    .flow-arrow{display:none}
+    code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    pre{
+      background:#20293B;color:#F7F9FC;border-radius:16px;padding:18px;
+      overflow:auto;font-size:13px;line-height:1.55;
+    }
+    .app-preview{
+      display:grid;grid-template-columns:repeat(2,1fr);gap:14px;
+    }
+    .tile{
+      min-height:136px;border-radius:20px;padding:18px;
+      border:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between;
+    }
+    .tile.primary{background:var(--orange);border-color:transparent}
+    .tile.dark{background:var(--navy);color:#fff;border-color:transparent}
+    .tile .label{font-size:13px;color:var(--muted)}
+    .tile.dark .label{color:#D5DCEA}
+    .tile .value{font-size:30px;font-weight:900;letter-spacing:-.03em}
+    .tile .sub{font-size:12px;color:var(--muted)}
+    .tile.dark .sub{color:#CBD3E4}
+    .checklist{display:grid;gap:10px;margin-top:14px}
+    .check{
+      display:flex;gap:11px;align-items:flex-start;padding:12px 14px;
+      border:1px solid var(--line);border-radius:14px;background:#fff
+    }
+    .box{width:19px;height:19px;border:2px solid var(--navy);border-radius:5px;flex:0 0 19px;margin-top:2px}
+    .csv{font-size:12px}
+    .meta{
+      color:var(--muted);font-size:13px;margin-top:28px;text-align:center
+    }
+    .footer{
+      background:var(--navy-deep);color:#fff;padding:28px 24px;text-align:center
+    }
+    .footer strong{color:var(--orange)}
+    @media(max-width:850px){
+      .hero-inner{grid-template-columns:1fr}
+      .grid,.grid.two,.hardware-list,.app-preview,.contents{grid-template-columns:1fr}
+      .toc{grid-template-columns:repeat(2,1fr)}
+      .flow{grid-template-columns:1fr}
+      .topnav{display:none}
+    }
+    @page{size:A4;margin:14mm}
+    @media print{
+      html{scroll-behavior:auto}
+      body{background:#fff;font-size:10.5pt;line-height:1.45}
+      .topbar{position:static}
+      .topnav,.print-button{display:none!important}
+      .topbar-inner{padding:0}
+      .hero{break-after:avoid}
+      .hero-inner{padding:24px 18px;grid-template-columns:1.2fr .8fr;gap:18px}
+      h1{font-size:34pt}
+      .lead{font-size:12pt}
+      main{padding:14px 0 20px}
+      section{box-shadow:none;border:1px solid #d6dbe3;border-radius:10px;padding:18px;margin-bottom:12px;break-inside:auto}
+      h2,h3{break-after:avoid}
+      .card,.hardware,.callout,.check,.flow-step,.toc a{break-inside:avoid}
+      .toc{grid-template-columns:repeat(4,1fr)}
+      .footer,.hero,.topbar{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+      .footer{padding:14px}
+      a{color:inherit;text-decoration:none}
+      pre{white-space:pre-wrap}
+    }
+  </style>
 </head>
 <body>
-<header class="toolbar"><div><strong>DataLogger · Toolkit 1</strong><small>A5-handleiding · gebruik afdrukken om als PDF op te slaan</small></div><div class="toolbar-actions"><a class="pdf-download" href="Toolkit_1_DataLogger_Handleiding.pdf" download>PDF downloaden</a><button type="button" onclick="window.print()">Afdrukken</button></div></header>
-<main>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">Data<span>Logger</span> · Toolkit 1</div>
+    <nav class="topnav">
+      <a href="#doel">Doel</a>
+      <a href="#opbouw">Opbouw</a>
+      <a href="#hardware">Hardware</a>
+      <a href="#aansluiten">Aansluiten</a>
+      <a href="#opstarten">Opstarten</a>
+      <a href="#app">Webapp</a>
+      <a href="#meten">Meten</a>
+      <a href="#data">Data</a>
+      <a href="#problemen">Problemen</a>
+      <a class="print-button" href="DataLogger-Handleiding.html" target="_blank" rel="noopener">Print PDF</a>
+    </nav>
+  </div>
+</header>
 
-<section class="sheet cover" aria-label="Omslag">
-  <div class="cover-inner">
-    <p class="eyebrow">DataLab · Hogeschool van Amsterdam</p>
-    <h1>Data<span style="color:var(--orange)">Logger</span></h1>
-    <p class="subtitle">TOOLKIT 1 · GELUID METEN</p>
-    <p class="lead">Een praktische handleiding voor het bouwen en gebruiken van de DataLogger met een MAX4466-microfoonmodule.</p>
-    <div class="cover-art" aria-label="Schematische illustratie van de DataLogger en MAX4466">
-      <svg viewBox="0 0 620 300" role="img" aria-label="Schematische dataloggeropstelling">
-        <defs><filter id="sh" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#263650" flood-opacity=".18"/></filter></defs>
-        <g filter="url(#sh)" transform="translate(75 45)">
-          <rect x="90" y="145" width="285" height="86" rx="12" fill="#273650"/>
-          <rect x="112" y="158" width="240" height="54" rx="5" fill="#384c6a"/>
-          <rect x="132" y="168" width="75" height="33" rx="4" fill="#d9e1eb"/><text x="169" y="189" text-anchor="middle" font-size="12" font-family="Arial" fill="#263650" font-weight="700">UNO R4 WiFi</text>
-          <rect x="240" y="165" width="88" height="39" rx="4" fill="#e8edf4"/><text x="284" y="181" text-anchor="middle" font-size="10" font-family="Arial" fill="#263650" font-weight="700">LOGGING</text><text x="284" y="194" text-anchor="middle" font-size="9" font-family="Arial" fill="#263650">RTC + SD</text>
-          <g fill="#d4a03f"><circle cx="100" cy="150" r="3"/><circle cx="365" cy="150" r="3"/><circle cx="100" cy="225" r="3"/><circle cx="365" cy="225" r="3"/></g>
-          <path d="M188 145V120H438" stroke="#f2a62b" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M185 145V106H435" stroke="#687f9e" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M182 145V92H432" stroke="#c9534b" stroke-width="5" fill="none" stroke-linecap="round"/>
-          <rect x="414" y="64" width="110" height="74" rx="13" fill="#263650"/><rect x="427" y="77" width="84" height="48" rx="6" fill="#e8edf4"/><circle cx="469" cy="101" r="15" fill="#263650"/><circle cx="469" cy="101" r="8" fill="#f7a928"/><text x="469" y="153" text-anchor="middle" font-size="11" font-family="Arial" fill="#263650" font-weight="700">MAX4466</text>
-          <rect x="393" y="194" width="78" height="31" rx="4" fill="#f7a928"/><text x="432" y="214" text-anchor="middle" font-size="10" font-family="Arial" fill="#263650" font-weight="700">A0 · GELUID</text>
-          <g transform="translate(18 2)"><path d="M15 15a30 30 0 0 1 0 50M26 24a18 18 0 0 1 0 32M37 32a7 7 0 0 1 0 16" fill="none" stroke="#f7a928" stroke-width="5" stroke-linecap="round"/><circle cx="7" cy="40" r="6" fill="#263650"/></g>
-        </g>
-      </svg>
+<div class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="eyebrow">DataLab · Hogeschool van Amsterdam</div>
+      <h1>Toolkit 1<br>Geluid meten</h1>
+      <p class="lead">Van onderdelen monteren tot een geluidsmeting opslaan en analyseren. Deze Toolkit 1-handleiding combineert de praktische stappen uit het DataLogger-handboek met de MAX4466-configuratie.</p>
     </div>
-    <div class="cover-tagline"><div><i></i>BOUWEN<br>Montage en aansluiting</div><div><i></i>VERBINDEN<br>Sensor en webapp</div><div><i></i>METEN<br>Start, pauzeer en stop</div><div><i></i>DATA BEKIJKEN<br>Downloaden en analyseren</div></div>
-    <div class="cover-band"><div class="version"><b>VERSIE 1.0</b><br>2026</div><div class="hva">Hogeschool van<br>Amsterdam</div></div>
+    <div class="hero-card">
+      <h3>Toolkit-configuratie</h3>
+      <div class="spec-row"><span>DataLogger</span><strong>Arduino UNO R4 WiFi</strong></div>
+      <div class="spec-row"><span>Sensor</span><strong>MAX4466</strong></div>
+      <div class="spec-row"><span>Analoge ingang</span><strong>A0</strong></div>
+      <div class="spec-row"><span>WiFi</span><strong>Arduino-Logger-01</strong></div>
+      <div class="spec-row"><span>Webapp</span><strong>192.168.4.1</strong></div>
+      <div class="spec-row"><span>Standaard interval</span><strong>0,1 s (10 Hz)</strong></div>
+      <div class="spec-row"><span>Minimum interval</span><strong>0,05 s (20 Hz)</strong></div>
+      <div class="spec-row"><span>Meetvenster</span><strong>50 ms</strong></div>
+    </div>
+  </div>
+</div>
+
+<main>
+<nav class="toc" aria-label="Inhoud van de handleiding">
+  <a href="#doel">1. Wat doet Toolkit 1?</a>
+  <a href="#opbouw">2. Opstelling opbouwen</a>
+  <a href="#hardware">3. Onderdelen herkennen</a>
+  <a href="#aansluiten">4. Sensor aansluiten</a>
+  <a href="#software">5. Firmware installeren</a>
+  <a href="#opstarten">6. Eerste keer opstarten</a>
+  <a href="#app">7. Webapp gebruiken</a>
+  <a href="#meten">8. Meten</a>
+  <a href="#data">9. Data terugvinden</a>
+  <a href="#problemen">10. Problemen oplossen</a>
+</nav>
+<section id="doel">
+  <h2>1. Wat meet Toolkit 1?</h2>
+  <p class="section-intro">Toolkit 1 registreert de amplitude van geluid met een MAX4466 microfoonversterker. De DataLogger koppelt deze geluidsmeting aan tijd en GPS-locatie en slaat iedere meting op de SD-kaart op.</p>
+
+  <div class="grid">
+    <div class="card">
+      <div class="num">1</div>
+      <h3>Geluidsamplitude</h3>
+      <p>Piek-tot-piek amplitude van het analoge microfoonsignaal in millivolt.</p>
+    </div>
+    <div class="card">
+      <div class="num">2</div>
+      <h3>Ruwe meetwaarde</h3>
+      <p>Piek-tot-piek verschil in ADC-counts. Handig voor controle en verdere analyse.</p>
+    </div>
+    <div class="card">
+      <div class="num">3</div>
+      <h3>Tijd & locatie</h3>
+      <p>RTC-tijd, verstreken tijd, GPS-positie en het aantal gevonden satellieten worden aan de meetdata toegevoegd.</p>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <strong>Geen gekalibreerde dB-meter</strong>
+    De MAX4466 levert een analoog audiosignaal. Zonder akoestische kalibratie mogen de waarden niet als dB(A) of een officieel geluidsniveau worden geïnterpreteerd. De ruwe waarden worden wel opgeslagen als mV p-p en ADC p-p, maar tijdens het meten toont de app alleen of de geluidssensor <em>Actief</em> is.
   </div>
 </section>
 
-<section class="sheet s2" aria-label="Voorwoord">
-  <span class="folio">02</span><p class="eyebrow">DataLogger · Toolkit 1</p>
-  <h2>Voorwoord</h2><h3 style="margin:4mm 0 3mm;color:#52627b;font-size:12pt">Zelf meten. Zelf ontdekken.</h3>
-  <p>Dit handboek hoort bij de DataLogger van het DataLab van de Hogeschool van Amsterdam. Met Toolkit 1 gebruik je de meetopstelling om geluidssignalen te onderzoeken en zelf meetdata te verzamelen.</p>
-  <p>Je bouwt de Arduino-opstelling op, sluit een MAX4466-microfoonmodule aan en bedient de meting via een webapp. De Arduino meet het signaal, koppelt er tijd en eventueel GPS-gegevens aan en bewaart de resultaten op een microSD-kaart.</p>
-  <p>De bedoeling is dat je het volledige meetproces doorloopt: van sensor aansluiten en een meetinterval kiezen tot een CSV-bestand bekijken en analyseren. De uitleg is stap voor stap opgezet; je hoeft geen ervaren programmeur of elektronicus te zijn.</p>
-  <div class="callout" style="margin-top:7mm"><strong>Belangrijk over geluidsniveaus</strong><p>De MAX4466 is geen gekalibreerde decibelmeter. Deze Toolkit registreert een relatieve piek-tot-piek amplitude. Gebruik de uitkomst niet als officieel dB(A)-niveau.</p></div>
-  <div class="callout cool"><strong>Werk rustig en veilig</strong><p>Controleer aansluitingen voordat je de voeding aansluit. Zet de DataLogger uit voordat je onderdelen monteert of bedrading wijzigt.</p></div>
-  <div class="signature">Vragen over de DataLogger? Neem contact op met het DataLab via <b>Datalab-ft@hva.nl</b>.</div>
-  <div class="page-brand"><span>DataLab · Hogeschool van Amsterdam</span><b>Data<span>Logger</span></b></div>
-</section>
-
-<section class="sheet" aria-label="Inhoudsopgave">
-  <span class="folio">03</span><p class="eyebrow">Wegwijzer</p><h2>Inhoudsopgave</h2>
-  <ol class="toc-list">
-    <li><span class="toc-num">1</span><span>De DataLogger en Toolkit 1</span><span class="toc-page">4</span></li>
-    <li><span class="toc-num">2</span><span>Onderdelen van het sensorsysteem</span><span class="toc-page">5</span></li>
-    <li><span class="toc-num">3</span><span>De meetopstelling bouwen</span><span class="toc-page">6</span></li>
-    <li><span class="toc-num">4</span><span>Sensor, GPS en SD-kaart aansluiten</span><span class="toc-page">7</span></li>
-    <li><span class="toc-num">5</span><span>Firmware installeren en opstarten</span><span class="toc-page">8</span></li>
-    <li><span class="toc-num">6</span><span>Verbinden met de webapp</span><span class="toc-page">9</span></li>
-    <li><span class="toc-num">7</span><span>De eerste meting uitvoeren</span><span class="toc-page">10</span></li>
-    <li><span class="toc-num">8</span><span>Data bekijken en analyseren</span><span class="toc-page">11</span></li>
-    <li><span class="toc-num">9</span><span>Controle en problemen oplossen</span><span class="toc-page">12</span></li>
+<section id="opbouw">
+  <h2>2. De meetopstelling opbouwen</h2>
+  <p class="section-intro">Bouw de boardstack eerst op en sluit daarna de sensor, GPS en opslag aan. Monteer onderdelen alleen wanneer de DataLogger niet op de stroom is aangesloten.</p>
+  <ol class="steps">
+    <li><div><strong>Leg de onderdelen klaar</strong>Controleer de Arduino UNO R4 WiFi, Keyes Data Logging Shield, Grove Shield, MAX4466, Air530Z GPS, microSD-kaart en USB-C-voeding.</div></li>
+    <li><div><strong>Monteer het Keyes Logging Shield</strong>Houd de headers recht boven de Arduino-pinnen. Druk het shield voorzichtig en gelijkmatig aan; controleer dat er geen pinnen naast een aansluiting vallen.</div></li>
+    <li><div><strong>Plaats het Grove Shield</strong>Richt de headers goed uit op het Logging Shield en druk het voorzichtig aan. Vermijd herhaald loshalen en buigen van pinnen.</div></li>
+    <li><div><strong>Sluit sensor en GPS aan</strong>Sluit de MAX4466 met losse jumperdraden aan op voeding, massa en analoge ingang A0. Sluit de Air530Z aan op de UART/Serial1-aansluiting en klik de antenne op de GPS-module.</div></li>
+    <li><div><strong>Plaats de microSD-kaart</strong>Schuif de kaart volledig in de houder van het Keyes Logging Shield.</div></li>
+    <li><div><strong>Controleer vóór inschakelen</strong>Controleer alle headers en draden nogmaals. Sluit daarna pas een powerbank of laptop via USB-C aan.</div></li>
   </ol>
-  <div class="toc-note"><b>In deze handleiding</b><br>De basishardware van de DataLogger blijft gelijk. Voor Toolkit 1 wordt de standaard temperatuur-/luchtvochtigheidssensor vervangen door de MAX4466-geluidssensor.</div>
-  <div class="page-brand"><span>DataLab · Hogeschool van Amsterdam</span><b>Data<span>Logger</span></b></div>
+  <div class="callout danger"><strong>Werk spanningsloos</strong>Haal de USB-C-voeding los voordat je shields monteert, bedrading wijzigt of de microSD-kaart plaatst of verwijdert.</div>
 </section>
 
-<section class="sheet" aria-label="De DataLogger">
-  <span class="folio">04</span><p class="eyebrow">01 · De meetopstelling</p><h2>De DataLogger</h2>
-  <p class="intro">De DataLogger bestaat uit hardware die meet en opslaat, en een webapp waarmee je het apparaat bedient.</p>
-  <div class="columns">
-    <div class="card"><div class="icon-card"><div class="icon">▦</div><div><h3>Arduino-sensorsysteem</h3><p>Leest de sensor uit, houdt tijd en GPS bij en schrijft meetsessies naar de microSD-kaart.</p></div></div></div>
-    <div class="card"><div class="icon-card"><div class="icon">▣</div><div><h3>Webapp</h3><p>Start, pauzeert en stopt metingen. Je bekijkt en downloadt data via telefoon, tablet of laptop.</p></div></div></div>
+<section id="hardware">
+  <h2>3. Benodigde hardware</h2>
+  <p class="section-intro">De standaard DataLogger blijft intact. Alleen de temperatuur-/luchtvochtigheidssensor wordt voor Toolkit 1 vervangen door de MAX4466.</p>
+
+  <div class="hardware-list">
+    <div class="hardware">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 7h8M8 11h8M8 15h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <div><strong>Arduino UNO R4 WiFi</strong><small>Draait firmware, webapp en lokaal WiFi-netwerk.</small></div>
+    </div>
+    <div class="hardware">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 6h14v12H5z" stroke="currentColor" stroke-width="1.8"/><path d="M8 9h8M8 13h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <div><strong>Data Logging Shield V1.0</strong><small>RTC-klok en microSD-opslag.</small></div>
+    </div>
+    <div class="hardware">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 15a4 4 0 0 0 4-4V7a4 4 0 1 0-8 0v4a4 4 0 0 0 4 4Z" stroke="currentColor" stroke-width="1.8"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <div><strong>MAX4466 microfoonmodule</strong><small>Analoge geluidsensor met versterker.</small></div>
+    </div>
+    <div class="hardware">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 17 9 8l4 5 2-3 5 7H4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="17" cy="6" r="2" stroke="currentColor" stroke-width="1.8"/></svg></div>
+      <div><strong>Air530Z GPS</strong><small>GPS via Serial1/UART, zoals bij de standaard DataLogger.</small></div>
+    </div>
+    <div class="hardware">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 3h9l3 3v15H6V3Z" stroke="currentColor" stroke-width="1.8"/><path d="M9 3v6h6V3" stroke="currentColor" stroke-width="1.8"/></svg></div>
+      <div><strong>microSD-kaart</strong><small>Slaat de meetsessies op als CSV-bestanden.</small></div>
+    </div>
+    <div class="hardware">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M7 12h10M12 7v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/></svg></div>
+      <div><strong>3 verbindingsdraden</strong><small>Voor 3.3V, GND en analoge uitgang naar A0.</small></div>
+    </div>
   </div>
-  <h3 style="margin-top:5mm">Wat meet Toolkit 1?</h3>
-  <div class="part-grid">
-    <div class="part"><div class="num">1</div><div><b>Geluidsamplitude</b><small>Piek-tot-piek signaal in millivolt (mV p-p).</small></div></div>
-    <div class="part"><div class="num">2</div><div><b>Ruwe signaalwaarde</b><small>Verschil tussen ADC-minimum en maximum.</small></div></div>
-    <div class="part"><div class="num">3</div><div><b>Tijd</b><small>RTC-tijd en verstreken meettijd.</small></div></div>
-    <div class="part"><div class="num">4</div><div><b>Locatie</b><small>GPS-positie, fixstatus en satellietinformatie.</small></div></div>
-  </div>
-  <div class="callout" style="margin-top:4mm"><strong>De meetwaarde is geen decibelwaarde</strong><p>Zonder akoestische kalibratie kan de MAX4466 niet worden gebruikt als officiële dB(A)-meter. De waarden zijn geschikt om veranderingen en pieken binnen je eigen meting te vergelijken.</p></div>
-  <div class="page-brand"><span>DataLogger-handleiding · Toolkit 1</span><b>Data<span>Logger</span></b></div>
 </section>
 
-<section class="sheet" aria-label="Onderdelen herkennen">
-  <span class="folio">05</span><p class="eyebrow">02 · Hardware</p><h2>Het Arduino-sensorsysteem</h2>
-  <p class="intro">De nummers komen terug in de bouwstappen en in het aansluitschema.</p>
-  <div class="stack-art">
-    <svg viewBox="0 0 520 255" role="img" aria-label="Overzicht van de gestapelde DataLogger-modules">
-      <g transform="translate(115 26)">
-        <rect x="45" y="139" width="235" height="70" rx="10" fill="#293a55"/><rect x="63" y="153" width="196" height="42" rx="5" fill="#527092"/><text x="161" y="179" text-anchor="middle" fill="#fff" font-family="Arial" font-size="13" font-weight="bold">1 · Arduino UNO R4 WiFi</text>
-        <rect x="34" y="87" width="257" height="45" rx="8" fill="#bb4240"/><text x="162" y="115" text-anchor="middle" fill="#fff" font-family="Arial" font-size="12" font-weight="bold">2 · Keyes Logging Shield</text>
-        <rect x="24" y="39" width="277" height="39" rx="7" fill="#f7a928"/><text x="162" y="64" text-anchor="middle" fill="#263650" font-family="Arial" font-size="12" font-weight="bold">3 · Grove Shield</text>
-        <g stroke="#d0a34c" stroke-width="4"><path d="M61 78v9m31-9v9m31-9v9m31-9v9m31-9v9m31-9v9m31-9v9m31-9v9"/><path d="M70 132v7m32-7v7m32-7v7m32-7v7m32-7v7m32-7v7m32-7v7"/></g>
-        <rect x="327" y="38" width="82" height="48" rx="8" fill="#fff" stroke="#263650" stroke-width="3"/><circle cx="367" cy="60" r="13" fill="#f7a928"/><text x="368" y="101" text-anchor="middle" fill="#263650" font-family="Arial" font-size="11" font-weight="bold">4 · MAX4466</text>
-        <rect x="334" y="120" width="68" height="36" rx="6" fill="#29415f"/><path d="M347 132q21-28 42 0M352 137q16-18 32 0" fill="none" stroke="#f7a928" stroke-width="3"/><text x="368" y="173" text-anchor="middle" fill="#263650" font-family="Arial" font-size="10" font-weight="bold">5 · Air530Z GPS</text>
-        <rect x="341" y="195" width="54" height="27" rx="4" fill="#f7a928"/><text x="368" y="213" text-anchor="middle" fill="#263650" font-family="Arial" font-size="9" font-weight="bold">6 · microSD</text>
-      </g>
-    </svg>
+<section id="aansluiten">
+  <h2>4. MAX4466 aansluiten</h2>
+  <p class="section-intro">Schakel de Arduino volledig uit voordat je de bedrading aansluit. De MAX4466 gebruikt geen I2C; het audiosignaal wordt rechtstreeks analoog op A0 ingelezen.</p>
+
+  <div class="wiring">
+    <table class="wire-table">
+      <thead>
+        <tr><th>MAX4466</th><th>Arduino / Logging Shield</th><th>Functie</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="pin">VCC</span></td><td><span class="pin">3.3V</span></td><td>Voeding sensor</td></tr>
+        <tr><td><span class="pin">GND</span></td><td><span class="pin">GND</span></td><td>Gemeenschappelijke massa</td></tr>
+        <tr><td><span class="pin">OUT</span></td><td><span class="pin">A0</span></td><td>Analoog audiosignaal</td></tr>
+      </tbody>
+    </table>
   </div>
-  <div class="part-grid">
-    <div class="part"><div class="num">1</div><div><b>Arduino UNO R4 WiFi</b><small>Draait de firmware en maakt het WiFi-netwerk.</small></div></div>
-    <div class="part"><div class="num">2</div><div><b>Keyes Data Logging Shield</b><small>Voegt DS1307-klok en microSD-opslag toe.</small></div></div>
-    <div class="part"><div class="num">3</div><div><b>Grove Shield</b><small>Breekt aansluitingen uit naar poorten.</small></div></div>
-    <div class="part"><div class="num">4</div><div><b>MAX4466</b><small>Versterkte analoge microfoonmodule.</small></div></div>
-    <div class="part"><div class="num">5</div><div><b>Air530Z GPS</b><small>Levert locatie en GPS-tijd via UART.</small></div></div>
-    <div class="part"><div class="num">6</div><div><b>microSD-kaart</b><small>Bewaarplek voor CSV-meetsessies.</small></div></div>
+
+  <div class="callout danger">
+    <strong>Niet op een I2C-poort aansluiten</strong>
+    De MAX4466 heeft een analoge uitgang. OUT moet naar A0. SDA en SCL worden voor deze sensor niet gebruikt.
   </div>
-  <div class="page-brand"><span>DataLab · Hogeschool van Amsterdam</span><b>Data<span>Logger</span></b></div>
+
+  <h3>Overige onderdelen</h3>
+  <p>De RTC en SD-kaart blijven op het Data Logging Shield werken. De Air530Z GPS blijft aangesloten zoals bij de standaard DataLogger en wordt via <code>Serial1</code> uitgelezen.</p>
 </section>
 
-<section class="sheet" aria-label="Bouwstappen">
-  <span class="folio">06</span><p class="eyebrow">03 · Bouwstappen</p><h2>De meetopstelling bouwen</h2>
-  <p class="intro">Bouw eerst de boardstack. Sluit daarna de sensoronderdelen aan. Leg alle onderdelen klaar voordat je begint.</p>
-  <div class="step-list">
-    <div class="step"><div class="step-no">A</div><p><strong>Leg de onderdelen klaar</strong>Arduino UNO R4 WiFi, Keyes Data Logging Shield, Grove Shield, MAX4466, Air530Z GPS, microSD-kaart en USB-C-voeding.</p></div>
-    <div class="step"><div class="step-no">B</div><p><strong>Plaats het Keyes Logging Shield</strong>Richt de pinnen recht boven de Arduino-headers. Druk het shield rustig en gelijkmatig aan.</p></div>
-    <div class="step"><div class="step-no">C</div><p><strong>Plaats het Grove Shield</strong>Richt ook deze headers zorgvuldig uit. Controleer rondom of alle pinnen in de juiste aansluiting vallen.</p></div>
-    <div class="step"><div class="step-no">D</div><p><strong>Controleer de boardstack</strong>De Arduino, het Logging Shield en het Grove Shield vormen samen de gestapelde meetopstelling.</p></div>
+<section id="software">
+  <h2>5. Firmware installeren</h2>
+  <p class="section-intro">Gebruik de Toolkit 1 firmware uit de DataLab-repository. Deze versie bevat zowel de sensormeting als de volledige webapp.</p>
+
+  <pre>DataLab/
+└── Minor_FuturCity_dataloggers/
+    └── DataLogger_Toolkit_1/
+        └── DataLogger_Toolkit_1.ino</pre>
+
+  <div class="grid two">
+    <div class="card">
+      <div class="num">1</div>
+      <h3>Arduino IDE</h3>
+      <p>Open <code>DataLogger_Toolkit_1.ino</code>, kies Arduino UNO R4 WiFi en selecteer de juiste COM-poort.</p>
+    </div>
+    <div class="card">
+      <div class="num">2</div>
+      <h3>Upload</h3>
+      <p>Upload de sketch. Open daarna de Serial Monitor op <strong>115200 baud</strong>.</p>
+    </div>
   </div>
-  <div class="stack-art" style="margin-top:5mm">
-    <svg viewBox="0 0 520 210" role="img" aria-label="Exploded view van drie gestapelde boards">
-      <g transform="translate(82 10)">
-        <rect x="55" y="18" width="270" height="42" rx="8" fill="#f7a928"/><text x="190" y="44" text-anchor="middle" fill="#263650" font-family="Arial" font-size="14" font-weight="bold">Grove Shield</text>
-        <g stroke="#c99b45" stroke-width="4"><path d="M82 60v23m42-23v23m42-23v23m42-23v23m42-23v23m42-23v23"/></g>
-        <rect x="42" y="85" width="296" height="43" rx="8" fill="#bb4240"/><text x="190" y="112" text-anchor="middle" fill="#fff" font-family="Arial" font-size="14" font-weight="bold">Keyes Data Logging Shield</text>
-        <g stroke="#c99b45" stroke-width="4"><path d="M82 128v22m42-22v22m42-22v22m42-22v22m42-22v22m42-22v22"/></g>
-        <rect x="55" y="152" width="270" height="44" rx="8" fill="#293a55"/><text x="190" y="180" text-anchor="middle" fill="#fff" font-family="Arial" font-size="14" font-weight="bold">Arduino UNO R4 WiFi</text>
-      </g>
-    </svg>
+
+  <div class="callout good">
+    <strong>Firmwareconfiguratie</strong>
+    De huidige firmware gebruikt <code>A0</code> voor de MAX4466, een 12-bit ADC en een meetvenster van 50 ms per geluidsmeting. Het standaard opslaginterval is 0,1 s. De kortste instelbare interval is 0,05 s; daarbij sluiten de 50 ms meetvensters direct op elkaar aan zonder extra ingestelde wachttijd.
   </div>
-  <div class="callout danger"><strong>Let op</strong><p>Sluit de Arduino nog niet aan op de voeding. Voorkom kortsluiting en forceer de headers niet. Scheef geplaatste pinnen kunnen verbuigen.</p></div>
-  <div class="page-brand"><span>Boards opbouwen · Toolkit 1</span><b>Data<span>Logger</span></b></div>
 </section>
 
-<section class="sheet" aria-label="Sensor aansluiten">
-  <span class="folio">07</span><p class="eyebrow">04 · Sensor en opslag</p><h2>Aansluiten</h2>
-  <p class="intro">De MAX4466 wordt anders aangesloten dan een Grove-sensor. Het geluidssignaal gaat naar een analoge Arduino-ingang.</p>
-  <h3>MAX4466 naar de Arduino</h3>
-  <table class="wire-table"><thead><tr><th>MAX4466</th><th>Aansluiten op</th><th>Functie</th></tr></thead><tbody>
-    <tr><td>VCC</td><td>3.3V</td><td>Voeding sensor</td></tr><tr><td>GND</td><td>GND</td><td>Gemeenschappelijke massa</td></tr><tr><td>OUT</td><td>A0</td><td>Analoog geluidssignaal</td></tr>
-  </tbody></table>
-  <div class="stack-art" style="padding:2mm"><svg viewBox="0 0 500 130" role="img" aria-label="MAX4466 verbindingen naar A0, 3.3 volt en ground">
-    <rect x="12" y="29" width="116" height="70" rx="10" fill="#263650"/><circle cx="70" cy="60" r="17" fill="#f7a928"/><text x="70" y="91" text-anchor="middle" fill="#fff" font-family="Arial" font-size="11" font-weight="bold">MAX4466</text>
-    <path d="M128 43H330" stroke="#c9534b" stroke-width="4"/><path d="M128 64H330" stroke="#71849f" stroke-width="4"/><path d="M128 85H330" stroke="#f7a928" stroke-width="4"/>
-    <rect x="330" y="23" width="155" height="84" rx="10" fill="#fff" stroke="#263650" stroke-width="3"/><text x="350" y="47" fill="#263650" font-family="Arial" font-size="12" font-weight="bold">3.3V ← VCC</text><text x="350" y="68" fill="#263650" font-family="Arial" font-size="12" font-weight="bold">GND ← GND</text><text x="350" y="89" fill="#263650" font-family="Arial" font-size="12" font-weight="bold">A0 ← OUT</text>
-  </svg></div>
-  <div class="callout danger"><strong>Niet op I²C aansluiten</strong><p>De MAX4466 gebruikt geen SDA- of SCL-lijn. Verbind OUT met A0; een I²C-poort is niet geschikt voor dit analoge signaal.</p></div>
-  <h3>GPS en microSD</h3>
-  <div class="step-list">
-    <div class="step"><div class="step-no">1</div><p><strong>Air530Z GPS</strong>Verbind de GPS met de UART/Serial1-aansluiting. Klik de GPS-antenne op de daarvoor bestemde connector.</p></div>
-    <div class="step"><div class="step-no">2</div><p><strong>microSD-kaart</strong>Schuif de kaart in de houder van het Keyes Logging Shield.</p></div>
-    <div class="step"><div class="step-no">3</div><p><strong>Voeding</strong>Sluit een powerbank of laptop pas aan nadat alle onderdelen zijn gecontroleerd, via USB-C.</p></div>
-  </div>
-  <div class="page-brand"><span>DataLab · Hogeschool van Amsterdam</span><b>Data<span>Logger</span></b></div>
+<section id="opstarten">
+  <h2>6. De DataLogger voor het eerst opstarten</h2>
+  <ol class="steps">
+    <li><div><strong>Sluit de voeding aan</strong>Gebruik USB-C via een powerbank of laptop. Wacht ongeveer 10 tot 30 seconden tot de Arduino en de webserver zijn gestart.</div></li>
+    <li><div><strong>Verbind met de WiFi-hotspot</strong>Open WiFi-instellingen op je telefoon, tablet of laptop en kies <code>Arduino-Logger-01</code>. Blijf verbonden als je apparaat meldt dat het netwerk geen internet heeft.</div></li>
+    <li><div><strong>Open de webapp</strong>Open een browser en ga naar <code>http://192.168.4.1</code>. De webapp wordt door de DataLogger aangeboden; internet of een losse app-installatie is niet nodig.</div></li>
+    <li><div><strong>Optioneel: zet de webapp op je beginscherm</strong>Gebruik in je browser het menu of de deelknop en kies 'Toevoegen aan beginscherm' als die optie beschikbaar is.</div></li>
+  </ol>
+  <div class="callout warn"><strong>De webapp laadt niet meteen?</strong>Wacht nog even; de eerste keer kan het enkele seconden duren. Controleer daarna of je met het DataLogger-netwerk bent verbonden en laad <code>192.168.4.1</code> opnieuw.</div>
 </section>
 
-<section class="sheet" aria-label="Firmware en eerste start">
-  <span class="folio">08</span><p class="eyebrow">05 · Firmware en voeding</p><h2>Voor het eerst opstarten</h2>
-  <p class="intro">De firmware voor Toolkit 1 bevat zowel de MAX4466-meting als de webapp.</p>
-  <div class="terminal">DataLab/<br>└── Minor_FuturCity_dataloggers/<br>&nbsp;&nbsp;&nbsp;&nbsp;└── DataLogger_Toolkit_1/<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="accent">DataLogger_Toolkit_1.ino</span></div>
-  <div class="step-list">
-    <div class="step"><div class="step-no">1</div><p><strong>Open de sketch</strong>Open <code>DataLogger_Toolkit_1.ino</code> in Arduino IDE.</p></div>
-    <div class="step"><div class="step-no">2</div><p><strong>Kies board en poort</strong>Selecteer <code>Arduino UNO R4 WiFi</code> en de COM-poort van de DataLogger.</p></div>
-    <div class="step"><div class="step-no">3</div><p><strong>Upload de firmware</strong>Upload de sketch. Open eventueel de Serial Monitor op <code>115200 baud</code>.</p></div>
-    <div class="step"><div class="step-no">4</div><p><strong>Sluit de voeding aan</strong>Gebruik USB-C via een powerbank of laptop. Wacht ongeveer 10–30 seconden tot de logger is gestart.</p></div>
+<section id="app">
+  <h2>7. De webapp gebruiken</h2>
+  <div class="flow">
+    <div class="flow-step">1. DataLogger inschakelen</div>
+    <div class="flow-step">2. WiFi openen</div>
+    <div class="flow-step">3. Arduino-Logger-01 kiezen</div>
+    <div class="flow-step">4. Logger2026! invoeren</div>
+    <div class="flow-step">5. 192.168.4.1 openen</div>
   </div>
-  <div class="callout good"><strong>Toolkit 1-instellingen</strong><p>De MAX4466 gebruikt ingang A0. De firmware meet het signaal in een venster van 50 ms. Standaard wordt iedere 0,1 s opgeslagen; het kortste interval is 0,05 s.</p></div>
-  <div class="callout cool"><strong>Voeding loshalen</strong><p>Schakel de DataLogger uit voordat je aansluitingen verandert of de microSD-kaart verwijdert.</p></div>
-  <div class="page-brand"><span>Firmwarepad in de DataLab-repository</span><b>Data<span>Logger</span></b></div>
+
+  <h3>Onderdelen van de webapp</h3>
+  <div class="grid">
+    <div class="card"><h3>Home</h3><p>Controleer live systeeminformatie en ga snel naar meten of opgeslagen data.</p></div>
+    <div class="card"><h3>Meten</h3><p>Start, pauzeer, hervat of stop een sessie en kies het meetinterval.</p></div>
+    <div class="card"><h3>Data</h3><p>Bekijk sessies en open, download, deel of verwijder opgeslagen bestanden.</p></div>
+    <div class="card"><h3>Grafieken</h3><p>Bekijk de opgeslagen geluidsmetingen als grafiek en onderzoek veranderingen tijdens de sessie.</p></div>
+    <div class="card"><h3>Instellingen</h3><p>Controleer de systeemstatus en instellingen voor tijd, locatie, opslag en weergave.</p></div>
+  </div>
+  <div class="callout"><strong>Verbinding valt weg</strong>Controleer de voeding en WiFi-verbinding. Verbind zo nodig opnieuw met <code>Arduino-Logger-01</code> en herlaad de pagina. Een korte onderbreking van de webpagina stopt een lopende meting niet automatisch.</div>
+  <h3>Status in de webapp</h3>
+  <p>Om de gebruiker tijdens een geluidsmeting niet af te leiden met snel wisselende ruwe waarden, toont de app op het dashboard vooral de meetstatus. De geluidswaarden zelf blijven volledig beschikbaar in de CSV-bestanden en grafieken.</p>
+  <div class="app-preview">
+    <div class="tile primary">
+      <div class="label">Geluidssensor</div>
+      <div class="value">Actief</div>
+      <div class="sub">MAX4466 · meetstatus</div>
+    </div>
+    <div class="tile dark">
+      <div class="label">GPS status</div>
+      <div class="value">Satelliet gevonden</div>
+      <div class="sub">of: Geen satelliet gevonden</div>
+    </div>
+    <div class="tile">
+      <div class="label">SD-kaart</div>
+      <div class="value">Gereed</div>
+      <div class="sub">meetsessie wordt opgeslagen</div>
+    </div>
+    <div class="tile">
+      <div class="label">Tijd</div>
+      <div class="value">RTC</div>
+      <div class="sub">tijdstempel per meting</div>
+    </div>
+  </div>
 </section>
 
-<section class="sheet" aria-label="Webapp">
-  <span class="folio">09</span><p class="eyebrow">06 · Verbinden</p><h2>De webapp openen</h2>
-  <p class="intro">De DataLogger maakt een eigen WiFi-hotspot. De webapp komt vanaf de Arduino; internet is niet nodig.</p>
-  <div class="step-list">
-    <div class="step"><div class="step-no">1</div><p><strong>Open de WiFi-instellingen</strong>Gebruik een telefoon, tablet of laptop.</p></div>
-    <div class="step"><div class="step-no">2</div><p><strong>Kies het DataLogger-netwerk</strong>Verbind met <code>Arduino-Logger-01</code>. Kies zo nodig het wachtwoord <code>Logger2026!</code>.</p></div>
-    <div class="step"><div class="step-no">3</div><p><strong>Blijf verbonden</strong>Negeer de melding dat WiFi geen internet heeft; dat is normaal voor dit lokale netwerk.</p></div>
-    <div class="step"><div class="step-no">4</div><p><strong>Open de webapp</strong>Ga in je browser naar <code>http://192.168.4.1</code>.</p></div>
+<section id="meten">
+  <h2>8. Een meting uitvoeren</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="num">1</div>
+      <h3>Controleer de status</h3>
+      <p>Controleer vóór het starten of de geluidssensor als <strong>Actief</strong> wordt weergegeven, de SD-kaart gereed is en indien nodig een GPS-satelliet is gevonden.</p>
+    </div>
+    <div class="card">
+      <div class="num">2</div>
+      <h3>Start de sessie</h3>
+      <p>Open <strong>Meten</strong>, kies het gewenste meetinterval en druk op <strong>START MET METEN</strong>. Beschikbare intervallen zijn 0,05 s, 0,1 s, 0,25 s, 0,5 s, 1 s, 2 s en 5 s. Standaard staat Toolkit 1 op 0,1 s.</p>
+    </div>
+    <div class="card">
+      <div class="num">3</div>
+      <h3>Stop & analyseer</h3>
+      <p>Stop de sessie en bevestig dit als de app daarom vraagt. De DataLogger sluit het CSV-bestand af. Open daarna Data of Grafieken om de meetreeks te bekijken.</p>
+    </div>
   </div>
-  <div class="app-phone" aria-label="Schematische preview van de DataLogger webapp">
-    <div class="phone-head">DataLogger · Toolkit 1</div>
-    <div class="phone-stat"><div>Geluidssensor<b>Actief</b></div><div>SD-kaart<b>Gereed</b></div><div>GPS<b>Zoeken…</b></div><div>Tijd<b>RTC</b></div></div>
-    <div style="padding:2mm"><div style="background:var(--orange);border-radius:2mm;padding:2mm;text-align:center;font-weight:800;font-size:7pt;color:var(--navy)">BEGIN MET METEN</div></div>
-    <div class="phone-nav"><div><b>⌂</b>Home</div><div><b>◉</b>Meten</div><div><b>▤</b>Data</div><div><b>⚙</b>Instellingen</div></div>
+
+  <h3>Pauzeren en hervatten</h3>
+  <p>Tik op <strong>PAUZE</strong> om tijdelijk geen nieuwe meetpunten toe te voegen. De sessie blijft open. Tik op <strong>VERDER METEN</strong> om dezelfde sessie te hervatten. Gebruik <strong>STOP SESSIE</strong> wanneer je klaar bent; na bevestiging wordt het bestand afgesloten.</p>
+  <h3>Meetprincipe</h3>
+  <div class="flow">
+    <div class="flow-step">A0 snel bemonsteren</div>
+    <div class="flow-step">50 ms meetvenster</div>
+    <div class="flow-step">minimum & maximum bepalen</div>
+    <div class="flow-step">piek-tot-piek berekenen</div>
+    <div class="flow-step">direct opslaan in CSV</div>
   </div>
-  <div class="columns">
-    <div class="card"><h3>Home</h3><p>Controleer de status van sensor, SD, GPS en tijd.</p></div><div class="card"><h3>Meten</h3><p>Kies interval en bedien de meetsessie.</p></div>
-    <div class="card"><h3>Data en grafieken</h3><p>Bekijk sessies, CSV-inhoud en signaalverloop.</p></div><div class="card"><h3>Instellingen</h3><p>Bekijk systeemstatus en beschikbare instellingen.</p></div>
-  </div>
-  <div class="callout cool"><strong>Tip</strong><p>Je kunt de webapp eventueel aan het beginscherm toevoegen via het browsermenu. Bij verbindingsproblemen: controleer de voeding, verbind opnieuw met de hotspot en herlaad de pagina.</p></div>
-  <div class="page-brand"><span>DataLab · Hogeschool van Amsterdam</span><b>Data<span>Logger</span></b></div>
 </section>
 
-<section class="sheet" aria-label="Een meting uitvoeren">
-  <span class="folio">10</span><p class="eyebrow">07 · Meten</p><h2>Een meting uitvoeren</h2>
-  <p class="intro">Start pas wanneer de sensor en opslag gereed zijn. GPS is alleen nodig als je locatie aan de meting wilt koppelen.</p>
-  <div class="step-list">
-    <div class="step"><div class="step-no">1</div><p><strong>Controleer de status</strong>De geluidssensor moet als Actief worden weergegeven en de SD-kaart moet gereed zijn. Wacht buiten of bij vrij zicht op de lucht op GPS-fix als je locatiegegevens nodig hebt.</p></div>
-    <div class="step"><div class="step-no">2</div><p><strong>Kies het meetinterval</strong>Voor een eerste test kun je 1 of 5 seconden proberen. Voor meer detail is 0,1 s de standaard; 0,05 s is het kortste instelbare interval.</p></div>
-    <div class="step"><div class="step-no">3</div><p><strong>Start de sessie</strong>Open Meten en tik op <b>START MET METEN</b>. De verstreken tijd en het aantal meetpunten lopen op.</p></div>
-    <div class="step"><div class="step-no">4</div><p><strong>Pauzeer en hervat</strong>Tik op <b>PAUZE</b> om tijdelijk te stoppen met nieuwe meetpunten. Tik op <b>VERDER METEN</b> om dezelfde sessie voort te zetten.</p></div>
-    <div class="step"><div class="step-no">5</div><p><strong>Stop de sessie</strong>Tik op <b>STOP SESSIE</b> en bevestig. De DataLogger sluit het CSV-bestand af.</p></div>
+<section id="data">
+  <h2>9. Data bekijken, downloaden en analyseren</h2>
+  <p class="section-intro">Iedere meetsessie wordt als afzonderlijk CSV-bestand opgeslagen. Toolkit 1 gebruikt de volgende kolommen:</p>
+
+  <pre class="csv">measurement_id,
+rtc_datetime_local,
+elapsed_ms,
+sound_p2p_mV,
+sound_p2p_adc,
+sound_bias_V,
+latitude,
+longitude,
+satellites,
+gps_fix,
+gps_speed_kmh,
+gps_utc,
+location_source</pre>
+
+  <p>Open in de webapp het tabblad <strong>Data</strong> om de sessies te bekijken. Selecteer een bestand om de inhoud te bekijken of gebruik de beschikbare acties om het CSV-bestand te downloaden of te delen. Verwijder een sessie alleen als je het bestand niet meer nodig hebt. CSV-bestanden kun je openen in Excel, Python of andere data-analysetools.</p>
+  <div class="callout">
+    <strong>Grafieken</strong>
+    De opgeslagen geluidsamplitude wordt uitgezet tegen de verstreken tijd. Het zichtbare venster is 20 seconden breed met een tijd-as per 5 seconden. Bij langere metingen kun je horizontaal door de grafiek swipen of scrollen. De y-as blijft daarbij vast staan, zodat de schaal altijd leesbaar blijft en korte geluidspieken niet worden samengedrukt.
   </div>
-  <h3 style="margin-top:4mm">Wat gebeurt er tijdens een meting?</h3>
-  <div class="columns" style="grid-template-columns:repeat(4,1fr);gap:1.5mm;margin-top:2mm">
-    <div class="card" style="text-align:center;padding:2mm"><div class="label">1</div><b style="font-size:7pt">A0 uitlezen</b></div><div class="card" style="text-align:center;padding:2mm"><div class="label">2</div><b style="font-size:7pt">50 ms meten</b></div><div class="card" style="text-align:center;padding:2mm"><div class="label">3</div><b style="font-size:7pt">Min/max vinden</b></div><div class="card" style="text-align:center;padding:2mm"><div class="label">4</div><b style="font-size:7pt">CSV opslaan</b></div>
-  </div>
-  <div class="callout"><strong>Meetinstellingen</strong><p>Beschikbare intervallen: 0,05 s, 0,1 s, 0,25 s, 0,5 s, 1 s, 2 s en 5 s. Het meetvenster voor een geluidswaarde duurt 50 ms.</p></div>
-  <div class="page-brand"><span>DataLogger-handleiding · Toolkit 1</span><b>Data<span>Logger</span></b></div>
 </section>
 
-<section class="sheet" aria-label="Data bekijken">
-  <span class="folio">11</span><p class="eyebrow">08 · Data bekijken</p><h2>Downloaden en analyseren</h2>
-  <p class="intro">Elke meetsessie wordt als afzonderlijk CSV-bestand op de microSD-kaart opgeslagen.</p>
-  <div class="columns">
-    <div class="card"><h3>In de webapp</h3><p>Open <b>Data</b> om sessies te bekijken. Selecteer een bestand om de inhoud te openen, te downloaden of te delen. Verwijder bestanden alleen als je ze niet meer nodig hebt.</p></div>
-    <div class="card"><h3>Op je computer</h3><p>Open het CSV-bestand in Excel, Python of een ander data-analyseprogramma. Bewaar een kopie voordat je data bewerkt.</p></div>
+<section id="grafiek">
+  <h2>10. Grafiek gebruiken</h2>
+  <p class="section-intro">Toolkit 1 is ingericht om korte geluidspieken ook tijdens langere sessies zichtbaar te houden.</p>
+  <div class="grid two">
+    <div class="card"><div class="num">1</div><h3>20 seconden per venster</h3><p>De x-as toont steeds ongeveer 20 seconden meettijd. Tijdmarkeringen staan iedere 5 seconden.</p></div>
+    <div class="card"><div class="num">2</div><h3>Horizontaal scrollen</h3><p>Duurt de meting langer dan 20 seconden, swipe of scroll dan naar rechts. De meetlijn wordt niet samengeperst.</p></div>
+    <div class="card"><div class="num">3</div><h3>Vaste y-as</h3><p>De schaal links blijft op zijn plaats tijdens horizontaal scrollen, zodat amplitudes altijd afleesbaar blijven.</p></div>
+    <div class="card"><div class="num">4</div><h3>Pieken behouden</h3><p>Omdat de tijd-as breder wordt bij langere sessies blijven korte pieken zichtbaar in plaats van samen te vallen.</p></div>
   </div>
-  <h3 style="margin-top:4mm">Kolommen in het CSV-bestand</h3>
-  <div class="terminal">measurement_id · rtc_datetime_local<br>elapsed_ms · sound_p2p_mV · sound_p2p_adc<br>sound_bias_V · latitude · longitude<br>satellites · gps_fix · gps_speed_kmh<br>gps_utc · location_source</div>
-  <div class="chart"><svg viewBox="0 0 520 200" role="img" aria-label="Voorbeeldgrafiek van geluidsamplitude als functie van tijd">
-    <path d="M52 16V164H498" fill="none" stroke="#263650" stroke-width="2"/><g stroke="#d9e0e9" stroke-width="1"><path d="M52 48H498M52 86H498M52 124H498"/><path d="M162 16V164M272 16V164M382 16V164"/></g>
-    <path d="M52 112 L76 109 L99 115 L123 105 L147 110 L170 80 L194 112 L218 107 L241 99 L265 108 L289 43 L312 114 L336 104 L360 107 L383 92 L407 106 L430 34 L454 114 L477 102 L498 105" fill="none" stroke="#f0a31f" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
-    <text x="14" y="82" transform="rotate(-90 14 82)" fill="#536177" font-size="11" font-family="Arial">amplitude (mV p-p)</text><text x="260" y="190" text-anchor="middle" fill="#536177" font-size="11" font-family="Arial">verstreken tijd</text>
-    <text x="52" y="179" fill="#536177" font-size="9" font-family="Arial">0 s</text><text x="156" y="179" fill="#536177" font-size="9" font-family="Arial">5 s</text><text x="267" y="179" fill="#536177" font-size="9" font-family="Arial">10 s</text><text x="376" y="179" fill="#536177" font-size="9" font-family="Arial">15 s</text><text x="476" y="179" fill="#536177" font-size="9" font-family="Arial">20 s</text>
-  </svg><div class="chart-caption"><span>Voorbeeld: korte geluidspieken in een meetreeks</span><span>Waarden ter illustratie</span></div></div>
-  <div class="callout cool"><strong>Grafiek lezen</strong><p>De grafiek toont een venster van ongeveer 20 seconden met tijdmarkeringen per 5 seconden. Bij langere sessies kun je horizontaal door de tijd scrollen; de verticale schaal blijft leesbaar.</p></div>
-  <div class="page-brand"><span>DataLab · Hogeschool van Amsterdam</span><b>Data<span>Logger</span></b></div>
 </section>
 
-<section class="sheet" aria-label="Controle en problemen">
-  <span class="folio">12</span><p class="eyebrow">09 · Afronden</p><h2>Controle en problemen</h2>
-  <h3 style="margin-top:3mm">Controle vóór je start</h3>
+<section id="controle">
+  <h2>11. Controle vóór gebruik</h2>
   <div class="checklist">
-    <div class="check"><i></i>Arduino en shields zitten recht en volledig op elkaar.</div>
-    <div class="check"><i></i>MAX4466: VCC → 3.3V, GND → GND, OUT → A0.</div>
-    <div class="check"><i></i>GPS zit op UART; microSD-kaart is geplaatst.</div>
-    <div class="check"><i></i>Toolkit 1-firmware is geüpload; voeding en WiFi zijn actief.</div>
-    <div class="check"><i></i>Webapp toont geluidssensor Actief en SD-kaart Gereed.</div>
-    <div class="check"><i></i>Je hebt een meetinterval gekozen en weet waar het CSV-bestand wordt opgeslagen.</div>
+    <div class="check"><div class="box"></div><div>Arduino UNO R4 WiFi en Data Logging Shield correct gemonteerd.</div></div>
+    <div class="check"><div class="box"></div><div>microSD-kaart geplaatst.</div></div>
+    <div class="check"><div class="box"></div><div>MAX4466 VCC aangesloten op 3.3V.</div></div>
+    <div class="check"><div class="box"></div><div>MAX4466 GND aangesloten op GND.</div></div>
+    <div class="check"><div class="box"></div><div>MAX4466 OUT aangesloten op A0.</div></div>
+    <div class="check"><div class="box"></div><div>Air530Z GPS aangesloten.</div></div>
+    <div class="check"><div class="box"></div><div>Toolkit 1 firmware geüpload.</div></div>
+    <div class="check"><div class="box"></div><div>Serial Monitor ingesteld op 115200 baud.</div></div>
+    <div class="check"><div class="box"></div><div>Verbonden met Arduino-Logger-01.</div></div>
+    <div class="check"><div class="box"></div><div>De webapp toont de geluidssensor als <strong>Actief</strong>.</div></div>
+    <div class="check"><div class="box"></div><div>Standaard meetinterval staat op 0,1 s; 0,05 s is beschikbaar voor de hoogste tijdsresolutie.</div></div>
   </div>
-  <h3 style="margin-top:4mm">Problemen oplossen</h3>
-  <div class="trouble">
-    <div class="card"><h3>Sensor niet actief</h3><p>Controleer OUT → A0 en daarna 3.3V en GND. Controleer ook of firmware voor Toolkit 1 is geladen.</p></div>
-    <div class="card"><h3>Webapp opent niet</h3><p>Verbind opnieuw met Arduino-Logger-01 en open <code>192.168.4.1</code>. Wacht na inschakelen 10–30 seconden.</p></div>
-    <div class="card"><h3>SD-kaart niet gereed</h3><p>Schakel uit, plaats de kaart opnieuw en start de DataLogger weer op.</p></div>
-    <div class="card"><h3>Geen GPS-fix</h3><p>Ga naar buiten of bij een raam staan. Een eerste fix kan enkele minuten duren.</p></div>
-    <div class="card"><h3>Waarde lijkt constant</h3><p>Controleer A0, de gain-instelling en of de sensor niet clipte door te hoge versterking.</p></div>
-    <div class="card"><h3>Waarde lijkt erg hoog</h3><p>De waarden zijn amplitude, geen dB(A). Vergelijk metingen onder dezelfde instellingen.</p></div>
-  </div>
-  <div class="endmark"><strong>DataLab</strong> · Toolkit 1 · DataLogger<br>Hogeschool van Amsterdam</div>
-  <div class="page-brand"><span>Werk zorgvuldig · meet zelf · onderzoek je data</span><b>Data<span>Logger</span></b></div>
 </section>
 
+<section id="problemen">
+  <h2>12. Problemen oplossen</h2>
+
+  <div class="grid two">
+    <div class="card">
+      <h3>Geluidssensor niet actief</h3>
+      <p>Controleer eerst OUT → A0, daarna 3.3V en GND. De webapp hoeft geen live amplitude te tonen; de status moet wel <strong>Actief</strong> worden.</p>
+    </div>
+    <div class="card">
+      <h3>Webapp opent niet</h3>
+      <p>Controleer of je verbonden bent met <strong>Arduino-Logger-01</strong> en open <strong>192.168.4.1</strong>.</p>
+    </div>
+    <div class="card">
+      <h3>SD niet beschikbaar</h3>
+      <p>Schakel de DataLogger uit, plaats de microSD volledig en start opnieuw.</p>
+    </div>
+    <div class="card">
+      <h3>Geen satelliet gevonden</h3>
+      <p>Ga naar buiten of naar een plek met vrij zicht op de lucht en geef de GPS tijd om satellieten te vinden. Een eerste GPS-fix kan enkele minuten duren. Zodra een geldige positie beschikbaar is verandert de melding naar <strong>Satelliet gevonden</strong>.</p>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <strong>Waarde lijkt constant of extreem</strong>
+    Controleer de aansluiting van A0 en de positie van de gain-instelling op de MAX4466. Een verkeerde of zeer hoge gain kan het signaal laten clippen.
+  </div>
+</section>
+
+<p class="meta">Toolkit 1 · Minor FuturCity · DataLab · Hogeschool van Amsterdam<br>Deze handleiding beschrijft de MAX4466-uitvoering; de standaard SHT31-sensor uit het algemene DataLogger-handboek is voor Toolkit 1 vervangen door de geluidssensor.</p>
 </main>
+
+<footer class="footer">
+  <strong>DataLab</strong> · Toolkit 1 · DataLogger
+</footer>
+
+<script>
+(function(){
+  try{
+    if(new URLSearchParams(location.search).get('print')==='1'){
+      window.addEventListener('load',function(){setTimeout(function(){window.print()},300)});
+    }
+  }catch(e){}
+})();
+</script>
 </body>
 </html>

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Printbare HTML-versie van het DataLogger-handboek van HvA DataLab.">
+  <title>DataLogger Handleiding — printweergave</title>
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: #e8edf2;
+      color: #142d4e;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: .8rem max(1rem, calc((100vw - 900px) / 2));
+      background: #123d70;
+      color: white;
+      box-shadow: 0 2px 12px #102b4933;
+    }
+    .toolbar strong { font-size: 1rem; }
+    .toolbar p { margin: .2rem 0 0; font-size: .82rem; opacity: .88; }
+    .toolbar button {
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 999px;
+      padding: .7rem 1rem;
+      background: #f4a62a;
+      color: #142d4e;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    main { padding: 24px 12px; }
+    .page {
+      width: min(100%, 780px);
+      margin: 0 auto 24px;
+      aspect-ratio: 419.25 / 595.5;
+      background: white;
+      box-shadow: 0 5px 24px #102b4926;
+      break-after: page;
+      page-break-after: always;
+    }
+    .page:last-child { break-after: auto; page-break-after: auto; }
+    .page img { display: block; width: 100%; height: 100%; }
+    @page { size: 147.99mm 210.143mm; margin: 0; }
+    @media print {
+      html, body { width: 147.99mm; margin: 0; background: white; }
+      .toolbar { display: none !important; }
+      main { padding: 0; margin: 0; }
+      .page {
+        width: 147.99mm;
+        height: 210.143mm;
+        margin: 0;
+        box-shadow: none;
+        break-after: page;
+        page-break-after: always;
+      }
+      .page:last-child { break-after: auto; page-break-after: auto; }
+      img { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <header class="toolbar">
+    <div>
+      <strong>DataLogger Handleiding</strong>
+      <p>Gebruik de knop om af te drukken of als PDF op te slaan.</p>
+    </div>
+    <button type="button" onclick="window.print()">Afdrukken / opslaan als PDF</button>
+  </header>
+  <main>
+    <section class="page" aria-label="Pagina 1">
+      <img src="datalogger-handleiding-assets/page-1.svg" alt="DataLogger handleiding, pagina 1" />
+    </section>
+    <section class="page" aria-label="Pagina 2">
+      <img src="datalogger-handleiding-assets/page-2.svg" alt="DataLogger handleiding, pagina 2" />
+    </section>
+    <section class="page" aria-label="Pagina 3">
+      <img src="datalogger-handleiding-assets/page-3.svg" alt="DataLogger handleiding, pagina 3" />
+    </section>
+    <section class="page" aria-label="Pagina 4">
+      <img src="datalogger-handleiding-assets/page-4.svg" alt="DataLogger handleiding, pagina 4" />
+    </section>
+    <section class="page" aria-label="Pagina 5">
+      <img src="datalogger-handleiding-assets/page-5.svg" alt="DataLogger handleiding, pagina 5" />
+    </section>
+    <section class="page" aria-label="Pagina 6">
+      <img src="datalogger-handleiding-assets/page-6.svg" alt="DataLogger handleiding, pagina 6" />
+    </section>
+    <section class="page" aria-label="Pagina 7">
+      <img src="datalogger-handleiding-assets/page-7.svg" alt="DataLogger handleiding, pagina 7" />
+    </section>
+    <section class="page" aria-label="Pagina 8">
+      <img src="datalogger-handleiding-assets/page-8.svg" alt="DataLogger handleiding, pagina 8" />
+    </section>
+    <section class="page" aria-label="Pagina 9">
+      <img src="datalogger-handleiding-assets/page-9.svg" alt="DataLogger handleiding, pagina 9" />
+    </section>
+    <section class="page" aria-label="Pagina 10">
+      <img src="datalogger-handleiding-assets/page-10.svg" alt="DataLogger handleiding, pagina 10" />
+    </section>
+    <section class="page" aria-label="Pagina 11">
+      <img src="datalogger-handleiding-assets/page-11.svg" alt="DataLogger handleiding, pagina 11" />
+    </section>
+    <section class="page" aria-label="Pagina 12">
+      <img src="datalogger-handleiding-assets/page-12.svg" alt="DataLogger handleiding, pagina 12" />
+    </section>
+  </main>
+</body>
+</html>
