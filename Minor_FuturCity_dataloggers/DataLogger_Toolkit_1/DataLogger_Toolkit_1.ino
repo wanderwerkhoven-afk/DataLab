@@ -148,7 +148,7 @@ body,.app{background:var(--bg);color:var(--ink)}
 
 /* Grafiekenpagina */
 .chartwrap{padding:17px}.chartwrap h1{font-size:23px;margin:0 0 5px}.chartintro{font-size:13px;color:var(--muted);margin:0 0 16px}.chartpanel{background:var(--surface);border:1px solid var(--border);border-radius:17px;padding:16px;margin-bottom:13px;box-shadow:0 5px 16px var(--shadow)}
-.chartlabel{display:block;font-size:12px;color:var(--muted);margin-bottom:8px}.chartselect{width:100%;border:1px solid var(--border);background:var(--surface-alt);color:var(--ink);border-radius:12px;padding:13px 14px;font-weight:700;min-height:48px}.metricbuttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}.metricbuttons button{min-height:46px;border-radius:11px;background:var(--surface-alt);color:var(--ink);border:1px solid var(--border);font-weight:700}.metricbuttons button.active{background:var(--orange);border-color:var(--orange);color:#232323}.charthead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}.charthead h2{margin:0;font-size:17px}.chartvalue{text-align:right}.chartvalue strong{display:block;font-size:23px;line-height:1}.chartvalue small{color:var(--muted);font-size:11px}.chartbox{position:relative;height:265px;border-radius:13px;background:var(--surface-alt);overflow-x:auto;overflow-y:hidden;border:1px solid var(--border);-webkit-overflow-scrolling:touch;touch-action:pan-x}.chartbox svg{height:100%;display:block;max-width:none}.chartbox::-webkit-scrollbar{height:5px}.chartbox::-webkit-scrollbar-thumb{background:var(--border);border-radius:999px}.chart-empty{height:245px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-size:13px;padding:30px}.chartgridline{stroke:var(--border);stroke-width:1}.chartline{fill:none;stroke:var(--orange);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.chartarea{fill:var(--orange);opacity:.10}.chartdot{fill:var(--orange);stroke:var(--surface);stroke-width:2}.chartaxis{fill:var(--muted);font-size:10px}.chartstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.chartstat{background:var(--surface-alt);border-radius:11px;padding:10px;text-align:center}.chartstat small{display:block;color:var(--muted);font-size:10px;margin-bottom:4px}.chartstat strong{font-size:14px}.chartnote{font-size:11px;color:var(--muted);line-height:1.45;margin-top:10px}
+.chartlabel{display:block;font-size:12px;color:var(--muted);margin-bottom:8px}.chartselect{width:100%;border:1px solid var(--border);background:var(--surface-alt);color:var(--ink);border-radius:12px;padding:13px 14px;font-weight:700;min-height:48px}.metricbuttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}.metricbuttons button{min-height:46px;border-radius:11px;background:var(--surface-alt);color:var(--ink);border:1px solid var(--border);font-weight:700}.metricbuttons button.active{background:var(--orange);border-color:var(--orange);color:#232323}.charthead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}.charthead h2{margin:0;font-size:17px}.chartvalue{text-align:right}.chartvalue strong{display:block;font-size:23px;line-height:1}.chartvalue small{color:var(--muted);font-size:11px}.chartbox{position:relative;height:265px;border-radius:13px;background:var(--surface-alt);overflow:hidden;border:1px solid var(--border);display:grid;grid-template-columns:48px 1fr}.chartyaxis{position:relative;z-index:2;background:var(--surface-alt);border-right:1px solid var(--border);overflow:hidden}.chartyaxis svg{width:48px;height:100%;display:block}.chartscroll{min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-x}.chartscroll svg{height:100%;display:block;max-width:none}.chartscroll::-webkit-scrollbar{height:5px}.chartscroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:999px}.chart-empty{height:245px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-size:13px;padding:30px}.chartgridline{stroke:var(--border);stroke-width:1}.chartline{fill:none;stroke:var(--orange);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.chartarea{fill:var(--orange);opacity:.10}.chartdot{fill:var(--orange);stroke:var(--surface);stroke-width:2}.chartaxis{fill:var(--muted);font-size:10px}.chartstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.chartstat{background:var(--surface-alt);border-radius:11px;padding:10px;text-align:center}.chartstat small{display:block;color:var(--muted);font-size:10px;margin-bottom:4px}.chartstat strong{font-size:14px}.chartnote{font-size:11px;color:var(--muted);line-height:1.45;margin-top:10px}
 .nav .chartNavIcon{font-size:33px;font-weight:700;letter-spacing:-2px}
 
 @media (prefers-reduced-motion:reduce){.themeswitch::before,.themeswitch button,.themeglyph{transition:none!important}}
@@ -976,8 +976,6 @@ async function renderChart(){
       return Number.isFinite(ms)?ms/1000:NaN;
     });
 
-    // Oude CSV's hebben nog geen elapsed_ms. Gebruik dan de sessieduur
-    // om de punten over de werkelijke meetduur te verdelen.
     if(!times.every(Number.isFinite)){
       const duration=Number(session&&session.duration)||0;
       const step=duration>0&&vals.length>1?duration/(vals.length-1):Math.max(0.05,interval||0.1);
@@ -987,11 +985,14 @@ async function renderChart(){
     const totalDuration=Math.max(0.05,times[times.length-1]||0);
     const visibleSeconds=20;
     const viewportWidth=Math.max(320,canvas.clientWidth||360);
-    const plotViewport=Math.max(250,viewportWidth-52);
+    const yAxisWidth=48;
+    const plotViewport=Math.max(240,viewportWidth-yAxisWidth-2);
     const pxPerSecond=plotViewport/visibleSeconds;
-    const left=44,right=18,top=16,bottom=42,h=245;
+
+    const top=16,bottom=42,h=245;
+    const plotLeft=0,right=18;
     const plotWidth=Math.max(plotViewport,totalDuration*pxPerSecond);
-    const w=left+plotWidth+right;
+    const w=plotWidth+right;
     const ph=h-top-bottom;
 
     let min=Math.min(...vals),max=Math.max(...vals);
@@ -999,7 +1000,7 @@ async function renderChart(){
     const pad=(max-min)*.14;
     min-=pad;max+=pad;
 
-    const x=t=>left+(t/Math.max(totalDuration,visibleSeconds))*Math.max(plotViewport,plotWidth);
+    const x=t=>plotLeft+(t/Math.max(totalDuration,visibleSeconds))*plotWidth;
     const y=v=>top+(max-v)/(max-min)*ph;
 
     const pts=vals.map((v,i)=>x(times[i]).toFixed(1)+','+y(v).toFixed(1)).join(' ');
@@ -1007,35 +1008,46 @@ async function renderChart(){
     const lastX=x(times[times.length-1]);
     const area=firstX+','+(top+ph)+' '+pts+' '+lastX+','+(top+ph);
 
-    let grid='';
+    let yAxis='';
     for(let i=0;i<=4;i++){
       const yy=top+i*ph/4,val=max-i*(max-min)/4;
-      grid+='<line class="chartgridline" x1="'+left+'" x2="'+(left+plotWidth)+'" y1="'+yy+'" y2="'+yy+'"/>'+
-            '<text class="chartaxis" x="4" y="'+(yy+3)+'">'+val.toFixed(0)+'</text>';
+      yAxis+='<text class="chartaxis" text-anchor="end" x="42" y="'+(yy+3)+'">'+val.toFixed(0)+'</text>';
     }
 
-    // X-as: altijd zichtbaar, 5-secondenverdeling. Een venster is 20 seconden breed.
+    let grid='';
+    for(let i=0;i<=4;i++){
+      const yy=top+i*ph/4;
+      grid+='<line class="chartgridline" x1="0" x2="'+plotWidth+'" y1="'+yy+'" y2="'+yy+'"/>';
+    }
+
     const tickStep=5;
     const xAxisY=top+ph;
-    grid+='<line class="chartgridline" x1="'+left+'" x2="'+(left+plotWidth)+'" y1="'+xAxisY+'" y2="'+xAxisY+'"/>';
+    grid+='<line class="chartgridline" x1="0" x2="'+plotWidth+'" y1="'+xAxisY+'" y2="'+xAxisY+'"/>';
     for(let t=0;t<=Math.ceil(totalDuration/tickStep)*tickStep;t+=tickStep){
       const xx=x(t);
       grid+='<line class="chartgridline" x1="'+xx+'" x2="'+xx+'" y1="'+xAxisY+'" y2="'+(xAxisY+5)+'"/>'+
             '<text class="chartaxis" text-anchor="middle" x="'+xx+'" y="'+(xAxisY+18)+'">'+t+' s</text>';
     }
-    grid+='<text class="chartaxis" text-anchor="middle" x="'+(left+plotWidth/2)+'" y="'+(h-5)+'">Tijd</text>';
+    grid+='<text class="chartaxis" text-anchor="middle" x="'+(plotWidth/2)+'" y="'+(h-5)+'">Tijd</text>';
 
     const last=vals[vals.length-1];
-    canvas.className='chartbox';
-    canvas.innerHTML='<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'">'+
-      grid+
-      '<polygon class="chartarea" points="'+area+'"/>'+
-      '<polyline class="chartline" points="'+pts+'"/>'+
-      '<circle class="chartdot" cx="'+lastX+'" cy="'+y(last)+'" r="4"/>'+
-      '</svg>';
 
-    // Start links bij het begin van de meting.
-    canvas.scrollLeft=0;
+    canvas.className='chartbox';
+    canvas.innerHTML=
+      '<div class="chartyaxis">'+
+        '<svg viewBox="0 0 48 '+h+'" preserveAspectRatio="none">'+yAxis+'</svg>'+
+      '</div>'+
+      '<div class="chartscroll" id="chartScroll">'+
+        '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'">'+
+          grid+
+          '<polygon class="chartarea" points="'+area+'"/>'+
+          '<polyline class="chartline" points="'+pts+'"/>'+
+          '<circle class="chartdot" cx="'+lastX+'" cy="'+y(last)+'" r="4"/>'+
+        '</svg>'+
+      '</div>';
+
+    const scroller=$('chartScroll');
+    if(scroller)scroller.scrollLeft=0;
 
     $('chartTitle').textContent='Geluidsamplitude';
     $('chartSubtitle').textContent='Meetsessie '+id+' · '+vals.length+' meetpunten · '+totalDuration.toFixed(1).replace('.',',')+' s';
