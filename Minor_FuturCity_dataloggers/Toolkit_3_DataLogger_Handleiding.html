@@ -31,4 +31,14 @@ gps_speed_kmh
 gps_utc
 location_source</pre></section>
 <section><h2>Gebruik</h2><p>Verbind met <b>Arduino-Logger-03</b> en open <b>192.168.4.1</b>. Controleer eerst sensor, SD en GPS-status. Start daarna de meetsessie. In de grafieken kun je wind, temperatuur en luchtvochtigheid bekijken.</p></section>
-</main></body></html>
+</main>
+<script>
+(function(){
+  try{
+    if(new URLSearchParams(location.search).get('print')==='1'){
+      window.addEventListener('load',function(){setTimeout(function(){window.print()},300)});
+    }
+  }catch(e){}
+})();
+</script>
+</body></html>
