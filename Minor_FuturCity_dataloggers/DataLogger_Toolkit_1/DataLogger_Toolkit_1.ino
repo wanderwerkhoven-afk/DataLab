@@ -1030,11 +1030,11 @@ bool startSession(){
   sessionFile=SD.open(path.c_str(),FILE_WRITE);
   if(!sessionFile)return false;
   writeCsvHeader(sessionFile);
-  measurementCount=0; accumulatedRunMs=0; runStartedMs=millis(); lastMeasureMs=millis(); lastFlushMs=millis(); sessionState=STATE_RUNNING;
+  measurementCount=0; accumulatedRunMs=0; runStartedMs=millis(); lastMeasureMs=millis()-intervalMs; lastFlushMs=millis(); sessionState=STATE_RUNNING;
   return true;
 }
 void pauseSession(){ if(sessionState==STATE_RUNNING){ accumulatedRunMs+=(uint32_t)(millis()-runStartedMs); sessionState=STATE_PAUSED; if(sessionFile)sessionFile.flush(); } }
-void resumeSession(){ if(sessionState==STATE_PAUSED){ runStartedMs=millis(); lastMeasureMs=millis(); sessionState=STATE_RUNNING; } }
+void resumeSession(){ if(sessionState==STATE_PAUSED){ runStartedMs=millis(); lastMeasureMs=millis()-intervalMs; sessionState=STATE_RUNNING; } }
 void stopSession(){ if(sessionState==STATE_RUNNING)accumulatedRunMs+=(uint32_t)(millis()-runStartedMs); if(sessionFile){sessionFile.flush();sessionFile.close();} sessionState=STATE_IDLE; }
 
 void logMeasurement(){
@@ -1272,7 +1272,7 @@ void setup(){
 void loop(){
   readGps();
   uint32_t now=millis();
-  if(sessionState==STATE_RUNNING && (uint32_t)(now-lastMeasureMs)>=intervalMs){lastMeasureMs=now;logMeasurement();}
+  if(sessionState==STATE_RUNNING && (uint32_t)(now-lastMeasureMs)>=intervalMs){lastMeasureMs+=intervalMs;logMeasurement();}
   else if(sessionState!=STATE_RUNNING && (uint32_t)(now-lastSensorReadMs)>=1000)readSensors();
   handleWebClient();
 }
