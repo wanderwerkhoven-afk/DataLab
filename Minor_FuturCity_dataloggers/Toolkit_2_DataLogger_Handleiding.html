@@ -35,4 +35,14 @@ gps_speed_kmh
 gps_utc
 location_source</pre></section>
 <section><h2>Gebruik</h2><p>Verbind met <b>Arduino-Logger-02</b>, open <b>192.168.4.1</b>, controleer de sensorstatus en start een meetsessie. De app toont acceleratie per as en kan opgeslagen sessies als grafiek weergeven.</p><div class="good callout"><b>GPS-status</b><br>De webapp gebruikt “Satelliet gevonden” en “Geen satelliet gevonden”.</div></section>
-</main></body></html>
+</main>
+<script>
+(function(){
+  try{
+    if(new URLSearchParams(location.search).get('print')==='1'){
+      window.addEventListener('load',function(){setTimeout(function(){window.print()},300)});
+    }
+  }catch(e){}
+})();
+</script>
+</body></html>
