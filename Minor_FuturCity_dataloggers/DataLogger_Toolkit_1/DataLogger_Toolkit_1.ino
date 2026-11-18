@@ -148,7 +148,7 @@ body,.app{background:var(--bg);color:var(--ink)}
 
 /* Grafiekenpagina */
 .chartwrap{padding:17px}.chartwrap h1{font-size:23px;margin:0 0 5px}.chartintro{font-size:13px;color:var(--muted);margin:0 0 16px}.chartpanel{background:var(--surface);border:1px solid var(--border);border-radius:17px;padding:16px;margin-bottom:13px;box-shadow:0 5px 16px var(--shadow)}
-.chartlabel{display:block;font-size:12px;color:var(--muted);margin-bottom:8px}.chartselect{width:100%;border:1px solid var(--border);background:var(--surface-alt);color:var(--ink);border-radius:12px;padding:13px 14px;font-weight:700;min-height:48px}.metricbuttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}.metricbuttons button{min-height:46px;border-radius:11px;background:var(--surface-alt);color:var(--ink);border:1px solid var(--border);font-weight:700}.metricbuttons button.active{background:var(--orange);border-color:var(--orange);color:#232323}.charthead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}.charthead h2{margin:0;font-size:17px}.chartvalue{text-align:right}.chartvalue strong{display:block;font-size:23px;line-height:1}.chartvalue small{color:var(--muted);font-size:11px}.chartbox{position:relative;height:245px;border-radius:13px;background:var(--surface-alt);overflow:hidden;border:1px solid var(--border)}.chartbox svg{width:100%;height:100%;display:block}.chart-empty{height:245px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-size:13px;padding:30px}.chartgridline{stroke:var(--border);stroke-width:1}.chartline{fill:none;stroke:var(--orange);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.chartarea{fill:var(--orange);opacity:.10}.chartdot{fill:var(--orange);stroke:var(--surface);stroke-width:2}.chartaxis{fill:var(--muted);font-size:10px}.chartstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.chartstat{background:var(--surface-alt);border-radius:11px;padding:10px;text-align:center}.chartstat small{display:block;color:var(--muted);font-size:10px;margin-bottom:4px}.chartstat strong{font-size:14px}.chartnote{font-size:11px;color:var(--muted);line-height:1.45;margin-top:10px}
+.chartlabel{display:block;font-size:12px;color:var(--muted);margin-bottom:8px}.chartselect{width:100%;border:1px solid var(--border);background:var(--surface-alt);color:var(--ink);border-radius:12px;padding:13px 14px;font-weight:700;min-height:48px}.metricbuttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}.metricbuttons button{min-height:46px;border-radius:11px;background:var(--surface-alt);color:var(--ink);border:1px solid var(--border);font-weight:700}.metricbuttons button.active{background:var(--orange);border-color:var(--orange);color:#232323}.charthead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}.charthead h2{margin:0;font-size:17px}.chartvalue{text-align:right}.chartvalue strong{display:block;font-size:23px;line-height:1}.chartvalue small{color:var(--muted);font-size:11px}.chartbox{position:relative;height:265px;border-radius:13px;background:var(--surface-alt);overflow-x:auto;overflow-y:hidden;border:1px solid var(--border);-webkit-overflow-scrolling:touch;touch-action:pan-x}.chartbox svg{height:100%;display:block;max-width:none}.chartbox::-webkit-scrollbar{height:5px}.chartbox::-webkit-scrollbar-thumb{background:var(--border);border-radius:999px}.chart-empty{height:245px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-size:13px;padding:30px}.chartgridline{stroke:var(--border);stroke-width:1}.chartline{fill:none;stroke:var(--orange);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.chartarea{fill:var(--orange);opacity:.10}.chartdot{fill:var(--orange);stroke:var(--surface);stroke-width:2}.chartaxis{fill:var(--muted);font-size:10px}.chartstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.chartstat{background:var(--surface-alt);border-radius:11px;padding:10px;text-align:center}.chartstat small{display:block;color:var(--muted);font-size:10px;margin-bottom:4px}.chartstat strong{font-size:14px}.chartnote{font-size:11px;color:var(--muted);line-height:1.45;margin-top:10px}
 .nav .chartNavIcon{font-size:33px;font-weight:700;letter-spacing:-2px}
 
 @media (prefers-reduced-motion:reduce){.themeswitch::before,.themeswitch button,.themeglyph{transition:none!important}}
@@ -952,7 +952,107 @@ else if(which==='guide'){guideStep=0;renderGuide()}$('modal').classList.add('ope
 function syncChartSessions(){const sel=$('chartSession');if(!sel)return;const prev=sel.value;sel.innerHTML='<option value="">Selecteer een meetsessie</option>';sessions.forEach(f=>{const o=document.createElement('option');o.value=String(f.id);o.textContent='Meetsessie '+f.id+' · '+Number(f.count||0).toLocaleString('nl-NL')+' meetpunten';sel.appendChild(o)});if(sessions.some(f=>String(f.id)===prev))sel.value=prev;else if(sessions.length)sel.value=String(sessions[0].id)}
 function setChartMetric(metric){chartMetric='sound';renderChart()}
 function fmtChartTime(sec){if(sec<60)return Math.round(sec)+' s';if(sec<3600)return Math.round(sec/60)+' min';return (sec/3600).toFixed(1).replace('.',',')+' u'}
-async function renderChart(){const canvas=$('chartCanvas'),stats=$('chartStats'),select=$('chartSession');if(!canvas||!select)return;const id=Number(select.value);if(!id){canvas.className='chart-empty';canvas.innerHTML='Kies een opgeslagen meetsessie.';stats.hidden=true;return}canvas.className='chart-empty';canvas.innerHTML='Meetdata laden...';try{const parsed=parseCSV(await getSessionCsv(id)),vals=parsed.rows.map(r=>Number(r.sound_p2p_mV)).filter(Number.isFinite),unit='mV p-p',label='Geluidsamplitude';if(!vals.length)throw new Error('Geen geldige geluidsdata');let min=Math.min(...vals),max=Math.max(...vals);if(max-min<1){min-=.5;max+=.5}const pad=(max-min)*.14;min-=pad;max+=pad;const w=360,h=220,left=40,right=12,top=16,bottom=30,pw=w-left-right,ph=h-top-bottom,x=i=>left+(i/(vals.length-1||1))*pw,y=v=>top+(max-v)/(max-min)*ph;const pts=vals.map((v,i)=>x(i).toFixed(1)+','+y(v).toFixed(1)).join(' '),area=left+','+(top+ph)+' '+pts+' '+(left+pw)+','+(top+ph);let grid='';for(let i=0;i<=4;i++){const yy=top+i*ph/4,val=max-i*(max-min)/4;grid+='<line class="chartgridline" x1="'+left+'" x2="'+(left+pw)+'" y1="'+yy+'" y2="'+yy+'"/><text class="chartaxis" x="4" y="'+(yy+3)+'">'+val.toFixed(0)+'</text>'}const f=sessionByNumber(id),last=vals[vals.length-1];canvas.className='chartbox';canvas.innerHTML='<svg viewBox="0 0 '+w+' '+h+'">'+grid+'<polygon class="chartarea" points="'+area+'"/><polyline class="chartline" points="'+pts+'"/><circle class="chartdot" cx="'+x(vals.length-1)+'" cy="'+y(last)+'" r="4"/></svg>';$('chartTitle').textContent=label;$('chartSubtitle').textContent='Meetsessie '+id+' · '+vals.length+' meetpunten';$('chartLatest').textContent=last.toFixed(0);$('chartUnit').textContent=unit;const avg=vals.reduce((a,b)=>a+b,0)/vals.length;$('chartMin').textContent=Math.min(...vals).toFixed(0)+' '+unit;$('chartAvg').textContent=avg.toFixed(0)+' '+unit;$('chartMax').textContent=Math.max(...vals).toFixed(0)+' '+unit;stats.hidden=false}catch(e){canvas.className='chart-empty';canvas.innerHTML='Grafiek laden mislukt: '+esc(e.message);stats.hidden=true}}
+async function renderChart(){
+  const canvas=$('chartCanvas'),stats=$('chartStats'),select=$('chartSession');
+  if(!canvas||!select)return;
+  const id=Number(select.value);
+  if(!id){
+    canvas.className='chart-empty';
+    canvas.innerHTML='Kies een opgeslagen meetsessie.';
+    stats.hidden=true;
+    return;
+  }
+  canvas.className='chart-empty';
+  canvas.innerHTML='Meetdata laden...';
+  try{
+    const parsed=parseCSV(await getSessionCsv(id));
+    const rows=parsed.rows.filter(r=>Number.isFinite(Number(r.sound_p2p_mV)));
+    const vals=rows.map(r=>Number(r.sound_p2p_mV));
+    if(!vals.length)throw new Error('Geen geldige geluidsdata');
+
+    const session=sessionByNumber(id);
+    let times=rows.map(r=>{
+      const ms=Number(r.elapsed_ms);
+      return Number.isFinite(ms)?ms/1000:NaN;
+    });
+
+    // Oude CSV's hebben nog geen elapsed_ms. Gebruik dan de sessieduur
+    // om de punten over de werkelijke meetduur te verdelen.
+    if(!times.every(Number.isFinite)){
+      const duration=Number(session&&session.duration)||0;
+      const step=duration>0&&vals.length>1?duration/(vals.length-1):Math.max(0.05,interval||0.1);
+      times=vals.map((_,i)=>i*step);
+    }
+
+    const totalDuration=Math.max(0.05,times[times.length-1]||0);
+    const visibleSeconds=20;
+    const viewportWidth=Math.max(320,canvas.clientWidth||360);
+    const plotViewport=Math.max(250,viewportWidth-52);
+    const pxPerSecond=plotViewport/visibleSeconds;
+    const left=44,right=18,top=16,bottom=42,h=245;
+    const plotWidth=Math.max(plotViewport,totalDuration*pxPerSecond);
+    const w=left+plotWidth+right;
+    const ph=h-top-bottom;
+
+    let min=Math.min(...vals),max=Math.max(...vals);
+    if(max-min<1){min-=.5;max+=.5}
+    const pad=(max-min)*.14;
+    min-=pad;max+=pad;
+
+    const x=t=>left+(t/Math.max(totalDuration,visibleSeconds))*Math.max(plotViewport,plotWidth);
+    const y=v=>top+(max-v)/(max-min)*ph;
+
+    const pts=vals.map((v,i)=>x(times[i]).toFixed(1)+','+y(v).toFixed(1)).join(' ');
+    const firstX=x(times[0]);
+    const lastX=x(times[times.length-1]);
+    const area=firstX+','+(top+ph)+' '+pts+' '+lastX+','+(top+ph);
+
+    let grid='';
+    for(let i=0;i<=4;i++){
+      const yy=top+i*ph/4,val=max-i*(max-min)/4;
+      grid+='<line class="chartgridline" x1="'+left+'" x2="'+(left+plotWidth)+'" y1="'+yy+'" y2="'+yy+'"/>'+
+            '<text class="chartaxis" x="4" y="'+(yy+3)+'">'+val.toFixed(0)+'</text>';
+    }
+
+    // X-as: altijd zichtbaar, 5-secondenverdeling. Een venster is 20 seconden breed.
+    const tickStep=5;
+    const xAxisY=top+ph;
+    grid+='<line class="chartgridline" x1="'+left+'" x2="'+(left+plotWidth)+'" y1="'+xAxisY+'" y2="'+xAxisY+'"/>';
+    for(let t=0;t<=Math.ceil(totalDuration/tickStep)*tickStep;t+=tickStep){
+      const xx=x(t);
+      grid+='<line class="chartgridline" x1="'+xx+'" x2="'+xx+'" y1="'+xAxisY+'" y2="'+(xAxisY+5)+'"/>'+
+            '<text class="chartaxis" text-anchor="middle" x="'+xx+'" y="'+(xAxisY+18)+'">'+t+' s</text>';
+    }
+    grid+='<text class="chartaxis" text-anchor="middle" x="'+(left+plotWidth/2)+'" y="'+(h-5)+'">Tijd</text>';
+
+    const last=vals[vals.length-1];
+    canvas.className='chartbox';
+    canvas.innerHTML='<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'">'+
+      grid+
+      '<polygon class="chartarea" points="'+area+'"/>'+
+      '<polyline class="chartline" points="'+pts+'"/>'+
+      '<circle class="chartdot" cx="'+lastX+'" cy="'+y(last)+'" r="4"/>'+
+      '</svg>';
+
+    // Start links bij het begin van de meting.
+    canvas.scrollLeft=0;
+
+    $('chartTitle').textContent='Geluidsamplitude';
+    $('chartSubtitle').textContent='Meetsessie '+id+' · '+vals.length+' meetpunten · '+totalDuration.toFixed(1).replace('.',',')+' s';
+    $('chartLatest').textContent=last.toFixed(0);
+    $('chartUnit').textContent='mV p-p';
+
+    const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
+    $('chartMin').textContent=Math.min(...vals).toFixed(0)+' mV p-p';
+    $('chartAvg').textContent=avg.toFixed(0)+' mV p-p';
+    $('chartMax').textContent=Math.max(...vals).toFixed(0)+' mV p-p';
+    stats.hidden=false;
+  }catch(e){
+    canvas.className='chart-empty';
+    canvas.innerHTML='Grafiek laden mislukt: '+esc(e.message);
+    stats.hidden=true;
+  }
+}
 try{theme(localStorage.getItem('datalogger-theme')||'light')}catch(e){theme('light')}
 window.addEventListener('online',()=>setTimeout(retryArduinoConnection,250));
 window.addEventListener('offline',()=>setTimeout(()=>{pollStatus()},250));
@@ -1018,7 +1118,7 @@ uint32_t findNextSessionId(){
 bool ensureLogDir(){ if(SD.exists(LOG_DIR))return true; return SD.mkdir(LOG_DIR); }
 
 void writeCsvHeader(File &f){
-  f.println("measurement_id,rtc_datetime_local,sound_p2p_mV,sound_p2p_adc,sound_bias_V,latitude,longitude,satellites,gps_fix,gps_speed_kmh,gps_utc,location_source");
+  f.println("measurement_id,rtc_datetime_local,elapsed_ms,sound_p2p_mV,sound_p2p_adc,sound_bias_V,latitude,longitude,satellites,gps_fix,gps_speed_kmh,gps_utc,location_source");
   f.flush();
 }
 
@@ -1043,7 +1143,7 @@ void logMeasurement(){
   DateTime now=rtcReady?rtc.now():DateTime(2000,1,1,0,0,0);
   double lat=0,lon=0; const char* locSource; bool hasPos=selectedPosition(lat,lon,locSource); bool gpsFix=validArduinoFix();
   measurementCount++;
-  sessionFile.print(measurementCount);sessionFile.print(',');sessionFile.print(formatDateTime(now));sessionFile.print(',');
+  sessionFile.print(measurementCount);sessionFile.print(',');sessionFile.print(formatDateTime(now));sessionFile.print(',');sessionFile.print(elapsedSessionMs());sessionFile.print(',');
   if(isnan(liveSoundMv))sessionFile.print("");else sessionFile.print(liveSoundMv,1);sessionFile.print(',');
   sessionFile.print(liveSoundAdc);sessionFile.print(',');if(isnan(liveSoundBiasV))sessionFile.print("");else sessionFile.print(liveSoundBiasV,3);sessionFile.print(',');
   if(hasPos){sessionFile.print(lat,6);sessionFile.print(',');sessionFile.print(lon,6);}sessionFile.print(',');
