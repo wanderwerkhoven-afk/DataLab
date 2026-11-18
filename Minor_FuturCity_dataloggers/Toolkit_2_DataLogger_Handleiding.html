@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Toolkit 2 · MPU6050 versnellingsmeting</title>
+<style>
+:root{--navy:#343F58;--orange:#FCB031;--cream:#F6F2EA;--paper:#fff;--ink:#232323;--muted:#667085;--line:#DCE1E8;--green:#2FAE7B}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--cream);color:var(--ink);line-height:1.6}.top{background:var(--navy);color:#fff;padding:44px 24px}.wrap{max-width:1050px;margin:auto}.top h1{font-size:48px;margin:0 0 8px}.top b{color:var(--orange)}main{max-width:1050px;margin:auto;padding:28px 24px 70px}section{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:26px;margin:0 0 20px}h2{margin-top:0}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid var(--line);border-radius:14px;padding:15px}.callout{border-left:5px solid var(--orange);background:#fff7e7;padding:14px;border-radius:12px}.good{border-color:var(--green);background:#effaf6}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line)}code,pre{font-family:ui-monospace,monospace}pre{background:#20293B;color:white;padding:16px;border-radius:14px;overflow:auto}@media(max-width:700px){.grid{grid-template-columns:1fr}.top h1{font-size:38px}}@media print{body{background:#fff}section{break-inside:avoid}}</style>
+</head><body><header class="top"><div class="wrap"><b>DataLab · Minor FuturCity</b><h1>Toolkit 2 · Versnelling</h1><p>Arduino UNO R4 WiFi + Joy-IT MPU6050 + GPS + RTC + SD</p></div></header>
+<main>
+<section><h2>Doel</h2><p>Toolkit 2 meet versnelling in drie assen met de Joy-IT MPU6050. De sensor bevat daarnaast een gyroscoop; deze rotatiesnelheden worden ook opgeslagen in de CSV. De webapp richt zich primair op acceleratie X, Y en Z.</p>
+<div class="grid"><div class="card"><b>Accelerometer</b><br>±2 g · 16384 LSB/g</div><div class="card"><b>Gyroscoop</b><br>±250 °/s · 131 LSB/°/s</div><div class="card"><b>Standaard interval</b><br>0,1 s</div><div class="card"><b>WiFi</b><br>Arduino-Logger-02</div></div></section>
+<section><h2>Belangrijk: aparte I²C-bus</h2><div class="callout"><b>Gebruik de Qwiic / Wire1-bus.</b><br>De DS1307 op het Data Logging Shield gebruikt adres 0x68 op de standaard I²C-bus. De MPU6050 gebruikt standaard óók 0x68. Daarom is Toolkit 2 bewust geconfigureerd op de tweede I²C-bus van de UNO R4 WiFi: <code>Wire1</code>.</div>
+<p>De Qwiic-bus van de UNO R4 WiFi werkt op 3,3 V. Dit past bij het 3,3 V-logicaniveau van de Joy-IT MPU6050.</p></section>
+<section><h2>Aansluiten MPU6050</h2><table><tr><th>MPU6050</th><th>UNO R4 WiFi Qwiic / Wire1</th></tr><tr><td>VCC</td><td>3.3V</td></tr><tr><td>GND</td><td>GND</td></tr><tr><td>SDA</td><td>SDA1 / Qwiic SDA</td></tr><tr><td>SCL</td><td>SCL1 / Qwiic SCL</td></tr></table>
+<div class="callout"><b>Niet op A4/A5 aansluiten in deze Toolkit.</b><br>Daar zit de RTC-bus van het logging shield. Gebruik een Qwiic-naar-Dupont kabel/adapter of soldeer de vier lijnen naar de Qwiic-bus.</div></section>
+<section><h2>Firmware</h2><pre>DataLab/
+└── Minor_FuturCity_dataloggers/
+    └── DataLogger_Toolkit_2/
+        └── DataLogger_Toolkit_2.ino</pre><p>Upload naar een Arduino UNO R4 WiFi. De firmware detecteert de MPU6050 op adres 0x68 via <code>Wire1</code>.</p></section>
+<section><h2>CSV</h2><pre>measurement_id
+rtc_datetime_local
+elapsed_ms
+accel_x_g
+accel_y_g
+accel_z_g
+accel_magnitude_g
+gyro_x_dps
+gyro_y_dps
+gyro_z_dps
+mpu_temperature_C
+latitude
+longitude
+satellites
+gps_fix
+gps_speed_kmh
+gps_utc
+location_source</pre></section>
+<section><h2>Gebruik</h2><p>Verbind met <b>Arduino-Logger-02</b>, open <b>192.168.4.1</b>, controleer de sensorstatus en start een meetsessie. De app toont acceleratie per as en kan opgeslagen sessies als grafiek weergeven.</p><div class="good callout"><b>GPS-status</b><br>De webapp gebruikt “Satelliet gevonden” en “Geen satelliet gevonden”.</div></section>
+</main></body></html>
