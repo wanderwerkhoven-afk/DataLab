@@ -999,3 +999,280 @@ void readSensors(){
   liveSoundBiasV=n?((sum/(float)n)*5.0f/4095.0f):NAN;
   sensorReady=!isnan(liveSoundBiasV) && liveSoundBiasV>0.4f && liveSoundBiasV<3.0f;
   lastSensorReadMs=millis();
+}
+
+uint32_t findNextSessionId(){
+  uint32_t maxId=0;
+  if(!sdReady)return 1;
+  File dir=SD.open(LOG_DIR); if(!dir)return 1;
+  for(File f=dir.openNextFile(); f; f=dir.openNextFile()){
+    if(!f.isDirectory()){
+      String n=String(f.name()); int p=n.lastIndexOf('/'); if(p>=0)n=n.substring(p+1);
+      if(n.startsWith("S") && n.endsWith(".CSV")){ uint32_t id=(uint32_t)n.substring(1,n.length()-4).toInt(); if(id>maxId)maxId=id; }
+    }
+    f.close();
+  }
+  dir.close(); return maxId+1;
+}
+
+bool ensureLogDir(){ if(SD.exists(LOG_DIR))return true; return SD.mkdir(LOG_DIR); }
+
+void writeCsvHeader(File &f){
+  f.println("measurement_id,rtc_datetime_local,sound_p2p_mV,sound_p2p_adc,sound_bias_V,latitude,longitude,satellites,gps_fix,gps_speed_kmh,gps_utc,location_source");
+  f.flush();
+}
+
+bool startSession(){
+  if(sessionState!=STATE_IDLE || !sdReady)return false;
+  if(!ensureLogDir())return false;
+  sessionId=findNextSessionId();
+  String path=sessionPath(sessionId);
+  sessionFile=SD.open(path.c_str(),FILE_WRITE);
+  if(!sessionFile)return false;
+  writeCsvHeader(sessionFile);
+  measurementCount=0; accumulatedRunMs=0; runStartedMs=millis(); lastMeasureMs=millis(); lastFlushMs=millis(); sessionState=STATE_RUNNING;
+  return true;
+}
+void pauseSession(){ if(sessionState==STATE_RUNNING){ accumulatedRunMs+=(uint32_t)(millis()-runStartedMs); sessionState=STATE_PAUSED; if(sessionFile)sessionFile.flush(); } }
+void resumeSession(){ if(sessionState==STATE_PAUSED){ runStartedMs=millis(); lastMeasureMs=millis(); sessionState=STATE_RUNNING; } }
+void stopSession(){ if(sessionState==STATE_RUNNING)accumulatedRunMs+=(uint32_t)(millis()-runStartedMs); if(sessionFile){sessionFile.flush();sessionFile.close();} sessionState=STATE_IDLE; }
+
+void logMeasurement(){
+  if(sessionState!=STATE_RUNNING || !sessionFile)return;
+  readSensors();
+  DateTime now=rtcReady?rtc.now():DateTime(2000,1,1,0,0,0);
+  double lat=0,lon=0; const char* locSource; bool hasPos=selectedPosition(lat,lon,locSource); bool gpsFix=validArduinoFix();
+  measurementCount++;
+  sessionFile.print(measurementCount);sessionFile.print(',');sessionFile.print(formatDateTime(now));sessionFile.print(',');
+  if(isnan(liveSoundMv))sessionFile.print("");else sessionFile.print(liveSoundMv,1);sessionFile.print(',');
+  sessionFile.print(liveSoundAdc);sessionFile.print(',');if(isnan(liveSoundBiasV))sessionFile.print("");else sessionFile.print(liveSoundBiasV,3);sessionFile.print(',');
+  if(hasPos){sessionFile.print(lat,6);sessionFile.print(',');sessionFile.print(lon,6);}sessionFile.print(',');
+  sessionFile.print(gps.satellites.isValid()?gps.satellites.value():0);sessionFile.print(',');sessionFile.print(gpsFix?1:0);sessionFile.print(',');
+  if(gps.speed.isValid())sessionFile.print(gps.speed.kmph(),2);sessionFile.print(',');
+  if(validGpsUtc()){char utc[24];snprintf(utc,sizeof(utc),"%04d-%02d-%02d %02d:%02d:%02d",gps.date.year(),gps.date.month(),gps.date.day(),gps.time.hour(),gps.time.minute(),gps.time.second());sessionFile.print(utc);}sessionFile.print(',');sessionFile.println(locSource);
+  if((uint32_t)(millis()-lastFlushMs)>=1000){sessionFile.flush();lastFlushMs=millis();}
+}
+
+// ---------- HTTP ----------
+String queryValue(const String &url,const String &key){
+  int q=url.indexOf('?'); if(q<0)return ""; String qs=url.substring(q+1); String needle=key+"="; int p=0;
+  while(p<qs.length()){int amp=qs.indexOf('&',p);if(amp<0)amp=qs.length();String part=qs.substring(p,amp);if(part.startsWith(needle))return part.substring(needle.length());p=amp+1;}return "";
+}
+String routeOnly(const String &url){int q=url.indexOf('?');return q<0?url:url.substring(0,q);}
+void sendHeaders(WiFiClient &c,int code,const char* type,int32_t length=-1,const char* extra=nullptr,const char* cacheControl="no-store"){
+  c.print("HTTP/1.1 ");c.print(code);c.println(code==200?" OK":code==400?" Bad Request":code==404?" Not Found":" Error");
+  c.print("Content-Type: ");c.println(type); if(length>=0){c.print("Content-Length: ");c.println(length);} if(extra)c.println(extra); c.print("Cache-Control: "); c.println(cacheControl); c.println("Connection: close"); c.println();
+}
+void sendText(WiFiClient &c,int code,const String &s,const char* type="text/plain; charset=utf-8"){sendHeaders(c,code,type,s.length());c.print(s);}
+void sendOk(WiFiClient &c){sendText(c,200,"OK");}
+
+float estimateLoggedMB(){
+  if(!sdReady)return -1;
+  uint64_t bytes=0;
+  File dir=SD.open(LOG_DIR); if(dir){for(File f=dir.openNextFile();f;f=dir.openNextFile()){if(!f.isDirectory())bytes+=f.size();f.close();}dir.close();}
+  return max(0.0f,SD_NOMINAL_CAPACITY_MB-(float)bytes/1048576.0f);
+}
+
+void sendStatus(WiFiClient &c){
+  if((uint32_t)(millis()-lastSensorReadMs)>1000)readSensors();
+  DateTime now=rtcReady?rtc.now():DateTime(2000,1,1,0,0,0);double lat=0,lon=0;const char* source;bool pos=selectedPosition(lat,lon,source);
+  sendHeaders(c,200,"application/json; charset=utf-8");c.print('{');
+  c.print("\"state\":\"");c.print(stateName());c.print("\",");c.print("\"sessionId\":");c.print(sessionId);c.print(',');c.print("\"elapsed\":");c.print(elapsedSessionMs()/1000.0,1);c.print(',');c.print("\"count\":");c.print(measurementCount);c.print(',');c.print("\"intervalMs\":");c.print(intervalMs);c.print(',');
+  c.print("\"sensorType\":\"MAX4466\",");c.print("\"sensorReady\":");c.print(sensorReady?"true":"false");c.print(',');c.print("\"soundP2PmV\":");if(isnan(liveSoundMv))c.print("null");else c.print(liveSoundMv,1);c.print(',');c.print("\"soundP2PAdc\":");c.print(liveSoundAdc);c.print(',');c.print("\"soundBiasV\":");if(isnan(liveSoundBiasV))c.print("null");else c.print(liveSoundBiasV,3);c.print(',');
+  c.print("\"rtcReady\":");c.print(rtcReady?"true":"false");c.print(',');c.print("\"rtcSynced\":");c.print(rtcSynced?"true":"false");c.print(',');c.print("\"rtcTime\":\"");c.print(formatTimeOnly(now));c.print("\",");c.print("\"sdReady\":");c.print(sdReady?"true":"false");c.print(',');c.print("\"sdFreeMB\":");c.print(estimateLoggedMB(),1);c.print(',');
+  c.print("\"gpsSeen\":");c.print(gpsSeen?"true":"false");c.print(',');c.print("\"gpsFix\":");c.print(validArduinoFix()?"true":"false");c.print(',');c.print("\"gpsUtcValid\":");c.print(validGpsUtc()?"true":"false");c.print(',');c.print("\"satellites\":");c.print(gps.satellites.isValid()?gps.satellites.value():0);c.print(',');c.print("\"positionValid\":");c.print(pos?"true":"false");c.print(',');c.print("\"latitude\":");c.print(lat,6);c.print(',');c.print("\"longitude\":");c.print(lon,6);c.print(',');c.print("\"locationSource\":\"");c.print(source);c.print("\"}");
+}
+
+bool parseCsvTimestamp(const String &line, DateTime &out){
+  int a=line.indexOf(','); if(a<0)return false; int b=line.indexOf(',',a+1); if(b<0)return false; String s=line.substring(a+1,b); if(s.length()<19)return false;
+  int y=s.substring(0,4).toInt(),mo=s.substring(5,7).toInt(),d=s.substring(8,10).toInt(),h=s.substring(11,13).toInt(),mi=s.substring(14,16).toInt(),se=s.substring(17,19).toInt();
+  if(y<2020||mo<1||mo>12||d<1||d>31)return false; out=DateTime(y,mo,d,h,mi,se); return true;
+}
+
+struct SessionMeta{uint32_t id=0,count=0;uint32_t size=0,duration=0;String start="";};
+bool sessionMetaFromFile(File &f,uint32_t id,SessionMeta &m){
+  m.id=id;m.size=f.size();m.count=0;String line="";DateTime first,last;bool gotFirst=false,gotLast=false;bool header=true;
+  while(f.available()){
+    char ch=(char)f.read();
+    if(ch=='\n'){
+      line.trim(); if(header){header=false;} else if(line.length()){m.count++;DateTime dt;if(parseCsvTimestamp(line,dt)){if(!gotFirst){first=dt;gotFirst=true;m.start=formatDateTime(dt);}last=dt;gotLast=true;}}
+      line="";
+    } else if(ch!='\r' && line.length()<220) line+=ch;
+  }
+  if(line.length()&&!header){m.count++;DateTime dt;if(parseCsvTimestamp(line,dt)){if(!gotFirst){first=dt;gotFirst=true;m.start=formatDateTime(dt);}last=dt;gotLast=true;}}
+  if(gotFirst&&gotLast){int64_t diff=(int64_t)last.unixtime()-(int64_t)first.unixtime();if(diff>0)m.duration=(uint32_t)diff;}
+  f.seek(0);return true;
+}
+
+void sendSessions(WiFiClient &c){
+  sendHeaders(c,200,"application/json; charset=utf-8"); c.print("{\"sessions\":["); bool firstOut=true;
+  if(sdReady){File dir=SD.open(LOG_DIR);if(dir){for(File f=dir.openNextFile();f;f=dir.openNextFile()){
+    if(!f.isDirectory()){String n=String(f.name());int p=n.lastIndexOf('/');if(p>=0)n=n.substring(p+1);if(n.startsWith("S")&&n.endsWith(".CSV")){uint32_t id=n.substring(1,n.length()-4).toInt();SessionMeta m;sessionMetaFromFile(f,id,m);if(!firstOut)c.print(',');firstOut=false;c.print("{\"id\":");c.print(m.id);c.print(",\"count\":");c.print(m.count);c.print(",\"size\":");c.print(m.size);c.print(",\"duration\":");c.print(m.duration);c.print(",\"start\":\"");c.print(m.start);c.print("\"}");}}
+    f.close();}dir.close();}}
+  c.print("]}");
+}
+
+void sendDownload(WiFiClient &c,uint32_t id){
+  if(!sdReady){sendText(c,404,"SD niet beschikbaar");return;}String path=sessionPath(id);File f=SD.open(path.c_str(),FILE_READ);if(!f){sendText(c,404,"Bestand niet gevonden");return;}
+  String disposition="Content-Disposition: attachment; filename=\"DataLogger_meetsessie_"+String(id)+".csv\"";sendHeaders(c,200,"text/csv; charset=utf-8",f.size(),disposition.c_str());uint8_t buf[256];while(f.available()){int n=f.read(buf,sizeof(buf));if(n>0)c.write(buf,n);readGps();}f.close();
+}
+
+void serveHome(WiFiClient &c){
+  const size_t total = sizeof(INDEX_HTML) - 1;
+  sendHeaders(c,200,"text/html; charset=utf-8",(int32_t)total,nullptr,
+              "public, max-age=300, stale-if-error=604800");
+
+  size_t sent = 0;
+  const size_t CHUNK = 768;
+
+  while(sent < total && c.connected()){
+    size_t remaining = total - sent;
+    size_t n = remaining < CHUNK ? remaining : CHUNK;
+
+    size_t written = c.write(
+      reinterpret_cast<const uint8_t*>(INDEX_HTML) + sent,
+      n
+    );
+
+    if(written == 0){
+      delay(2);
+      continue;
+    }
+
+    sent += written;
+    readGps();
+    delay(1);
+  }
+
+  c.flush();
+}
+
+void handleRequest(WiFiClient &c,const String &url,const String &method){
+  String route=routeOnly(url);
+  if(route=="/"){serveHome(c);return;}
+  if(route=="/ping"){sendText(c,200,"DataLogger OK");return;}
+  if(route=="/api/status" || route=="/status"){sendStatus(c);return;}
+  if(route=="/api/sessions" || route=="/sessions"){sendSessions(c);return;}
+  if(route=="/api/start" || route=="/start"){if(startSession())sendOk(c);else sendText(c,400,"Starten mislukt");return;}
+  if(route=="/api/pause" || route=="/pause"){if(sessionState==STATE_RUNNING){pauseSession();sendOk(c);}else sendText(c,400,"Niet actief");return;}
+  if(route=="/api/resume" || route=="/resume"){if(sessionState==STATE_PAUSED){resumeSession();sendOk(c);}else sendText(c,400,"Niet gepauzeerd");return;}
+  if(route=="/api/stop" || route=="/stop"){if(sessionState!=STATE_IDLE){stopSession();sendOk(c);}else sendText(c,400,"Geen actieve sessie");return;}
+  if(route=="/api/interval" || route=="/interval"){
+    long ms=queryValue(url,"ms").toInt();
+    if(ms<=0){float sec=queryValue(url,"seconds").toFloat(); if(sec>0)ms=(long)(sec*1000.0f+0.5f);}
+    if(ms>=100 && ms<=2147483000L){intervalMs=(uint32_t)ms;sendOk(c);}else sendText(c,400,"Interval moet minimaal 100 ms zijn");return;
+  }
+  if(route=="/api/time"){
+    int y=queryValue(url,"y").toInt(),mo=queryValue(url,"mo").toInt(),d=queryValue(url,"d").toInt(),h=queryValue(url,"h").toInt(),mi=queryValue(url,"mi").toInt(),s=queryValue(url,"s").toInt();
+    if(rtcReady&&y>=2024&&y<=2100&&mo>=1&&mo<=12&&d>=1&&d<=31&&h>=0&&h<24&&mi>=0&&mi<60&&s>=0&&s<60){rtc.adjust(DateTime(y,mo,d,h,mi,s));rtcSynced=true;sendOk(c);}else sendText(c,400,"Ongeldige tijd");return;}
+  if(route=="/api/delete"){uint32_t id=queryValue(url,"id").toInt();if(sessionState!=STATE_IDLE&&id==sessionId){sendText(c,400,"Actieve sessie kan niet worden verwijderd");return;}String path=sessionPath(id);if(sdReady&&SD.exists(path.c_str())&&SD.remove(path.c_str()))sendOk(c);else sendText(c,404,"Bestand niet gevonden");return;}
+  if(route=="/api/download"){
+    uint32_t id=queryValue(url,"id").toInt();
+    if(sessionState!=STATE_IDLE && id==sessionId){sendText(c,400,"De actieve sessie kan pas na stoppen worden gelezen");return;}
+    sendDownload(c,id);return;
+  }
+  if(route=="/download"){
+    if(sessionState!=STATE_IDLE){sendText(c,400,"Downloaden kan pas nadat de actieve meetsessie is gestopt");return;}
+    sendDownload(c,queryValue(url,"id").toInt());return;
+  }
+  sendText(c,404,"Niet gevonden");
+}
+
+void handleWebClient(){
+  WiFiClient c = server.available();
+  if(!c) return;
+
+  c.setTimeout(1200);
+
+  uint32_t started = millis();
+  String line = "";
+
+  while(c.connected() && (uint32_t)(millis() - started) < 2000){
+    readGps();
+
+    if(c.available()){
+      char ch = (char)c.read();
+
+      if(ch == '\n') break;
+      if(ch != '\r' && line.length() < 500) line += ch;
+    } else {
+      delay(1);
+    }
+  }
+
+  if(line.length()){
+    int s1 = line.indexOf(' ');
+    int s2 = line.indexOf(' ', s1 + 1);
+
+    if(s1 > 0 && s2 > s1){
+      String method = line.substring(0, s1);
+      String url    = line.substring(s1 + 1, s2);
+
+      uint32_t headerStart = millis();
+      while(c.connected() && (uint32_t)(millis() - headerStart) < 2500){
+        readGps();
+
+        if(c.available()){
+          String h = c.readStringUntil('\n');
+          if(h == "\r" || h.length() <= 1) break;
+        } else {
+          delay(1);
+        }
+      }
+
+      if(method == "GET" || method == "POST"){
+        handleRequest(c, url, method);
+      } else {
+        sendText(c,400,"Alleen GET en POST ondersteund");
+      }
+    }
+  }
+
+  delay(2);
+  c.stop();
+}
+
+void setup(){
+  Serial.begin(115200); delay(200);
+  Wire.begin(); Serial1.begin(GPS_BAUD);
+  analogReadResolution(12); pinMode(SOUND_PIN,INPUT); rtcReady=rtc.begin();
+  if(rtcReady){if(!rtc.isrunning()){rtc.adjust(DateTime(F(__DATE__),F(__TIME__)));rtcSynced=false;}else{DateTime n=rtc.now();rtcSynced=n.year()>=2024&&n.year()<=2100;}}
+  sdReady=SD.begin(SD_CS_PIN); if(sdReady)ensureLogDir();
+  readSensors();
+  int ap = WiFi.beginAP(WIFI_SSID, WIFI_PASS);
+
+  Serial.print("WiFi AP starten... status=");
+  Serial.println(ap);
+
+  uint32_t wifiWaitStart = millis();
+  while(WiFi.status() != WL_AP_LISTENING &&
+        WiFi.status() != WL_AP_CONNECTED &&
+        (uint32_t)(millis() - wifiWaitStart) < 10000){
+    delay(100);
+  }
+
+  if(WiFi.status() != WL_AP_LISTENING &&
+     WiFi.status() != WL_AP_CONNECTED){
+    Serial.println("WAARSCHUWING: WiFi Access Point is niet correct gestart.");
+  }
+
+  server.begin();
+
+  Serial.println("\nDataLogger Toolkit 1 gestart");
+  Serial.print("WiFi status: ");
+  Serial.println(WiFi.status());
+  Serial.print("WiFi: ");
+  Serial.println(WIFI_SSID);
+  Serial.print("Wachtwoord: ");
+  Serial.println(WIFI_PASS);
+  Serial.print("Open: http://");
+  Serial.println(WiFi.localIP());
+}
+
+void loop(){
+  readGps();
+  uint32_t now=millis();
+  if(sessionState==STATE_RUNNING && (uint32_t)(now-lastMeasureMs)>=intervalMs){lastMeasureMs=now;logMeasurement();}
+  else if(sessionState!=STATE_RUNNING && (uint32_t)(now-lastSensorReadMs)>=1000)readSensors();
+  handleWebClient();
+}
