@@ -13,10 +13,10 @@ De SolarNL-website is een SPA met de inleiding, theoretisch kader, methode, data
 
 1. Installeer Python en Jupyter.
 2. Installeer de pakketten met `python -m pip install -r requirements.txt`.
-3. Plaats in deze map de geautoriseerde invoerbestanden met de namen `Datasheet_query_(10).csv` en `knmi_hourly.csv`.
+3. Plaats alleen de geautoriseerde SolarNL-meetexport als `Datasheet_query_(10).csv` in deze map. Het gebruikte KNMI-uurbestand staat al in de repository.
 4. Open Jupyter vanuit deze map en voer `SolarNL_Onderzoek.ipynb` uit.
 
-De notebook bevat geen ruwe SolarNL-data. De geautoriseerde meetexport is daarom een lokale invoer en staat niet in deze openbare repository. De KNMI-reeks is eveneens een invoerbestand; bron en variabeledefinities staan in het onderzoeksverslag. De reproduceerbare code verwerkt PV1–PV8 afzonderlijk, maakt de weertypevergelijkingen en gebruikt dagblok-bootstrapintervallen.
+De notebook bevat geen ruwe SolarNL-data. De geautoriseerde SolarNL-meetexport blijft een lokale invoer en staat niet in deze openbare repository. `knmi_hourly.csv` bevat de aanvullende openbare uurgegevens van KNMI-station 240; bron en variabeledefinities staan in het onderzoeksverslag. De reproduceerbare code verwerkt PV1–PV8 afzonderlijk, maakt de weertypevergelijkingen en gebruikt dagblok-bootstrapintervallen.
 
 ## Reikwijdte
 
