@@ -1,7 +1,7 @@
 # SolarNL — publieke onderzoeksstatus
 
-De SolarNL-resultaten zijn op 18 november 2026 vrijgegeven voor publicatie op de projectwebsite. De rootpagina bevat een interactieve resultatenpagina met vijf Plotly-figuren, regressie-uitkomsten en expliciete beperkingen.
+De vrijgegeven onderzoekswebsite (`index.html`) is opgebouwd als een SPA met acht onderdelen: overzicht, inleiding, theoretisch kader, methode, data en aannames, resultaten, conclusie en bronnen.
 
-De ruwe CSV wordt niet als los downloadbestand in de repository aangeboden. De openbare notebooks zijn opgeschoond van opgeslagen meetuitvoer; de reproduceerbare, volledige analyse-notebook staat voorlopig in de onderzoekswerkmap.
+De resultatenpagina bevat zes interactieve Plotly-figuren, een Pearson-correlatiematrix, regressie-uitkomsten en uitleg over datakwaliteit, aannames en interpretatie. De ruwe CSV wordt niet als los downloadbestand aangeboden. De openbare notebooks zijn opgeschoond van opgeslagen meetuitvoer; de volledige reproduceerbare analyse-notebook staat voorlopig in de onderzoekswerkmap.
 
-De website presenteert verbanden als associaties. De korte meetperiode, niet-gekalibreerde sensoren en mogelijke duplicatie van elektrische kanalen beperken causale interpretaties en paneelvergelijkingen.
+De analyse is verkennend. De korte meetperiode, ontbrekende kalibratiegegevens en aanwijzingen voor gedeelde elektrische meetkanalen begrenzen causale interpretaties en paneelvergelijkingen.
