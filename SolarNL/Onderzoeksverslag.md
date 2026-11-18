@@ -1,11 +1,12 @@
 # Invloed van weersomstandigheden op de temperatuur en elektrische prestaties van acht zonnepanelen
 
-**Project:** Solar Field data-analyse, HvA Energielab en AMOLF  
-**Locatie:** Science Park 104, Amsterdam  
-**Versie:** 1.1 — verkennende analyse, 18 november 2026  
-**Status:** afgeleide resultaten mogen voor de projectwebsite worden gebruikt; ruwe meetexport wordt niet als los bestand verspreid.
 
-> De afgeleide resultaten zijn met toestemming opgenomen op de openbare SolarNL-projectwebsite. De ruwe projectexport is niet opgenomen in deze rapportage of als los downloadbestand gepubliceerd.
+**Project:** Solar Field-dataanalyse · HvA Energielab / AMOLF  
+**Locatie:** Science Park 104, Amsterdam  
+**Dataperiode:** 23 oktober–17 november 2026  
+**Rapport:** verkennende analyse · versie 1.2 · 18 november 2026
+
+> Afgeleide resultaten zijn vrijgegeven voor projectvisualisatie. De ruwe SolarNL-export wordt niet als afzonderlijk bestand in dit rapport opgenomen.
 
 ## Samenvatting
 
@@ -19,23 +20,78 @@ Alle acht panelen zijn afzonderlijk geanalyseerd. In de volledige KNMI-daglichtr
 
 **Antwoord:** de beschikbare metingen suggereren dat meer globale straling samenhangt met een groter temperatuurverschil tussen paneel en omgevingslucht. Met deze korte, onvolledig gekalibreerde meetreeks kan niet betrouwbaar worden vastgesteld welk causaal effect paneeltemperatuur heeft op Voc of MPP-vermogen. Sensor- en kanaalvalidatie, onafhankelijke instraling op paneelvlak, paneelspecificaties en langere meetreeksen zijn nodig voor een definitieve conclusie. De modules zijn wel afzonderlijk gemodelleerd, maar niet onderling gerangschikt.
 
+## Inhoudsopgave
+
+- [Samenvatting](#samenvatting)
+- [Afkortingen en symbolen](#afkortingen-en-symbolen)
+1. [Inleiding](#1-inleiding)  
+2. [Theoretisch kader](#2-theoretisch-kader)  
+3. [Hypothesen](#3-hypothesen)  
+4. [Data en methode](#4-data-en-methode)  
+5. [Resultaten](#5-resultaten)  
+6. [Discussie](#6-discussie)  
+7. [Conclusie](#7-conclusie)  
+8. [Aanbevelingen](#8-aanbevelingen)  
+9. [Bronnen](#9-bronnen)
+
+## Afkortingen en symbolen
+
+| Symbool/afkorting | Betekenis | Eenheid |
+|---|---|---|
+| `G` | Globale horizontale straling uit KNMI | W m⁻² |
+| `G_POA` | Instraling in het vlak van de module (plane of array) | W m⁻² |
+| `T_a` | Buitenluchttemperatuur | °C |
+| `T_m` / `T_paneel` | Gemeten module- of paneeltemperatuur; sensorlocatie niet bevestigd | °C |
+| `ΔT` | Paneeltemperatuur minus buitenluchttemperatuur | °C |
+| `V_oc` | Openklemspanning | V |
+| `I_sc` | Kortsluitstroom | A |
+| `V_mpp`, `I_mpp` | Spanning en stroom bij maximum power point | V, A |
+| `P_mpp` | Vermogen bij maximum power point | W |
+| `FF` | Fill factor | % |
+| `BI` | Betrouwbaarheidsinterval (bootstrapinterval in dit rapport) | — |
+| `UTC` | Coordinated Universal Time | — |
+| `PV` | Photovoltaic; label voor een afzonderlijk paneel | — |
+
+
 ## 1. Inleiding
 
-Fotovoltaïsche modules zetten zonnestraling om in gelijkstroom. De elektrische respons hangt samen met instraling en moduletemperatuur, terwijl windkoeling, montage, spectrum en moduletechnologie de uitkomst mede bepalen. Weersomstandigheden beïnvloeden dus zowel de thermische toestand van het paneel als de hoeveelheid invallend licht. Een ruwe correlatie tussen temperatuur en vermogen kan deze invloeden niet uit elkaar halen.
+### 1.1 Aanleiding
 
-Het Solar Field van het HvA Energielab en AMOLF omvat acht zonnepanelen met metingen van temperatuur en elektrische karakteristieken. Het onderzoek richt zich op het korte meetvenster dat in de beschikbare export aanwezig is; uitspraken over seizoensvariatie of degradatie vallen buiten het bereik.
+Een zonnepaneel wordt buiten niet onder één vaste toestand gebruikt. De instraling verandert door zonnestand en bewolking; de buitenlucht, wind en neerslag veranderen eveneens. Die invloeden werken gelijktijdig op het paneel. Meer zonlicht kan de fotostroom en daarmee het elektrisch vermogen verhogen, maar het geabsorbeerde deel van de straling warmt ook de module op. Tegelijk voert wind warmte af en beïnvloedt de buitenluchttemperatuur het thermische evenwicht. Een waargenomen stijging van vermogen bij een hogere paneeltemperatuur betekent daarom niet automatisch dat warmte het vermogen verhoogt: beide kunnen door dezelfde toename in instraling worden veroorzaakt.
 
-### Onderzoeksvraag
+Dit onderzoek is uitgevoerd met meetreeksen van acht modules in het Solar Field van het HvA Energielab en AMOLF. De vraag is praktisch relevant voor het interpreteren van buitenmetingen: wanneer verandert het vermogen door de beschikbare lichtintensiteit, wanneer verandert het door de temperatuurrespons, en wanneer kan een afwijking worden verklaard door de meetketen? Die vragen zijn alleen zinvol te beantwoorden wanneer eerst de kwaliteit en onafhankelijkheid van de meetkanalen worden onderzocht.
 
-*Wat is de invloed van verschillende weersomstandigheden op de elektrische prestaties van de acht zonnepanelen? Hoe beïnvloeden deze omstandigheden de temperatuur van de zonnepanelen en welk effect heeft die temperatuur op de elektrische prestaties?*
+### 1.2 Wetenschappelijke en praktische relevantie
 
-### Deelvragen
+Temperatuur is een belangrijke bedrijfsvariabele van fotovoltaïsche modules. Bij veel kristallijne-siliciumtechnologieën neemt de openklemspanning toe wanneer de celtemperatuur daalt, terwijl het vermogen bij vaste instraling doorgaans afneemt naarmate de cel warmer wordt [3]. In veldmetingen is de instraling echter zelden constant. Bewolking verlaagt doorgaans de directe component van zonnestraling, maar verandert ook de diffuse component; wind en luchttemperatuur veranderen tegelijk. Een analyse die alleen paneeltemperatuur en vermogen tegenover elkaar zet, kan deze mechanismen niet onderscheiden.
 
-1. Welke meteorologische en elektrische variabelen zijn beschikbaar, en wat is hun meetkwaliteit?
-2. Hoe verhouden paneeltemperaturen zich tot de lokale luchttemperatuur bij verschillende weersomstandigheden?
-3. Hoe hangen instraling, temperatuur, Voc, Isc, Vmpp, Impp, fill factor en MPP-vermogen samen?
-4. Welke verschillen tussen panelen zijn meetkundig betrouwbaar en fysisch interpreteerbaar?
+Voor het Energielab en AMOLF is het daarom van belang om niet alleen samenhang te rapporteren, maar ook aan te geven welke samenhang meetkundig te vertrouwen is. Dit rapport maakt zichtbaar welke conclusies rechtstreeks uit de meetdata volgen, welke slechts passen bij een fysische verwachting en welke aanvullende instrumentatie nodig is om een effect causaal of paneelspecifiek te toetsen.
+
+### 1.3 Onderzoeksdoel
+
+Het doel is de beschikbare veldmetingen van acht zonnepanelen systematisch te controleren en vervolgens per paneel te onderzoeken hoe meteorologische omstandigheden samenhangen met (1) de paneeltemperatuur ten opzichte van de buitenlucht en (2) elektrische grootheden zoals `Voc`, `Isc`, `Vmpp`, `Impp`, fill factor en MPP-vermogen. De analyse moet de totale associatie met weertype onderscheiden van de temperatuurassociatie bij statistische correctie voor gemeten verstorende variabelen. De uitkomsten worden met onzekerheidsmarges en expliciete meetbeperkingen gerapporteerd.
+
+### 1.4 Onderzoeksvraag
+
+*Wat is de invloed van verschillende weersomstandigheden op de elektrische prestaties van de acht zonnepanelen? Hoe beïnvloeden die omstandigheden de temperatuur van de zonnepanelen en welk effect heeft die temperatuur op de elektrische prestaties?*
+
+### 1.5 Deelvragen
+
+1. Welke meteorologische, thermische en elektrische variabelen zijn beschikbaar, en wat is hun meetkwaliteit?
+2. Hoe verhouden paneeltemperaturen zich tot lokale buitenluchttemperatuur en instraling bij verschillende weersomstandigheden?
+3. Hoe hangen instraling en temperatuur samen met `Voc`, `Isc`, `Vmpp`, `Impp`, fill factor en MPP-vermogen?
+4. Welke paneelverschillen zijn meetkundig betrouwbaar en fysisch interpreteerbaar?
 5. Welke conclusies zijn verantwoord gezien meetdekking, tijdsafhankelijkheid en onzekerheden?
+
+### 1.6 Afbakening
+
+De primaire export beslaat 23 oktober tot en met 17 november 2026. Dat korte meetvenster is geschikt voor een verkennende analyse van samenhang binnen deze periode, maar niet voor uitspraken over seizoenen, jaaropbrengst, degradatie of representatieve langetermijnprestaties. De aanvullende KNMI-gegevens komen van station 240 (Schiphol), niet van Science Park 104. De KNMI-straling is globale horizontale straling en geen instraling in het paneelvlak. De lokale CMP-10-reeks wordt vanwege de niet-gevalideerde schaal/offset niet als absolute irradiantie gebruikt.
+
+De acht fysieke modules worden afzonderlijk geanalyseerd. Dat betekent niet dat de acht elektrische reeksen aantoonbaar onafhankelijk zijn: mogelijke kanaalduplicatie wordt als beperking meegenomen. Het rapport rangschikt de panelen daarom niet en vergelijkt geen rendementen zonder paneelspecificaties, oppervlak en gevalideerde kanalen.
+
+### 1.7 Leeswijzer
+
+Hoofdstuk 2 beschrijft de thermische en elektrische principes achter de verwachte relaties. Hoofdstuk 3 vertaalt deze principes naar toetsbare hypothesen. Hoofdstuk 4 documenteert bronnen, kwaliteitscontroles, koppeling, regressies en onzekerheidsbepaling. Hoofdstuk 5 presenteert eerst datakwaliteit en daarna resultaten per mechanisme en per paneel. Hoofdstuk 6 bespreekt de betekenis en beperkingen; hoofdstuk 7 beantwoordt de onderzoeksvraag. Hoofdstuk 8 bevat aanbevelingen voor validatie en vervolgmetingen. De interactieve versies van de grafieken zijn beschikbaar op de SolarNL-projectwebsite; de notebook bevat de reproduceerbare berekeningen.
 
 ## 2. Theoretisch kader
 
@@ -78,9 +134,10 @@ Rond een referentietoestand kan temperatuurafhankelijkheid bij constante instral
 
 Voor veel kristallijn-siliciummodules zijn `β_Voc` en `γ_P` negatief; exacte waarden zijn modulespecifiek en horen uit fabrikantgegevens te komen [3]. Deze lineaire benadering geldt niet onafhankelijk van instraling of meetcondities. Omdat moduletechnologie, fabrikantcoëfficiënten en een gekalibreerde celtemperatuur ontbreken, worden de coëfficiënten in deze studie niet als bekende waarden verondersteld. IEC 60891 beschrijft correcties van gemeten I–V-karakteristieken, maar toepassing vraagt meer informatie dan de huidige export bevat [4].
 
-### 2.3 Verwachte verbanden en hypothesen
 
-De fysische verwachtingen zijn voorwaardelijk: andere omstandigheden, zoals instraling, wind en paneelopstelling, moeten vergelijkbaar zijn.
+## 3. Hypothesen
+
+De hypothesen zijn afgeleid uit de thermische energiebalans en de temperatuur- en instralingsafhankelijkheid van de I–V-curve. Het zijn vooraf geformuleerde verwachtingen, geen aannames dat de meetdata ze noodzakelijk bevestigen. De richting geldt alleen onder vergelijkbare omstandigheden voor de overige relevante variabelen. De tabel beschrijft de verwachte associatie; door het observationele ontwerp is een gevonden verband op zichzelf geen bewijs voor causaliteit.
 
 | Variabelen | Verwachte richting | Hypothese |
 |---|---|---|
@@ -95,15 +152,19 @@ Een ruwe temperatuur-vermogenscorrelatie vermengt de directe invloed van instral
 
 Voor weertype geldt een aanvullende verwachting. KNMI-bewolking wordt gecodeerd in achtsten: 0–2 okta wordt hier als helder, 3–5 als halfbewolkt en 6–8 als bewolkt beschouwd; code 9 is onbekend en uitgesloten [5,8]. Bij heldere lucht verwachten we doorgaans meer globale straling en daardoor grotere paneelopwarming boven de lucht (`ΔT`) en meer elektrische productie. Dit is een verwachting over het totale weereffect: instraling is een tussenliggend mechanisme van bewolking naar paneelrespons en wordt daarom niet als covariaat opgenomen in de weertypevergelijking. Bewolking is geen exacte proxy voor instraling op het paneelvlak; gebroken wolken, zonshoek, diffuse straling en regionale afstand kunnen de relatie veranderen.
 
-## 3. Data en methode
 
-### 3.1 Primaire meetdata
+Voor de inferentie is de nulhypothese per model dat de conditionele coëfficiënt voor het betreffende effect gelijk is aan nul. Een interval dat nul omvat, wordt geïnterpreteerd als onvoldoende precisie om de richting met deze dataset vast te stellen; het bewijst niet dat er geen fysisch effect bestaat. Omdat de studie observationeel is en slechts weinig onafhankelijke meetdagen bevat, worden de hypothesen verkennend getoetst en niet als causale experimenten geïnterpreteerd.
+
+
+## 4. Data en methode
+
+### 4.1 Primaire meetdata
 
 De bron is een InfluxDB-export met acht panel labels (`PvDevice-1` tot en met `PvDevice-8`) en een PVMET500-weerreeks. De solar export bevat 65.700 rijen van 23 oktober 2026 13:46 UTC tot 17 november 2026 16:30 UTC. De weerreeks bevat 18.684 rijen van 23 oktober 13:46 UTC tot 17 november 16:31 UTC.
 
 Per paneel zijn de beschikbare complete elektrische sets: PV1 696, PV2 706, PV3 638, PV4 637, PV5 637, PV6 637, PV7 502 en PV8 502. Dit zijn meetmomenten, geen onafhankelijke replicaten.
 
-### 3.2 Aanvullende meteorologie
+### 4.2 Aanvullende meteorologie
 
 KNMI-station 240, Schiphol Airport, is gekozen als dichtstbijzijnde goed gedocumenteerde bron met uurgegevens voor temperatuur, globale straling, bewolking, relatieve vochtigheid, wind en neerslag. De verkregen serie bevat 600 uurwaarnemingen van 23 oktober 01:00 tot 17 november 00:00 UTC. KNMI-uurtijdstempels geven het einde van het voorafgaande uurvak. De solar-metingen zijn per paneel geaggregeerd naar hetzelfde uurvak en op eindtijd gekoppeld. De KNMI-reeks stopt eerder dan de laatste solar-metingen.
 
@@ -111,13 +172,13 @@ KNMI rapporteert `Q` in J/cm² per uurvak [5]. De omzetting naar een gemiddeld v
 
 Schiphol is regionale context en ligt buiten de meetlocatie. De data zijn niet gebruikt als vervanging voor lokale plane-of-array-instraling. KNMI vermeldt bovendien dat uurlijkse langjarige reeksen door stationsverplaatsingen en methodewijzigingen niet geschikt zijn voor trendanalyse.
 
-### 3.3 Opschoning en synchronisatie
+### 4.3 Opschoning en synchronisatie
 
 De Influx-export is per tabel gesplitst en numeriek getypeerd. Dubbele combinaties van tijdstempel en paneellabel zijn gecontroleerd. PVMET500-luchtvochtigheid viel in de geaccepteerde 0–100%-range. Eén luchttemperatuurwaarde boven 40 °C is als foutkandidaat gemarkeerd; deze blijft in de ruwe kolom staan en wordt in analysekolommen ontbrekend gemaakt. Er is niet geïnterpoleerd.
 
 Pt100-metingen zijn op basis van het paneelsuffix gekoppeld aan het overeenkomstige label. De hoofdtag (`Pt100-n`) en alternatieve tag (met exportprefix `df112` of `1dd12`) zijn in niet-overlappende periodes geregistreerd. Er zijn geen gelijktijdige paren om hun offset te controleren. De reeks is daarom alleen als gecombineerde kandidaatreeks gebruikt met behoud van tagherkomst; de sensor-paneel-mapping moet worden bevestigd.
 
-### 3.4 Correlatie, regressiemodellen en onzekerheid
+### 4.4 Correlatie, regressiemodellen en onzekerheid
 
 De ruwe lineaire samenhang is samengevat met Pearson-correlatie:
 
@@ -147,9 +208,9 @@ Instrumentele Type-B meetonzekerheid is niet numeriek berekend doordat datasheet
 
 De covariantie tussen stroom en spanning is niet bekend. De bootstrapintervallen beschrijven dus regressievariatie over tijdsblokken, niet de volledige metrologische meetonzekerheid.
 
-## 4. Resultaten
+## 5. Resultaten
 
-### 4.1 Datakwaliteit
+### 5.1 Datakwaliteit
 
 | Controle | Uitkomst | Betekenis |
 |---|---:|---|
@@ -164,13 +225,13 @@ PV8 heeft waarden die een fysieke controle vereisen: de hoofdtag loopt op tot on
 
 De elektrische metingen wijzen op mogelijke gedeelde of gekloonde kanalen. `Impp` van PV4 en PV5 is exact gelijk op 637 overlappende tijdstippen. Veel vergelijkingen binnen PV3–PV8 hebben exact gelijke waarden op ongeveer 97–100% van overlapmomenten. Dit patroon is te sterk om panelen als acht onafhankelijke elektrische meetkanalen te behandelen, maar bewijst op zichzelf niet waar in de meetketen de duplicatie ontstaat. PV1 en PV2 zijn niet exact gelijk; hun Impp-correlatie is wel 0,997, wat gemeenschappelijke weersinvloeden én mogelijke gedeelde meetstructuur kan weerspiegelen.
 
-### 4.2 Weer, instraling en paneeltemperatuur
+### 5.2 Weer, instraling en paneeltemperatuur
 
 KNMI-station 240 leverde regionale uurcontext; dit station is niet op Science Park 104 en de globale straling is horizontaal, niet in het paneelvlak. De lokale CMP-10-export is niet bruikbaar als absolute straling zonder kalibratie: waarden liggen ook bij KNMI-nachtstraling boven nul. De vergelijking met KNMI is daarom diagnostisch en levert geen absolute instralingscorrectie.
 
 Voor elk paneel is een apart model geschat voor `ΔT = T_paneel − T_lucht`. De regressiehellingen voor KNMI-straling waren positief voor PV1–PV8. De puntschattingen lopen uiteen van 0,0266 tot 0,0996 °C per W/m². De dagblok-bootstrapintervallen liggen voor alle acht boven nul; de onzekerheid is vooral groot bij PV8, waar minder dagen bruikbaar zijn (11 tegenover 14 bij PV1–PV7). Dit ondersteunt binnen de gebruikte data een positieve conditionele associatie, geen lokaal of causaal effect van paneelvlak-instraling.
 
-### 4.3 Ruwe correlaties per paneel
+### 5.3 Ruwe correlaties per paneel
 
 De tabel rapporteert Pearson-correlaties op geldige daglichturen (`G > 50 W/m²`) per module. De correlaties zijn niet gecorrigeerd voor andere variabelen. Per paneel verschilt het aantal complete uren; n is 80 voor PV1–PV7 en 51 voor PV8.
 
@@ -187,7 +248,7 @@ De tabel rapporteert Pearson-correlaties op geldige daglichturen (`G > 50 W/m²`
 
 De positieve ruwe relatie tussen temperatuur en MPP-vermogen is bij alle panelen zichtbaar, maar volgt mede uit het feit dat instraling tegelijk temperatuur en fotostroom verhoogt. Dit is dus geen schatting van het geïsoleerde temperatuureffect. De tegengestelde of wisselende correlaties tussen temperatuur en Voc benadrukken waarom per-paneel correctie en meetkwaliteitscontrole nodig zijn.
 
-### 4.4 Buitenluchttemperatuur, paneeltemperatuur en vermogen
+### 5.4 Buitenluchttemperatuur, paneeltemperatuur en vermogen
 
 De relatie is per paneel bekeken op gematchte daglichturen (`G > 50 W/m²`). De onderstaande Pearson-correlaties zijn ruwe verbanden. Een correlatie van `T_lucht` met `P_mpp` is geen maat voor het temperatuurcoëfficiënt: instraling verschilt tussen uren en bepaalt de stroom sterk.
 
@@ -204,7 +265,7 @@ De relatie is per paneel bekeken op gematchte daglichturen (`G > 50 W/m²`). De 
 
 De meeste panelen tonen een positieve samenhang tussen buitenlucht- en paneeltemperatuur, maar die is zwak voor PV2 en negatief voor PV8. Dit is geen vanzelfsprekend thermisch resultaat en onderstreept de behoefte aan bevestiging van Pt100-mapping en montage. De correlatie tussen buitenluchttemperatuur en vermogen ligt per paneel dicht bij nul of is licht negatief. Dat is logisch mogelijk: buitenlucht alleen bepaalt de elektrische productie niet; bewolking en instraling variëren tegelijk. De interactieve spreidingsdiagrammen tonen daarom ook paneel, bewolkingsklasse, wind, instraling en tijdstip.
 
-### 4.5 Helder, halfbewolkt en bewolkt weer
+### 5.5 Helder, halfbewolkt en bewolkt weer
 
 De KNMI-classificatie is gekoppeld aan de uurregels. In de volledige KNMI-reeks met `G > 50 W/m²` zijn er 37 heldere uren over 10 dagen, 16 halfbewolkte uren over 10 dagen en 115 bewolkte uren over 23 dagen. De mediane globale straling is respectievelijk 253, 207 en 156 W/m². Dat volgt de vooraf verwachte richting: de heldere categorie heeft de hoogste mediane straling. De categorieën bevatten echter sterk ongelijke aantallen waarnemingen.
 
@@ -238,7 +299,7 @@ Als aanvullende analyse is per paneel een model geschat voor het verschil tussen
 
 De geschatte heldere-weereffecten zijn positief, maar de intervallen voor `ΔT` omvatten nul voor alle panelen; bij `P_mpp` omvatten de intervallen nul voor PV3–PV8. De vermogensintervallen zijn zeer breed en de PV8-temperatuurschatting is instabiel. De uitkomsten ondersteunen dus de richting van de verwachting, maar zijn onvoldoende precies om het effect betrouwbaar vast te stellen. De waargenomen mediane MPP-waarden zijn bij helder weer hoger dan bij bewolkt weer voor alle labels; door duplicatie tussen PV4/PV5 en andere overeenkomsten is dit geen bewijs van acht onafhankelijke responsen.
 
-### 4.6 Paneelspecifieke regressies
+### 5.6 Paneelspecifieke regressies
 
 De regressies zijn voor ieder paneel afzonderlijk geschat. De puntschatting en 95%-dagblok-bootstrapinterval staan hieronder. De dagbootstrap trekt volledige kalenderdagen 500 keer met teruglegging. Er worden geen beslissende p-waarden gebruikt: er zijn slechts 8–14 dagclusters per paneel en de panelen delen dezelfde weersomstandigheden.
 
@@ -255,15 +316,15 @@ De regressies zijn voor ieder paneel afzonderlijk geschat. De puntschatting en 9
 
 Alle acht ΔT-hellingen zijn positief en alle bijbehorende bootstrapintervallen liggen boven nul. Alle Voc-hellingen zijn negatief, maar de intervallen omvatten nul. Dit past qua richting bij de gebruikelijke negatieve temperatuurrespons van silicium-PV [3], maar is onvoldoende bewijs voor een aantoonbaar effect in deze meetreeks. Alle `ln(Pmpp)`-puntschattingen zijn positief; vijf intervallen liggen boven nul. Dit teken is fysisch onverwacht en mag niet worden uitgelegd als een vermogensverhoging door opwarming. Resterende instralingsconfounding, de regionale stralingsproxy, elektrische kanaalproblemen of tijdsstructuur kunnen de uitkomst veroorzaken.
 
-## 5. Discussie
+## 6. Discussie
 
-### 5.1 Betekenis van de resultaten
+### 6.1 Betekenis van de resultaten
 
 De weeranalyse geeft een concreter, maar voorlopig antwoord. In de volledige KNMI-reeks hadden heldere daglichturen een hogere mediane globale straling dan bewolkte uren. Binnen de gekoppelde paneeluren was de mediane `ΔT` onder helder weer groter bij alle labels en was de MPP-mediaan hoger. De absolute paneeltemperatuur was niet consequent hoger, omdat de lokale buitenlucht tijdens de heldere matched uren juist koeler was. Dit onderscheid onderbouwt waarom `T_paneel` en `ΔT` apart zijn geanalyseerd. De wolkeneffectmodellen zijn echter breed onzeker, met slechts zes heldere meetdagen; zij wijzen de verwachte kant op, maar leveren geen nauwkeurige effectgrootte. Wind, montage, stralingshoek en afstand tussen Schiphol en Science Park blijven beperkingen.
 
 Elektrische effecten zijn niet betrouwbaar te isoleren. De regressietekens van Voc en `Pmpp` zijn tegengesteld aan de eenvoudige verwachting voor veel silicium-PV-systemen; daarnaast veranderen schattingen bij een andere instralingsdrempel. De gegevens missen een betrouwbare lokale `GPOA`-meting, sensorkalibratie, onafhankelijke kanaalverificatie en paneldatasheets. De afzonderlijke paneelcoëfficiënten zijn daarom exploratieve associaties, geen gevalideerde modulecoëfficiënten. Een rendementvergelijking of rangorde blijft niet gerechtvaardigd.
 
-### 5.2 Beperkingen
+### 6.2 Beperkingen
 
 1. **Meetduur:** ongeveer 26 kalenderdagen in het bronbestand; elektrische/temp-koppeling voor het model beslaat 14 dagen.
 2. **Pt100-herkomst:** twee tagfamilies zonder overlap en onbekende fysieke montage.
@@ -276,7 +337,7 @@ Elektrische effecten zijn niet betrouwbaar te isoleren. De regressietekens van V
 9. **Clustering:** slechts 14 dagclusters voor regressies; kleine steekproef maakt p-waarden en intervallen kwetsbaar.
 10. **Reproduceerbaarheid:** voor uitvoering is de geautoriseerde ruwe CSV naast het notebook nodig; deze is bewust niet in de openbare repo of het downloadpakket opgenomen.
 
-## 6. Conclusie
+## 7. Conclusie
 
 De metingen geven een richtinggevend antwoord op het weertype-deel van de onderzoeksvraag. In de volledige KNMI-daglichtreeks was de mediane globale straling hoger onder heldere dan onder bewolkte omstandigheden. In de gekoppelde paneeldata was de mediane opwarming boven de buitenlucht (`ΔT`) bij helder weer hoger voor elk paneellabel; de ruwe MPP-mediaan was eveneens hoger. De absolute paneeltemperatuur was niet overal hoger, doordat de heldere matched uren een lagere mediane buitenluchttemperatuur hadden. Het lijkt er dus op dat helderder weer de extra paneelopwarming en elektrische productie verhoogt, maar de gekoppelde metingen zijn klein en niet representatief: slechts zes heldere meetdagen. De per-paneel-modellen met correctie voor lucht, wind en tijd hebben brede intervallen; zij bevestigen geen precieze effectgrootte. KNMI is bovendien regionale context en geen meting op het paneelvlak.
 
@@ -284,9 +345,9 @@ De dataset kan geen betrouwbaar causaal effect van paneeltemperatuur op Voc of M
 
 **Conclusie:** de resultaten zijn consistent met de verwachting dat heldere omstandigheden meer straling, extra paneelopwarming boven de buitenlucht en hogere elektrische opbrengst geven. De beschikbare metingen geven nog geen betrouwbaar causaal effect van temperatuur op vermogen: instraling en temperatuur bewegen samen, elektrische kanalen vertonen duplicatie en de gecorrigeerde temperatuurmodellen blijven fysisch onverwacht. De panelen zijn afzonderlijk onderzocht, maar kunnen zonder gevalideerde kanalen en specificaties niet worden gerangschikt.
 
-## 7. Aanbevelingen
+## 8. Aanbevelingen
 
-### Direct nodig voor datavalidatie
+### 8.1 Direct nodig voor datavalidatie
 
 1. Bevestig de sensor-paneel-mapping van alle Pt100-tagvarianten en verklaar het gat tussen beide Pt100-periodes.
 2. Controleer PV8 fysiek: montageplaats, thermisch contact, bedrading, kanaalidentiteit en Pt100-weerstand/temperatuurconversie.
@@ -295,7 +356,7 @@ De dataset kan geen betrouwbaar causaal effect van paneeltemperatuur op Voc of M
 5. Verzamel paneelfabrikant, celtechnologie, STC-vermogen, oppervlakte, azimut/helling, montage en temperatuurcoëfficiënten.
 6. Verkrijg nauwkeurigheid, resolutie en kalibratie-informatie van stroom-, spannings-, temperatuur- en stralingskanalen.
 
-### Voor vervolgonderzoek
+### 8.2 Voor vervolgonderzoek
 
 1. Gebruik een gekalibreerde pyranometer in het paneelvlak, gelijktijdig met lokale wind- en omgevingstemperatuur.
 2. Meet gedurende meerdere seizoenen en verzamel I–V-curves of onafhankelijke MPP-traces met duidelijke tijdstempels.
@@ -303,7 +364,7 @@ De dataset kan geen betrouwbaar causaal effect van paneeltemperatuur op Voc of M
 4. Na kanaalvalidatie: analyseer dagblokken met irradiance-normalisatie; rapporteer effectgrootten, bootstrapintervallen, aantal onafhankelijke dagen, residudiagnostiek en gevoeligheidsanalyses.
 5. Publiceer pas na toestemming van HvA Energielab en AMOLF een gecontroleerde versie met geanonimiseerde/afgeleide resultaten.
 
-## 8. Bronnen
+## 9. Bronnen
 
 1. Faiman, D. (2008). Assessing the outdoor operating temperature of photovoltaic modules. *Progress in Photovoltaics: Research and Applications, 16*(4), 307–315. https://doi.org/10.1002/pip.813
 2. European Commission, Joint Research Centre. (z.d.). *Photovoltaic Geographical Information System (PVGIS): Data sources and calculation methods*. https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/general-information/data-sources-calculation-methods_en
