@@ -1,0 +1,84 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[dutch]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{csquotes}
+\usepackage[hidelinks]{hyperref}
+
+\geometry{margin=2.7cm}
+\onehalfspacing
+
+\title{De relatie tussen buitenluchttemperatuur en paneeltemperatuur}
+\author{Onderzoek aan het Solar Field van AMOLF \\ In samenwerking met AMOLF en SolarNL}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Inleiding}
+
+\subsection{Aanleiding}
+
+Zonnepanelen zetten zonlicht om in elektrische energie. Tijdens dat proces wordt een deel van de invallende energie niet elektrisch omgezet, maar omgezet in warmte. Daardoor kan een zonnepaneel warmer worden dan de buitenlucht. Hoe groot dat temperatuurverschil is, hangt niet alleen af van de buitenluchttemperatuur. Ook de hoeveelheid zonnestraling en de afvoer van warmte naar de omgeving spelen een rol.
+
+Dat samenspel is relevant wanneer de temperatuur van zonnepanelen wordt onderzocht. De buitenluchttemperatuur kan gedurende de dag stijgen, terwijl tegelijkertijd ook de instraling verandert. Bovendien kan wind de warmteafvoer van een paneel beïnvloeden. De paneeltemperatuur is daarom het resultaat van meerdere gelijktijdige invloeden. Het Faiman-model voor de bedrijfstemperatuur van zonnepanelen beschrijft deze samenhang bijvoorbeeld met de buitenluchttemperatuur, de instraling in het paneelvlak en de windsnelheid \cite{faiman2008outdoor}.
+
+\subsection{Onderzoekscontext}
+
+Dit onderzoek richt zich op de relatie tussen de buitenluchttemperatuur en de temperatuur van zonnepanelen. De gegevens zijn afkomstig van acht zonnepanelen op het Solar Field van AMOLF op Science Park 104 in Amsterdam. Het onderzoek wordt uitgevoerd in samenwerking met AMOLF en SolarNL. De meetopstelling registreert onder andere de buitenluchttemperatuur en de temperaturen van de zonnepanelen.
+
+De centrale vraag is of de paneeltemperatuur verandert wanneer de buitenluchttemperatuur verandert. Die vraag lijkt eenvoudig, maar de interpretatie vraagt aandacht. Een paneel kan bijvoorbeeld warmer worden doordat de buitenlucht warmer wordt, maar ook doordat het meer zonnestraling ontvangt of minder warmte aan de omgeving afgeeft. Als meerdere omstandigheden tegelijk veranderen, kan een waargenomen verband tussen buiten- en paneeltemperatuur dus niet zonder meer aan de buitenluchttemperatuur alleen worden toegeschreven.
+
+Daarom wordt in dit onderzoek eerst de samenhang tussen beide temperaturen per paneel beschreven. Vervolgens wordt onderzocht of die samenhang zichtbaar blijft wanneer rekening wordt gehouden met het tijdstip en, waar beschikbaar, een lokale meting die als indicatie voor instraling kan dienen. Zo wordt duidelijker wat de gegevens wel ondersteunen en waar de invloed van andere omstandigheden onzeker blijft.
+
+\subsection{Onderzoeksdoel}
+
+Het doel van dit deelonderzoek is om voor elk van de acht zonnepanelen te bepalen hoe sterk de paneeltemperatuur samenhangt met de buitenluchttemperatuur. De verandering wordt uitgedrukt als de geschatte verandering in paneeltemperatuur bij een stijging van \(1\,^\circ\mathrm{C}\) in buitenluchttemperatuur. De uitkomsten worden per paneel gerapporteerd, zodat verschillen tussen de paneellabels zichtbaar blijven.
+
+De analyse gebruikt correlatiecoëfficiënten om de richting en sterkte van de samenhang te beschrijven en regressie om de geschatte temperatuurverandering per graad te bepalen. Onzekerheidsintervallen geven aan hoe precies die schattingen zijn. De resultaten worden geïnterpreteerd als statistische verbanden in de meetreeks. Omdat de omstandigheden niet experimenteel afzonderlijk zijn veranderd, bewijst de analyse op zichzelf geen causaal effect van de buitenluchttemperatuur.
+
+\subsection{Onderzoeksvraag en deelvragen}
+
+De centrale onderzoeksvraag luidt:
+
+\begin{quote}
+\textbf{Wat is het effect van de buitentemperatuur op de paneeltemperatuur?}
+\end{quote}
+
+In dit onderzoek wordt \enquote{effect} operationeel onderzocht als de statistische samenhang tussen de gemeten buitenluchttemperatuur en paneeltemperatuur. De analyse bepaalt dus hoe sterk de paneeltemperatuur in de meetreeks verandert wanneer de buitenluchttemperatuur verandert. Omdat instraling en andere omstandigheden tegelijk kunnen variëren, worden de uitkomsten geïnterpreteerd als verbanden in de meetgegevens en niet automatisch als een bewezen causaal effect.
+
+De onderzoeksvraag wordt uitgewerkt met twee deelvragen:
+
+\begin{enumerate}
+    \item Hoe sterk verandert de paneeltemperatuur gemiddeld per paneel bij een stijging van \(1\,^\circ\mathrm{C}\) in buitenluchttemperatuur?
+    \item Blijft de samenhang tussen buiten- en paneeltemperatuur zichtbaar wanneer rekening wordt gehouden met het tijdstip en, waar beschikbaar, een lokale instralingsproxy?
+\end{enumerate}
+
+De eerste deelvraag richt zich op de richting en grootte van de samenhang per paneel. De tweede deelvraag onderzoekt of de geschatte relatie verandert wanneer relevante informatie over tijdstip en instraling in de analyse wordt meegenomen. De combinatie helpt onderscheid te maken tussen een eenvoudige gelijktijdige samenhang en een verband dat ook na deze statistische correctie zichtbaar blijft.
+
+\subsection{Afbakening}
+
+Dit deelonderzoek behandelt uitsluitend de relatie tussen buitenluchttemperatuur en paneeltemperatuur. Elektrische grootheden zoals spanning, stroom, fill factor en vermogen vallen buiten de onderzoeksvraag van dit eerste onderzoek. Ook worden de acht zonnepanelen niet gerangschikt op thermische prestaties: daarvoor moeten onder meer de sensorplaatsing en onderlinge vergelijkbaarheid van de metingen voldoende zijn vastgesteld.
+
+De analyse gebruikt de beschikbare meetperioden van 23 oktober tot en met 17 november 2026. De temperatuurmetingen zijn in afzonderlijke perioden en onder verschillende tagvarianten geregistreerd. Op basis van informatie over de meetopstelling worden kanalen met hetzelfde paneelnummer behandeld als metingen van dezelfde beoogde grootheid. Omdat de betreffende meetperioden niet overlappen, kan met deze gegevens alleen niet worden gecontroleerd of eventuele verschillen in kalibratie of sensoroffset afwezig zijn. Dit blijft daarom een beperking bij het samenvoegen en vergelijken van de meetreeksen.
+
+De conclusies gelden voor de onderzochte meetreeks en de omstandigheden tijdens die meetperiode. Ze zijn niet zonder aanvullende gegevens te vertalen naar andere seizoenen, andere locaties of alle zonnepanelen van dezelfde technologie.
+
+\subsection{Leeswijzer}
+
+Hoofdstuk~2 beschrijft de natuurkundige achtergrond van de paneeltemperatuur en de verwachte rol van buitenluchttemperatuur, instraling en warmteafvoer. Hoofdstuk~3 formuleert de hypothesen. Hoofdstuk~4 beschrijft de datasheet, de kwaliteitscontrole en de analysemethoden. In hoofdstuk~5 worden de resultaten per paneel gepresenteerd, met de bijbehorende correlaties, regressies en onzekerheidsintervallen. Hoofdstuk~6 bespreekt hoe de resultaten zich verhouden tot de natuurkundige verwachtingen en welke beperkingen de interpretatie beïnvloeden. Hoofdstuk~7 beantwoordt de onderzoeksvraag; hoofdstuk~8 geeft aanbevelingen voor vervolgmetingen en vervolgonderzoek.
+
+\begin{thebibliography}{9}
+\bibitem{faiman2008outdoor}
+Faiman, D. (2008).
+Assessing the outdoor operating temperature of photovoltaic modules.
+\textit{Progress in Photovoltaics: Research and Applications, 16}(4), 307--315.
+\href{https://doi.org/10.1002/pip.813}{https://doi.org/10.1002/pip.813}.
+\end{thebibliography}
+
+\end{document}
