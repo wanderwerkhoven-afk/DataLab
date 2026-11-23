@@ -30,7 +30,7 @@ footer{background:var(--navy);color:#c3d2d5;padding:24px 0;font-size:.84rem}.foo
 .study-card h3{margin-top:12px}
 @media(max-width:570px){.study-selector{width:100%;justify-content:space-between}.study-selector select{flex:1;max-width:65%}.navlinks{max-width:100%}}
 
-</style>
+.study-tabs{display:flex;gap:5px;padding:4px;background:#e9efec;border:1px solid var(--line);border-radius:11px}.study-tab{border:0;border-radius:8px;background:transparent;color:var(--muted);padding:9px 13px;font-weight:750;cursor:pointer;white-space:nowrap}.study-tab[aria-selected="true"]{background:var(--navy);color:#fff}.study-overview{max-width:none;padding:clamp(24px,5vw,46px)}#overviewDetails{display:grid;grid-template-columns:1fr 1fr;gap:8px 30px}#overviewDetails h3{margin:12px 0 0;color:var(--navy)}@media(max-width:700px){.study-tabs{width:100%;justify-content:space-around}.study-tab{flex:1;padding:8px 4px}#overviewDetails{grid-template-columns:1fr}}\n</style>
 </head>
 
 <body>
@@ -39,15 +39,7 @@ footer{background:var(--navy);color:#c3d2d5;padding:24px 0;font-size:.84rem}.foo
     <button class="brand" data-route="home" aria-label="Ga naar overzicht">
       <span class="brandmark">D</span><span>DataLab<small>SolarNL onderzoek</small></span>
     </button>
-    <label class="study-selector" for="studySelect">
-      <span>Onderzoek</span>
-      <select id="studySelect" aria-label="Selecteer een onderzoek">
-        <option value="">Kies een onderzoek…</option>
-        <option value="1">Onderzoek 1</option>
-        <option value="2">Onderzoek 2</option>
-        <option value="3">Onderzoek 3</option>
-      </select>
-    </label>
+    <div class="study-tabs" role="tablist" aria-label="Selecteer een onderzoek"><button class="study-tab" role="tab" aria-selected="false" data-select-study="1">Onderzoek 1</button><button class="study-tab" role="tab" aria-selected="false" data-select-study="2">Onderzoek 2</button><button class="study-tab" role="tab" aria-selected="false" data-select-study="3">Onderzoek 3</button></div>
     <div class="navlinks" id="pageNavigation" hidden aria-label="Pagina’s van het geselecteerde onderzoek">
       <button class="navbtn" data-route="home" aria-current="page">Overzicht</button>
       <button class="navbtn" data-route="inleiding">Inleiding</button>
@@ -78,46 +70,7 @@ footer{background:var(--navy);color:#c3d2d5;padding:24px 0;font-size:.84rem}.foo
         </div>
       </div>
     </div>
-    <div class="content wrap">
-      <div class="grid-3">
-        <button class="card study-card" data-select-study="1"><span class="card-icon">1</span><h3>Onderzoek 1</h3><p>Wat is het effect van de buitentemperatuur op de paneeltemperatuur?</p><span class="text-btn">Open onderzoek →</span></button>
-        <button class="card study-card" data-select-study="2"><span class="card-icon">2</span><h3>Onderzoek 2</h3><p>Onderzoeksvraag en inhoud worden hier uitgewerkt.</p><span class="text-btn">Open onderzoek →</span></button>
-        <button class="card study-card" data-select-study="3"><span class="card-icon">3</span><h3>Onderzoek 3</h3><p>Onderzoeksvraag en inhoud worden hier uitgewerkt.</p><span class="text-btn">Open onderzoek →</span></button>
-      </div>
-      <div class="notice" style="margin-top:20px"><strong>Verslagstructuur</strong><p>Na het kiezen van een onderzoek verschijnt de navigatie met de verslagonderdelen. Alleen inhoud die voor dat onderzoek is uitgewerkt, wordt hier gepubliceerd.</p></div>
-    </div>
-  </section>
-
-  <section class="view" data-view="inleiding" id="inleiding">
-    <div class="page-hero"><div class="wrap"><div class="crumb">SolarNL / Onderzoek <span data-study-number></span></div><div class="eyebrow" style="margin-top:14px">Hoofdstuk 1</div><h1 class="page-title">1. Inleiding</h1><p class="page-lead">Aanleiding, onderzoekscontext en doel van dit deelonderzoek.</p></div></div>
-    <div class="content wrap"><article class="prose report-body">
-      <h2>1.1 Aanleiding</h2>
-      <p>Zonnepanelen zetten zonlicht om in elektrische energie. Tijdens dat proces wordt een deel van de invallende energie niet elektrisch omgezet, maar omgezet in warmte. Daardoor kan een zonnepaneel warmer worden dan de buitenlucht. Hoe groot dat temperatuurverschil is, hangt niet alleen af van de buitenluchttemperatuur. Ook de hoeveelheid zonnestraling en de afvoer van warmte naar de omgeving spelen een rol.</p>
-      <p>Dat samenspel is relevant wanneer de temperatuur van zonnepanelen wordt onderzocht. De buitenluchttemperatuur kan gedurende de dag stijgen, terwijl tegelijkertijd ook de instraling verandert. Bovendien kan wind de warmteafvoer van een paneel beïnvloeden. De paneeltemperatuur is daarom het resultaat van meerdere gelijktijdige invloeden. Het Faiman-model voor de bedrijfstemperatuur van zonnepanelen beschrijft deze samenhang bijvoorbeeld met de buitenluchttemperatuur, de instraling in het paneelvlak en de windsnelheid <a href="#bronnen">[1]</a>.</p>
-      <h2>1.2 Onderzoekscontext</h2>
-      <p>Dit onderzoek richt zich op de relatie tussen de buitenluchttemperatuur en de temperatuur van zonnepanelen. De gegevens zijn afkomstig van acht zonnepanelen op het Solar Field van AMOLF op Science Park 104 in Amsterdam. Het onderzoek wordt uitgevoerd in samenwerking met AMOLF en SolarNL. De meetopstelling registreert onder andere de buitenluchttemperatuur en de temperaturen van de zonnepanelen.</p>
-      <p>De centrale vraag is of de paneeltemperatuur verandert wanneer de buitenluchttemperatuur verandert. Die vraag lijkt eenvoudig, maar de interpretatie vraagt aandacht. Een paneel kan bijvoorbeeld warmer worden doordat de buitenlucht warmer wordt, maar ook doordat het meer zonnestraling ontvangt of minder warmte aan de omgeving afgeeft. Als meerdere omstandigheden tegelijk veranderen, kan een waargenomen verband tussen buiten- en paneeltemperatuur dus niet zonder meer aan de buitenluchttemperatuur alleen worden toegeschreven.</p>
-      <p>Daarom wordt in dit onderzoek eerst de samenhang tussen beide temperaturen per paneel beschreven. Vervolgens wordt onderzocht of die samenhang zichtbaar blijft wanneer rekening wordt gehouden met het tijdstip en, waar beschikbaar, een lokale meting die als indicatie voor instraling kan dienen. Zo wordt duidelijker wat de gegevens wel ondersteunen en waar de invloed van andere omstandigheden onzeker blijft.</p>
-      <h2>1.3 Onderzoeksdoel</h2>
-      <p>Het doel van dit deelonderzoek is om voor elk van de acht zonnepanelen te bepalen hoe sterk de paneeltemperatuur samenhangt met de buitenluchttemperatuur. De verandering wordt uitgedrukt als de geschatte verandering in paneeltemperatuur bij een stijging van 1 °C in buitenluchttemperatuur. De uitkomsten worden per paneel gerapporteerd, zodat verschillen tussen de paneellabels zichtbaar blijven.</p>
-      <p>De analyse gebruikt correlatiecoëfficiënten om de richting en sterkte van de samenhang te beschrijven en regressie om de geschatte temperatuurverandering per graad te bepalen. Onzekerheidsintervallen geven aan hoe precies die schattingen zijn. De resultaten worden geïnterpreteerd als statistische verbanden in de meetreeks. Omdat de omstandigheden niet experimenteel afzonderlijk zijn veranderd, bewijst de analyse op zichzelf geen causaal effect van de buitenluchttemperatuur.</p>
-      <h2>1.4 Onderzoeksvraag en deelvragen</h2>
-      <blockquote><strong>Wat is het effect van de buitentemperatuur op de paneeltemperatuur?</strong></blockquote>
-      <ol>
-        <li>Hoe sterk verandert de paneeltemperatuur gemiddeld per paneel bij een stijging van 1 °C in buitenluchttemperatuur?</li>
-        <li>Blijft de samenhang tussen buiten- en paneeltemperatuur zichtbaar wanneer rekening wordt gehouden met het tijdstip en, waar beschikbaar, een lokale instralingsproxy?</li>
-      </ol>
-      <p>In dit onderzoek wordt ‘effect’ opgevat als de statistische samenhang in de meetreeks. De analyse kan dus een verband en de bijbehorende onzekerheid beschrijven, maar bewijst op zichzelf geen causaal effect.</p>
-      <h2>1.5 Afbakening</h2>
-      <p>Dit deelonderzoek behandelt uitsluitend de relatie tussen buitenluchttemperatuur en paneeltemperatuur. Elektrische grootheden zoals spanning, stroom, fill factor en vermogen vallen buiten de onderzoeksvraag van dit eerste onderzoek. De acht zonnepanelen worden afzonderlijk geanalyseerd en niet gerangschikt op thermische prestaties.</p>
-      <p>De analyse gebruikt de beschikbare meetperioden van 23 oktober tot en met 17 november 2026. De temperatuurmetingen zijn in afzonderlijke perioden en onder verschillende tagvarianten geregistreerd. Op basis van informatie over de meetopstelling worden kanalen met hetzelfde paneelnummer behandeld als metingen van dezelfde beoogde grootheid. Omdat de betreffende meetperioden niet overlappen, kan met deze gegevens alleen niet worden gecontroleerd of eventuele verschillen in kalibratie of sensoroffset afwezig zijn. Dit blijft een beperking bij het samenvoegen en vergelijken van de meetreeksen.</p>
-      <p>De conclusies gelden voor de onderzochte meetreeks en de omstandigheden tijdens die meetperiode. Ze zijn niet zonder aanvullende gegevens te vertalen naar andere seizoenen, andere locaties of alle zonnepanelen van dezelfde technologie.</p>
-      <h2>1.6 Leeswijzer</h2>
-      <p>Het theoretisch kader beschrijft de natuurkundige achtergrond van de paneeltemperatuur. Daarna volgen de hypothesen, methode en data-analyse. De resultaten worden per paneel gepresenteerd en vervolgens geïnterpreteerd in de discussie. De conclusie beantwoordt de onderzoeksvraag; de aanbevelingen beschrijven welke aanvullende metingen en controles het onderzoek kunnen versterken.</p>
-    </article></div>
-  </section>
-
-  <section class="view" data-view="theorie" id="theorie"><div class="page-hero"><div class="wrap"><div class="crumb">SolarNL / Onderzoek <span data-study-number></span></div><div class="eyebrow" style="margin-top:14px">Hoofdstuk 2</div><h1 class="page-title">2. Theoretisch kader</h1></div></div><div class="content wrap"><div class="private-state"><div><div class="lock">2</div><h3>Dit onderdeel wordt nog uitgewerkt</h3><p>De theorie en bronnen worden toegevoegd nadat ze voor dit onderzoek zijn onderbouwd.</p></div></div></div></section>
+    <div class="content wrap"><article class="card report-body study-overview"><div class="eyebrow" id="overviewEyebrow">Selecteer een onderzoek</div><h2 id="overviewTitle">Onderzoekskaart</h2><p id="overviewQuestion">Kies bovenaan Onderzoek 1, 2 of 3 om het abstracte overzicht te bekijken.</p><div id="overviewDetails"></div></article><div class="notice" style="margin-top:20px"><strong>Verslagstructuur</strong><p>Na selectie verschijnen de verslagpagina’s in de navigatiebalk.</p></div></div></div></section>
   <section class="view" data-view="hypothesen" id="hypothesen"><div class="page-hero"><div class="wrap"><div class="crumb">SolarNL / Onderzoek <span data-study-number></span></div><div class="eyebrow" style="margin-top:14px">Hoofdstuk 3</div><h1 class="page-title">3. Hypothesen</h1></div></div><div class="content wrap"><div class="private-state"><div><div class="lock">3</div><h3>Dit onderdeel wordt nog uitgewerkt</h3><p>De hypothesen worden geformuleerd vanuit het theoretisch kader en de onderzoeksvraag.</p></div></div></div></section>
   <section class="view" data-view="methode" id="methode"><div class="page-hero"><div class="wrap"><div class="crumb">SolarNL / Onderzoek <span data-study-number></span></div><div class="eyebrow" style="margin-top:14px">Hoofdstuk 4</div><h1 class="page-title">4. Methode</h1></div></div><div class="content wrap"><div class="private-state"><div><div class="lock">4</div><h3>Dit onderdeel wordt nog uitgewerkt</h3><p>Hier komen de meetopstelling, dataverwerking, kwaliteitscriteria en analysemethode.</p></div></div></div></section>
   <section class="view" data-view="data-analyse" id="data-analyse"><div class="page-hero"><div class="wrap"><div class="crumb">SolarNL / Onderzoek <span data-study-number></span></div><div class="eyebrow" style="margin-top:14px">Hoofdstuk 5</div><h1 class="page-title">5. Data-analyse</h1></div></div><div class="content wrap"><div class="private-state"><div><div class="lock">5</div><h3>Dit onderdeel wordt nog uitgewerkt</h3><p>Datakwaliteit, aannames, uitsluitingen en statistische berekeningen worden hier transparant beschreven.</p></div></div></div></section>
@@ -132,13 +85,15 @@ footer{background:var(--navy);color:#c3d2d5;padding:24px 0;font-size:.84rem}.foo
 (()=> {
   const views=[...document.querySelectorAll('[data-view]')];
   const nav=document.getElementById('pageNavigation');
-  const select=document.getElementById('studySelect');
+  const studyTabs=[...document.querySelectorAll('.study-tab')];
+  const overview={1:{title:'Buitenluchttemperatuur en paneeltemperatuur',question:'Wat is het effect van de buitentemperatuur op de paneeltemperatuur?',goal:'Per paneel onderzoeken hoe sterk de paneeltemperatuur samenhangt met de buitenluchttemperatuur, met aandacht voor tijdstip en beschikbare lokale instralingsinformatie.',scope:'Acht zonnepanelen op het Solar Field van AMOLF. Elektrische prestaties en KNMI-gegevens vallen buiten dit onderzoek.'},2:{title:'Onderzoek 2',question:'Onderzoeksvraag wordt nog geformuleerd.',goal:'Doel en aanpak volgen bij uitwerking.',scope:'Afbakening volgt uit de onderzoeksvraag.'},3:{title:'Onderzoek 3',question:'Onderzoeksvraag wordt nog geformuleerd.',goal:'Doel en aanpak volgen bij uitwerking.',scope:'Afbakening volgt uit de onderzoeksvraag.'}};
   const navButtons=[...document.querySelectorAll('.navbtn')];
   const titles={home:'Overzicht',inleiding:'Inleiding',theorie:'Theoretisch kader',hypothesen:'Hypothesen',methode:'Methode','data-analyse':'Data-analyse',resultaten:'Resultaten',discussie:'Discussie',conclusie:'Conclusie',aanbevelingen:'Aanbevelingen',bronnen:'Bronnen'};
   let study=localStorage.getItem('solarnl-selected-study')||'';
   function route(){
-    select.value=study;
     nav.hidden=!study;
+    studyTabs.forEach(t=>t.setAttribute('aria-selected',String(t.dataset.selectStudy===study)));
+    const c=overview[study];document.getElementById('overviewEyebrow').textContent=study?'Onderzoek '+study+' · Overzicht':'Selecteer een onderzoek';document.getElementById('overviewTitle').textContent=c?c.title:'Onderzoekskaart';document.getElementById('overviewQuestion').textContent=c?c.question:'Kies bovenaan Onderzoek 1, 2 of 3 om het abstracte overzicht te bekijken.';document.getElementById('overviewDetails').innerHTML=c?'<h3>Doel</h3><p>'+c.goal+'</p><h3>Afbakening</h3><p>'+c.scope+'</p>':'';
     const requested=location.hash.slice(1)||'home';
     const page=study&&views.some(v=>v.dataset.view===requested)?requested:'home';
     views.forEach(v=>v.classList.toggle('active',v.dataset.view===page));
@@ -153,8 +108,7 @@ footer{background:var(--navy);color:#c3d2d5;padding:24px 0;font-size:.84rem}.foo
     location.hash='home';
     route();
   }
-  select.addEventListener('change',()=>chooseStudy(select.value));
-  document.querySelectorAll('[data-select-study]').forEach(button=>button.addEventListener('click',()=>chooseStudy(button.dataset.selectStudy)));
+  studyTabs.forEach(button=>button.addEventListener('click',()=>chooseStudy(button.dataset.selectStudy)));
   navButtons.forEach(button=>button.addEventListener('click',()=>{const target=button.dataset.route;if(location.hash==='#'+target)route();else location.hash=target}));
   window.addEventListener('hashchange',route);
   route();
