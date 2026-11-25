@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#343F58">
+<title>DataLogger · Toolkits | HvA DataLab</title>
+<style>
+:root{--navy:#343F58;--deep:#273247;--orange:#FCB031;--cream:#F6F2EA;--line:#DCE1E8}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{display:flex;flex-direction:column;background:var(--cream);font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+.topbar{flex:none;background:var(--deep);color:white;border-bottom:1px solid #ffffff18}
+.nav{max-width:1200px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:12px 24px}
+.brand{white-space:nowrap;font-size:20px;font-weight:850;letter-spacing:-.04em}.brand span{color:var(--orange)}.brand small{display:block;font-size:10px;font-weight:650;letter-spacing:.10em;text-transform:uppercase;color:#cbd3e2}
+.tabs{display:flex;align-items:stretch;gap:6px}
+.tab{color:#e4e8f0;display:flex;flex-direction:column;justify-content:center;text-decoration:none;font-size:14px;font-weight:750;line-height:1.2;border:1px solid transparent;border-radius:10px;padding:10px 20px;white-space:nowrap;transition:background .15s,color .15s}
+.tab small{font-size:11px;font-weight:500;opacity:.85;margin-top:4px}
+.tab:hover{background:#ffffff12}
+.tab[aria-current="page"]{background:var(--orange);color:var(--deep)}
+.tab:focus-visible{outline:2px solid white;outline-offset:3px}
+.manual{flex:1;min-height:0;width:100%;position:relative}
+iframe{display:block;border:0;width:100%;height:100%;background:var(--cream)}
+@media(max-width:650px){.nav{flex-direction:column;align-items:stretch;gap:10px;padding:10px 12px}.brand{font-size:18px}.brand small{display:inline;margin-left:8px;font-size:9px}.tabs{width:100%;gap:5px}.tab{flex:1;text-align:center;padding:9px 4px;font-size:13px}.tab small{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.tab{transition:none}}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="nav">
+<div class="brand">Data<span>Logger</span><small>HvA DataLab · Minor FuturCity</small></div>
+<nav class="tabs" aria-label="Toolkit selecteren">
+<a class="tab" data-toolkit="1" href="?toolkit=1" aria-current="page">Toolkit 1<small>Geluid</small></a>
+<a class="tab" data-toolkit="2" href="?toolkit=2">Toolkit 2<small>Versnelling</small></a>
+<a class="tab" data-toolkit="3" href="?toolkit=3">Toolkit 3<small>Wind &amp; klimaat</small></a>
+</nav>
+</div></header>
+<main class="manual"><iframe id="manual" title="Toolkit 1 – Geluid" src="Toolkit_1_DataLogger_Handleiding.html" allow="fullscreen"></iframe></main>
+<script>
+(function(){
+  const manuals={
+    1:{file:'Toolkit_1_DataLogger_Handleiding.html',title:'Geluid'},
+    2:{file:'Toolkit_2_DataLogger_Handleiding.html',title:'Versnelling'},
+    3:{file:'Toolkit_3_DataLogger_Handleiding.html',title:'Wind & klimaat'}
+  };
+  const frame=document.getElementById('manual');
+  const tabs=Array.from(document.querySelectorAll('[data-toolkit]'));
+  let current='1';
+  function show(value,push){
+    const id=Object.prototype.hasOwnProperty.call(manuals,value)?String(value):'1';
+    const item=manuals[id];
+    if(id!==current){frame.src=item.file;current=id;}
+    frame.title='Toolkit '+id+' – '+item.title;
+    document.title=frame.title+' | DataLab';
+    tabs.forEach(tab=>{if(tab.dataset.toolkit===id)tab.setAttribute('aria-current','page');else tab.removeAttribute('aria-current')});
+    if(push){const url=new URL(location.href);url.searchParams.set('toolkit',id);history.pushState(null,'',url);}
+  }
+  function read(){return new URLSearchParams(location.search).get('toolkit')||'1'}
+  tabs.forEach(tab=>tab.addEventListener('click',event=>{
+    if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey||event.button!==0)return;
+    event.preventDefault();if(tab.dataset.toolkit!==current)show(tab.dataset.toolkit,true);
+  }));
+  window.addEventListener('popstate',()=>show(read(),false));
+  show(read(),false);
+})();
+</script>
+</body></html>
