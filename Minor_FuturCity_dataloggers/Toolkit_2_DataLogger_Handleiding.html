@@ -5,9 +5,10 @@
 :root{--navy:#343F58;--orange:#FCB031;--cream:#F6F2EA;--paper:#fff;--ink:#232323;--muted:#667085;--line:#DCE1E8;--green:#2FAE7B}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--cream);color:var(--ink);line-height:1.6}.top{background:var(--navy);color:#fff;padding:44px 24px}.wrap{max-width:1050px;margin:auto}.top h1{font-size:48px;margin:0 0 8px}.top b{color:var(--orange)}main{max-width:1050px;margin:auto;padding:28px 24px 70px}section{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:26px;margin:0 0 20px}h2{margin-top:0}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid var(--line);border-radius:14px;padding:15px}.callout{border-left:5px solid var(--orange);background:#fff7e7;padding:14px;border-radius:12px}.good{border-color:var(--green);background:#effaf6}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line)}code,pre{font-family:ui-monospace,monospace}pre{background:#20293B;color:white;padding:16px;border-radius:14px;overflow:auto}@media(max-width:700px){.grid{grid-template-columns:1fr}.top h1{font-size:38px}}@media print{body{background:#fff}section{break-inside:avoid}}
 .print-button{border:0;border-radius:9px;padding:10px 14px;margin-top:14px;background:var(--orange);color:var(--navy);font:800 13px Arial,sans-serif;cursor:pointer}
+.download-button{display:inline-flex;align-items:center;gap:8px;text-decoration:none;border:1px solid var(--navy);border-radius:9px;padding:10px 14px;margin-top:14px;background:var(--navy);color:#fff;font:800 13px Arial,sans-serif;cursor:pointer}.top .download-button{background:#fff;color:var(--navy);border-color:#fff;margin-left:8px}.download-button:hover{opacity:.85}.download-button:focus-visible{outline:3px solid var(--orange);outline-offset:3px}.download-status{font-size:13px;margin:8px 0 0}.download-status:empty{display:none}@media print{.download-button,.download-status{display:none!important}}
 #print-view{position:fixed;inset:0;z-index:1000;background:#e7eaf0}#print-view[hidden]{display:none!important}#print-frame{width:100%;height:100%;border:0;display:block}
 </style>
-</head><body><header class="top"><div class="wrap"><b>DataLab · Minor FuturCity</b><h1>Toolkit 2 · Versnelling</h1><p>Arduino UNO R4 WiFi + Joy-IT MPU6050 + GPS + RTC + SD</p><button class="print-button" type="button" onclick="openToolkitPrint()">Print PDF</button></div></header>
+</head><body><header class="top"><div class="wrap"><b>DataLab · Minor FuturCity</b><h1>Toolkit 2 · Versnelling</h1><p>Arduino UNO R4 WiFi + Joy-IT MPU6050 + GPS + RTC + SD</p><button class="print-button" type="button" onclick="openToolkitPrint()">Print PDF</button><a id="download-code-top" class="download-button" href="DataLogger_Toolkit_2/DataLogger_Toolkit_2.ino" download="DataLogger_Toolkit_2.ino" aria-label="Download Arduino-code voor Toolkit 2 (.ino)">↓ Download Arduino-code</a></div></header>
 <main>
 <section><h2>Doel</h2><p>Toolkit 2 meet versnelling in drie assen met de Joy-IT MPU6050. De sensor bevat daarnaast een gyroscoop; deze rotatiesnelheden worden ook opgeslagen in de CSV. De webapp richt zich primair op acceleratie X, Y en Z.</p>
 <div class="grid"><div class="card"><b>Accelerometer</b><br>±2 g · 16384 LSB/g</div><div class="card"><b>Gyroscoop</b><br>±250 °/s · 131 LSB/°/s</div><div class="card"><b>Standaard interval</b><br>0,1 s</div><div class="card"><b>WiFi</b><br>Arduino-Logger-02</div></div></section>
@@ -18,7 +19,7 @@
 <section><h2>Firmware</h2><pre>DataLab/
 └── Minor_FuturCity_dataloggers/
     └── DataLogger_Toolkit_2/
-        └── DataLogger_Toolkit_2.ino</pre><p>Upload naar een Arduino UNO R4 WiFi. De firmware detecteert de MPU6050 op adres 0x68 via <code>Wire1</code>.</p></section>
+        └── DataLogger_Toolkit_2.ino</pre><p>Upload naar een Arduino UNO R4 WiFi. De firmware detecteert de MPU6050 op adres 0x68 via <code>Wire1</code>.</p><a id="download-code-firmware" class="download-button" href="DataLogger_Toolkit_2/DataLogger_Toolkit_2.ino" download="DataLogger_Toolkit_2.ino" aria-label="Download Arduino-code voor Toolkit 2 (.ino)">↓ Download Arduino-code</a><p>Download het volledige <code>.ino</code>-bestand, inclusief de ingebouwde webapp. Open het bestand in Arduino IDE.</p><p id="download-code-status" class="download-status" role="status" aria-live="polite"></p></section>
 <section><h2>CSV</h2><pre>measurement_id
 rtc_datetime_local
 elapsed_ms
@@ -52,6 +53,33 @@ function closeToolkitPrint(){document.getElementById("print-view").hidden=true;d
       window.addEventListener('load',function(){setTimeout(function(){openToolkitPrint()},300)});
     }
   }catch(e){}
+})();
+</script>
+<script>
+(function(){
+  const name="DataLogger_Toolkit_2.ino";
+  const raw="https://raw.githubusercontent.com/wanderwerkhoven-afk/DataLab/main/Minor_FuturCity_dataloggers/DataLogger_Toolkit_2/DataLogger_Toolkit_2.ino";
+  const status=document.getElementById('download-code-status');
+  for(const id of ['download-code-top','download-code-firmware']){
+    const link=document.getElementById(id);
+    link.addEventListener('click',async function(event){
+      if(location.protocol!=='file:')return;
+      event.preventDefault();
+      status.textContent='Arduino-code ophalen…';
+      try{
+        const response=await fetch(raw,{cache:'no-store'});
+        if(!response.ok)throw new Error('HTTP '+response.status);
+        const code=await response.text();
+        if(!code.includes('void setup()')||!code.includes('void loop()'))throw new Error('Ongeldig sketchbestand');
+        const url=URL.createObjectURL(new Blob([code],{type:'application/octet-stream'}));
+        const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url),30000);
+        status.textContent='Download gestart.';
+      }catch(e){
+        status.textContent='Download niet beschikbaar. Controleer je internetverbinding of open de handleiding via GitHub Pages.';
+      }
+    });
+  }
 })();
 </script>
 </body></html>
