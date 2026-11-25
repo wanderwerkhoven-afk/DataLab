@@ -218,33 +218,19 @@
       a{color:inherit;text-decoration:none}
       pre{white-space:pre-wrap}
     }
-  </style>
+  
+.topbar-inner{flex-wrap:wrap;gap:12px}.topnav{display:flex;flex-wrap:wrap;gap:4px}.topnav a{padding:7px 9px}.brand{white-space:nowrap}.manual-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}.download-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;background:var(--navy);color:white;text-decoration:none;font:inherit;font-size:13px;font-weight:800;padding:10px 14px;cursor:pointer}.hero .download-button,.topnav .download-button{background:white;color:var(--navy)}.download-button:hover{filter:brightness(.94)}.download-button:focus-visible,.print-button:focus-visible{outline:3px solid var(--orange);outline-offset:3px}.download-status{font-size:13px;margin:8px 0}.download-status:empty{display:none}section[id]{scroll-margin-top:120px}.diagram{background:#f2f5f9;border-radius:16px;padding:20px;margin:18px 0}.diagram svg{width:100%;max-height:230px;display:block}.card b{display:block;color:var(--navy);margin-bottom:5px}.callout b{display:block;margin-bottom:4px}table{width:100%;border-collapse:collapse}th,td{padding:12px;text-align:left;border-bottom:1px solid var(--line)}.steps:not(ol){display:grid;gap:10px}.step{display:grid;grid-template-columns:38px 1fr;gap:12px;align-items:start;border:1px solid var(--line);border-radius:14px;padding:14px}.step .num{width:32px;height:32px;border-radius:10px;background:var(--orange);display:grid;place-items:center;font-weight:900}.step p{margin:0}#print-view{position:fixed;inset:0;z-index:1000;background:#e7eaf0}#print-view[hidden]{display:none!important}#print-frame{width:100%;height:100%;border:0;display:block}@media(max-width:850px){.topnav{display:none}.hero-inner{padding:36px 18px}.toc{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:22px 14px 50px}section{padding:20px}.hero-card{padding:18px}section[id]{scroll-margin-top:70px}}@media print{.manual-actions,.download-button,.download-status{display:none!important}}
+</style>
 </head>
 <body>
-<header class="topbar">
-  <div class="topbar-inner">
-    <div class="brand">Data<span>Logger</span> · Toolkit 1</div>
-    <nav class="topnav">
-      <a href="#doel">Doel</a>
-      <a href="#opbouw">Opbouw</a>
-      <a href="#hardware">Hardware</a>
-      <a href="#aansluiten">Aansluiten</a>
-      <a href="#opstarten">Opstarten</a>
-      <a href="#app">Webapp</a>
-      <a href="#meten">Meten</a>
-      <a href="#data">Data</a>
-      <a href="#problemen">Problemen</a>
-      <button class="print-button" type="button" onclick="openToolkitPrint()">Print PDF</button>
-    </nav>
-  </div>
-</header>
+<header class="topbar"><div class="topbar-inner"><div class="brand">Data<span>Logger</span> · Toolkit 1</div><nav class="topnav" aria-label="Hoofdstukken"><a href="#doel">Doel</a><a href="#aansluiten">Sensoren aansluiten</a><a href="#software">Firmware installeren</a><a href="#app">Webapp gebruiken</a><a href="#meten">Meten</a><a href="#data">Data analyseren</a><a href="#problemen">Problemen oplossen</a><button class="print-button" type="button" onclick="openToolkitPrint()">Print PDF</button><a class="download-button" href="DataLogger_Toolkit_1/DataLogger_Toolkit_1.ino" download="DataLogger_Toolkit_1.ino">↓ Download Arduino-code</a></nav></div></header>
 
 <div class="hero">
   <div class="hero-inner">
     <div>
       <div class="eyebrow">DataLab · Hogeschool van Amsterdam</div>
       <h1>Toolkit 1<br>Geluid meten</h1>
-      <p class="lead">Van onderdelen monteren tot een geluidsmeting opslaan en analyseren. Deze Toolkit 1-handleiding combineert de praktische stappen uit het DataLogger-handboek met de MAX4466-configuratie.</p>
+      <p class="lead">Van onderdelen monteren tot een geluidsmeting opslaan en analyseren. Deze Toolkit 1-handleiding combineert de praktische stappen uit het DataLogger-handboek met de MAX4466-configuratie.</p><div class="manual-actions"><button class="print-button" type="button" onclick="openToolkitPrint()">Print PDF</button><a class="download-button" href="DataLogger_Toolkit_1/DataLogger_Toolkit_1.ino" download="DataLogger_Toolkit_1.ino">↓ Download Arduino-code</a></div>
     </div>
     <div class="hero-card">
       <h3>Toolkit-configuratie</h3>
@@ -261,18 +247,7 @@
 </div>
 
 <main>
-<nav class="toc" aria-label="Inhoud van de handleiding">
-  <a href="#doel">1. Wat doet Toolkit 1?</a>
-  <a href="#opbouw">2. Opstelling opbouwen</a>
-  <a href="#hardware">3. Onderdelen herkennen</a>
-  <a href="#aansluiten">4. Sensor aansluiten</a>
-  <a href="#software">5. Firmware installeren</a>
-  <a href="#opstarten">6. Eerste keer opstarten</a>
-  <a href="#app">7. Webapp gebruiken</a>
-  <a href="#meten">8. Meten</a>
-  <a href="#data">9. Data terugvinden</a>
-  <a href="#problemen">10. Problemen oplossen</a>
-</nav>
+<nav class="toc" aria-label="Inhoud van de handleiding"><a href="#doel">1. Doel</a><a href="#opbouw">2. Opstelling opbouwen</a><a href="#hardware">3. Benodigde hardware</a><a href="#aansluiten">4. Sensoren aansluiten</a><a href="#software">5. Firmware installeren</a><a href="#opstarten">6. Eerste keer opstarten</a><a href="#app">7. Webapp gebruiken</a><a href="#meten">8. Meten</a><a href="#data">9. Data analyseren</a><a href="#grafiek">10. Grafieken</a><a href="#controle">11. Checklist</a><a href="#problemen">12. Problemen oplossen</a></nav>
 <section id="doel">
   <h2>1. Wat meet Toolkit 1?</h2>
   <p class="section-intro">Toolkit 1 registreert de amplitude van geluid met een MAX4466 microfoonversterker. De DataLogger koppelt deze geluidsmeting aan tijd en GPS-locatie en slaat iedere meting op de SD-kaart op.</p>
@@ -380,7 +355,7 @@
   <pre>DataLab/
 └── Minor_FuturCity_dataloggers/
     └── DataLogger_Toolkit_1/
-        └── DataLogger_Toolkit_1.ino</pre>
+        └── DataLogger_Toolkit_1.ino</pre><a class="download-button" href="DataLogger_Toolkit_1/DataLogger_Toolkit_1.ino" download="DataLogger_Toolkit_1.ino">↓ Download Arduino-code</a>
 
   <div class="grid two">
     <div class="card">
@@ -603,5 +578,10 @@ function closeToolkitPrint(){
   }catch(e){}
 })();
 </script>
-</body>
-</html>
+<script>
+(function(){const name='DataLogger_Toolkit_1.ino';const raw='https://raw.githubusercontent.com/wanderwerkhoven-afk/DataLab/main/Minor_FuturCity_dataloggers/DataLogger_Toolkit_1/DataLogger_Toolkit_1.ino';
+document.querySelectorAll('a.download-button').forEach(link=>link.addEventListener('click',async event=>{
+if(location.protocol!=='file:')return;event.preventDefault();
+try{const r=await fetch(raw,{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);const code=await r.text();if(!code.includes('void setup()')||!code.includes('void loop()'))throw Error('Ongeldige sketch');const url=URL.createObjectURL(new Blob([code],{type:'application/octet-stream'}));const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);}catch(e){alert('Download niet beschikbaar. Controleer internet of open de handleiding via GitHub Pages.');}
+}));})();
+</script></body></html>
