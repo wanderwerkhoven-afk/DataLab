@@ -76,54 +76,66 @@ Hoofdstuk~2 beschrijft de natuurkundige achtergrond van de paneeltemperatuur en 
 
 \section{Theoretisch kader}
 
-\subsection{Thermische energiebalans en moduletemperatuur}
-De temperatuur van een zonnepaneel volgt uit de balans tussen opgenomen zonnestraling en warmte-uitwisseling met de omgeving. Een deel van de geabsorbeerde straling wordt elektrisch omgezet; een ander deel draagt bij aan opwarming. Convectie en warmtestraling voeren warmte af. Wind beïnvloedt de convectie, terwijl moduleconstructie en montage mede bepalen hoe warmte wordt afgevoerd [1], [2].
+Om de relatie tussen buitenluchttemperatuur en paneeltemperatuur te kunnen interpreteren, moet eerst worden vastgesteld welke processen de temperatuur van een zonnepaneel bepalen. De buitenlucht is één onderdeel van de thermische omgeving, maar de module ontvangt ook zonnestraling en wisselt warmte uit met de lucht en haar omgeving. Dit kader beschrijft daarom eerst de thermische energiebalans en bestaande temperatuurmodellen. Vervolgens wordt uitgelegd hoe correlatie en regressie de theoretische verwachting in dit onderzoek kwantificeerbaar maken.
 
-Het empirische Faiman-model beschrijft de stationaire moduletemperatuur als:
+\subsection{Thermische energiebalans van een PV-module}
+
+Een zonnepaneel absorbeert een deel van de invallende zonnestraling. Een deel van deze energie wordt als elektriciteit afgevoerd; de rest draagt bij aan de opwarming van de module. De module staat tegelijkertijd warmte af aan haar omgeving. Een belangrijke route is convectie: warmteoverdracht tussen het paneeloppervlak en de omringende lucht. Ook warmtestraling draagt bij aan de energiebalans. De windsnelheid beïnvloedt de convectieve afvoer, terwijl constructie en montage bepalen hoe gemakkelijk warmte van de module kan verdwijnen [1], [2].
+
+Deze processen verklaren waarom paneeltemperatuur en buitenluchttemperatuur niet gelijk hoeven te zijn. Wanneer het paneel meer straling absorbeert dan het aan de omgeving afgeeft, wordt het warmer dan de lucht. De buitenluchttemperatuur bepaalt wel het uitgangsniveau van de thermische omgeving: bij dezelfde instraling en warmteafvoer zal een warmere luchtmassa doorgaans samengaan met een warmer paneel. De grootte van het verschil tussen beide temperaturen hangt echter mede af van instraling, wind en installatie.
+
+\subsection{Modellen voor de bedrijfstemperatuur}
+
+Een veelgebruikte empirische beschrijving van de stationaire moduletemperatuur is het Faiman-model [1]. Het model vat de genoemde warmtebalans samen in:
 \begin{equation}
 T_m=T_a+\frac{G_{\mathrm{POA}}}{U_0+U_1v},
 \label{eq:faiman}
 \end{equation}
-waarbij \(T_m\) de moduletemperatuur (\(^\circ\mathrm{C}\)), \(T_a\) de buitenluchttemperatuur (\(^\circ\mathrm{C}\)), \(G_{\mathrm{POA}}\) de instraling in het vlak van de module (\(\mathrm{W\,m^{-2}}\)), \(v\) de windsnelheid (\(\mathrm{m\,s^{-1}}\)) en \(U_0,U_1\) empirische warmteverliesparameters zijn [1], [2]. Bij gelijke instraling en windsnelheid voorspelt het model een positieve relatie tussen \(T_a\) en \(T_m\). De grootte van het temperatuurverschil \(T_m-T_a\) hangt echter tevens af van instraling en wind.
+waarin \(T_m\) de moduletemperatuur in \(^\circ\mathrm{C}\) is, \(T_a\) de buitenluchttemperatuur in \(^\circ\mathrm{C}\), \(G_{\mathrm{POA}}\) de instraling in het vlak van de module in \(\mathrm{W\,m^{-2}}\), en \(v\) de windsnelheid in \(\mathrm{m\,s^{-1}}\). De parameters \(U_0\) en \(U_1\) beschrijven empirisch het constante en windafhankelijke deel van het warmteverlies [1], [2]. De vergelijking laat zien dat moduletemperatuur niet alleen met buitenlucht maar ook met instraling en wind moet worden beschouwd. Bij een gelijkblijvende instraling en windsnelheid verschuift \(T_m\) mee met \(T_a\), terwijl de stralingsbijdrage aan \(T_m-T_a\) kleiner wordt naarmate de warmteafvoer toeneemt.
 
-Het Faiman-model is een vereenvoudigd stationair model; het beschrijft niet alle tijdelijke opwarm- en afkoelprocessen. De parameters hangen bovendien af van constructie en montage [1], [2]. In dit onderzoek onderbouwt het model de verwachte richting van de relatie, maar wordt het niet gebruikt om temperatuur te voorspellen zonder betrouwbare instraling, wind en moduleparameters. De studie van Bailek et al. ontwikkelt en vergelijkt empirische regressieverbanden voor de temperatuur aan de achterzijde van PV-modules in Adrar, een heet en droog gebied in Zuid-Algerije. Hun modellen gebruiken onder meer buitenluchttemperatuur en instraling, en laten zien dat empirische relaties voor moduletemperatuur locatiespecifiek kunnen zijn [6]. De studie ondersteunt daarom het meenemen van beide variabelen in onze redenering, maar de daar afgeleide coëfficiënten en modelprestaties worden niet naar Amsterdam overgezet: klimaat, installatie en gemeten temperatuur (achterzijde) verschillen van onze opstelling. Een Pt100 meet ook de temperatuur op de plaats van de sensor; die hoeft niet gelijk te zijn aan de gemiddelde celtemperatuur.
+De toepasbaarheid van zulke relaties is afhankelijk van klimaat en opstelling. Bailek et al. ontwikkelden en vergeleken regressiemodellen voor de temperatuur aan de achterzijde van PV-modules in Adrar, een heet en droog gebied in Zuid-Algerije [6]. Hun modellen gebruikten onder meer buitenluchttemperatuur en instraling. De auteurs onderzochten daarmee niet alleen één temperatuurvariabele, maar de gezamenlijke bijdrage van verschillende meteorologische invloeden. Dat ondersteunt de keuze om in het huidige onderzoek de buitenluchttemperatuur niet los van beschikbare instralingsinformatie te interpreteren. De getalsmatige coëfficiënten en modelprestaties uit die studie worden hier niet overgenomen: het klimaat, de installatie en de gemeten achterzijde-temperatuur verschillen van de omstandigheden en sensorlocatie op het Solar Field.
 
-\subsection{Correlatiecoëfficiënten}
-Voor \(n\) gepaarde metingen \(x_i\) (buitenluchttemperatuur) en \(y_i\) (paneeltemperatuur) is Pearson's product-momentcorrelatie:
+Het Faiman-model blijft eveneens een vereenvoudiging. Het model beschrijft een stationaire toestand en vangt niet volledig hoe een paneel vertraagd opwarmt of afkoelt wanneer de omstandigheden snel veranderen. Bovendien hangen de empirische warmteverliesparameters af van moduleconstructie en montage [1], [2]. In dit onderzoek vormt het model daarom de natuurkundige basis voor de verwachte richting van verbanden, maar niet een gevalideerde voorspelling van de paneeltemperatuur. De beschikbare meetreeksen bevatten geen bevestigde combinatie van alle modelinvoer en parameters die nodig is om die voorspelling rechtstreeks toe te passen. Daarnaast meet een Pt100 de temperatuur op de plaats waar de sensor is aangebracht; die lokale meting hoeft niet gelijk te zijn aan de gemiddelde temperatuur van de zonnecellen.
+
+\subsection{Correlatie als beschrijving van samenhang}
+
+De eerste stap in het beantwoorden van de onderzoeksvraag is vaststellen of buitenlucht- en paneeltemperatuur samen variëren. Pearson's product-momentcorrelatie \(r\) kwantificeert de richting en sterkte van een lineair verband tussen \(n\) gepaarde waarden \(x_i\) en \(y_i\) [3]:
 \begin{equation}
 r=\frac{\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})}
-{\sqrt{\sum_{i=1}^{n}(x_i-\bar{x})^2\sum_{i=1}^{n}(y_i-\bar{y})^2}}.
+{\sqrt{\sum_{i=1}^{n}(x_i-\bar{x})^2\sum_{i=1}^{n}(y_i-\bar{y})^2}},
 \label{eq:pearson}
 \end{equation}
-\(r\) ligt tussen \(-1\) en \(+1\): het teken geeft de richting aan en de absolute waarde de sterkte van de lineaire samenhang. Een waarde nabij nul sluit een niet-lineair verband niet uit [3].
+waarbij \(x_i\) de buitenluchttemperatuur, \(y_i\) de paneeltemperatuur en \(\bar{x}\) en \(\bar{y}\) de bijbehorende gemiddelden zijn. De waarde van \(r\) ligt tussen \(-1\) en \(+1\). Een positieve waarde betekent dat hogere buitenluchttemperaturen doorgaans samengaan met hogere paneeltemperaturen; een negatieve waarde geeft een tegengestelde lineaire samenhang aan. Een waarde nabij nul wijst op weinig lineaire samenhang, maar sluit een kromlijnig of anderszins niet-lineair verband niet uit [3].
 
-Spearman's rangcorrelatie is Pearson-correlatie toegepast op de rangnummers:
+Daarom wordt Pearson-correlatie aangevuld met Spearman's rangcorrelatie \(\rho_s\). Deze wordt berekend als Pearson-correlatie van de rangnummers van beide variabelen [4]:
 \begin{equation}
 \rho_s=\operatorname{corr}\!\left(\operatorname{rank}(x_i),\operatorname{rank}(y_i)\right).
 \label{eq:spearman}
 \end{equation}
-Deze maat beschrijft een monotone samenhang, die niet lineair hoeft te zijn. Gelijke waarnemingen krijgen gemiddelde rangen [4]. Pearson \(r\) en Spearman \(\rho_s\) vullen elkaar aan; geen van beide bewijst causaliteit.
+Spearman's maat toetst of de rangorde van de paneeltemperatuur doorgaans stijgt of daalt wanneer de rangorde van de buitenluchttemperatuur verandert. De relatie hoeft daarvoor niet lineair te zijn; gelijke waarden krijgen gemiddelde rangnummers [4]. De vergelijking van \(r\) en \(\rho_s\) helpt beoordelen of een waargenomen verband vooral lineair is of ook als monotone samenhang zichtbaar blijft. Beide maten beschrijven associatie: geen van beide toont aan dat de ene temperatuur de andere veroorzaakt.
 
-\subsection{Regressiehelling en correctie}
-De eenvoudige lineaire regressie wordt geschreven als:
+\subsection{Regressie: grootte van de temperatuurverandering}
+
+Een correlatiecoëfficiënt geeft geen antwoord op de vraag hoeveel graden de paneeltemperatuur verandert. Daarvoor wordt de regressiehelling gebruikt. In een eenvoudige lineaire regressie wordt paneeltemperatuur \(T_{m,i}\) beschreven als functie van buitenluchttemperatuur \(T_{a,i}\):
 \begin{equation}
 T_{m,i}=\beta_0+\beta_1T_{a,i}+\varepsilon_i,
 \label{eq:ols}
 \end{equation}
-waarbij \(\beta_1\) de geschatte verandering in paneeltemperatuur per \(1\,^\circ\mathrm{C}\) verandering in buitenluchttemperatuur weergeeft. Kleinste kwadraten kiest de parameters die de som van gekwadrateerde residuen minimaliseren [5]. De eenheid van \(\beta_1\) is \(^\circ\mathrm{C}/^\circ\mathrm{C}\).
+waarbij \(\beta_0\) het intercept is, \(\beta_1\) de gemiddelde paneeltemperatuurverandering per \(1\,^\circ\mathrm{C}\) verandering in buitenluchttemperatuur, en \(\varepsilon_i\) het verschil tussen de waarneming en de modelbeschrijving. De kleinste-kwadratenmethode schat de parameters door de som van de gekwadrateerde residuen te minimaliseren [5]. De helling \(\beta_1\), uitgedrukt in \(^\circ\mathrm{C}/^\circ\mathrm{C}\), beantwoordt zo de kwantitatieve kern van de tweede deelvraag.
 
-Om te onderzoeken of de helling verandert na correctie voor tijdstip en een beschikbare lokale instralingsproxy, kan per paneel een model worden gebruikt van de vorm:
+De eenvoudige regressie houdt geen rekening met andere gelijktijdig veranderende omstandigheden. Om te onderzoeken of de geschatte helling verandert wanneer tijdstip en instraling worden meegewogen, kan per paneel een uitgebreid model worden gebruikt:
 \begin{equation}
 T_{m,i}=\beta_0+\beta_1T_{a,i}+\beta_2G_i+
 \sum_{h=1}^{H-1}\gamma_h I_{h,i}+\varepsilon_i,
 \label{eq:adjusted}
 \end{equation}
-waarin \(G_i\) de instralingsproxy is en \(I_{h,i}\) indicatorvariabelen voor tijdstippen zijn. \(\beta_1\) beschrijft dan de conditionele associatie, gegeven de opgenomen variabelen. De lokale meting wordt alleen als proxy gebruikt als de meetkwaliteit en betekenis dat toelaten.
+waarin \(G_i\) de lokale instralingsproxy is en \(I_{h,i}\) indicatorvariabelen zijn voor de gekozen tijdsindeling. De coefficient \(\beta_1\) beschrijft in dit model de conditionele associatie tussen buitenlucht- en paneeltemperatuur, gegeven de overige opgenomen variabelen. Deze correctie kan de invloed van gemeten verstorende factoren beperken, maar maakt observationele gegevens niet experimenteel en bewijst geen causaliteit. Een onbekend gekalibreerde instralingsmeting kan bovendien slechts als proxy worden gebruikt; de absolute schaal mag dan niet als irradiantie worden geïnterpreteerd.
 
-Een 95\%-betrouwbaarheidsinterval beschrijft de onzekerheid van een modelschatting onder de modelaannames; het is geen interval dat 95\% van alle individuele meetpunten bevat [5]. Tijdmetingen kunnen onderling afhankelijk zijn en metingen binnen dezelfde dag delen omgevingsomstandigheden. Daarom kunnen meetpunten niet automatisch als onafhankelijke replicaten worden behandeld. De methode moet de gekozen tijdsaggregatie en onzekerheidsberekening expliciet verantwoorden.
+\subsection{Onzekerheid en toetsbare verwachting}
 
-\subsection{Hypothesen}
-Per paneel wordt de nulhypothese \(H_0:\beta_1=0\) getoetst tegenover de gerichte verwachting \(H_1:\beta_1>0\). De positieve richting volgt uit de rol van \(T_a\) in thermische modellen [1], [2]. De uitkomsten worden beoordeeld op effectgrootte en onzekerheidsinterval, niet uitsluitend op een p-waarde. Ook na correctie blijft \(\beta_1\) een conditionele associatie, geen bewijs van causaliteit.
+Een regressiehelling is een schatting uit een eindige meetreeks en kent onzekerheid. Daarom wordt bij \(\beta_1\) een 95\%-betrouwbaarheidsinterval gerapporteerd. Dit interval beschrijft, onder de aannames van het model, de onzekerheid over de geschatte parameter; het betekent niet dat 95\% van de individuele meetpunten binnen de grenzen valt [5]. De interpretatie is ook afhankelijk van de onafhankelijkheid van de waarnemingen. Metingen die kort na elkaar zijn verricht kunnen op elkaar lijken, en metingen binnen dezelfde dag delen weersomstandigheden. De statistische analyse moet daarom de tijdsstructuur meenemen en mag niet zonder controle elk meetpunt als een onafhankelijke herhaling behandelen.
+
+De thermische modellen leiden tot de verwachting dat de relatie tussen buitenluchttemperatuur en paneeltemperatuur positief is. Voor elk paneel wordt daarom de nulhypothese \(H_0:\beta_1=0\) afgezet tegen de gerichte hypothese \(H_1:\beta_1>0\). De beoordeling berust op de richting en grootte van de helling, het onzekerheidsinterval en de kwaliteit van de meetreeks; een p-waarde alleen geeft geen maat voor de fysische grootte of praktische betekenis van het verband. De hypothesen worden per paneel onderzocht, maar verschillen tussen paneelschattingen worden niet automatisch als verschillen in fysische paneeleigenschappen beschouwd zolang sensorplaatsing, kanaalcontinuïteit en montage niet volledig zijn gevalideerd.
 
 \begin{thebibliography}{9}
 \bibitem{faiman} D. Faiman, ``Assessing the outdoor operating temperature of photovoltaic modules,'' \textit{Progress in Photovoltaics: Research and Applications}, vol. 16, no. 4, pp. 307--315, 2008, doi: 10.1002/pip.813.
