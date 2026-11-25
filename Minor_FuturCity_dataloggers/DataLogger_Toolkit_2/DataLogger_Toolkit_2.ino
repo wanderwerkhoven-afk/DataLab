@@ -1129,7 +1129,7 @@ uint8_t shtCRC(const uint8_t* b){
   for(int j=0;j<2;j++){crc^=b[j];for(int i=0;i<8;i++)crc=(crc&0x80)?(uint8_t)((crc<<1)^0x31):(uint8_t)(crc<<1);}
   return crc;
 }
-void scanBus(TwoWire &bus,const char* label){
+void scanBus(decltype(Wire) &bus,const char* label){
   Serial.println(label);
   for(uint8_t a=8;a<120;a++){bus.beginTransmission(a);if(bus.endTransmission()==0){Serial.print("  0x");Serial.println(a,HEX);}}
 }
@@ -1207,7 +1207,7 @@ void logMeasurement(){
   sessionFile.print(measurementCount);sessionFile.print(',');sessionFile.print(formatDateTime(now));sessionFile.print(',');sessionFile.print(elapsedSessionMs());sessionFile.print(',');
   sessionFile.print(liveAccelX,5);sessionFile.print(',');sessionFile.print(liveAccelY,5);sessionFile.print(',');sessionFile.print(liveAccelZ,5);sessionFile.print(',');sessionFile.print(liveAccelMag,5);sessionFile.print(',');
   sessionFile.print(liveGyroX,3);sessionFile.print(',');sessionFile.print(liveGyroY,3);sessionFile.print(',');sessionFile.print(liveGyroZ,3);sessionFile.print(',');sessionFile.print(liveMpuTemp,2);sessionFile.print(',');
-  if(hasPos){sessionFile.print(lat,6);sessionFile.print(',');sessionFile.print(lon,6);}sessionFile.print(',');
+  if(hasPos)sessionFile.print(lat,6);sessionFile.print(',');if(hasPos)sessionFile.print(lon,6);sessionFile.print(',');
   sessionFile.print(gps.satellites.isValid()?gps.satellites.value():0);sessionFile.print(',');sessionFile.print(gpsFix?1:0);sessionFile.print(',');
   if(gps.speed.isValid())sessionFile.print(gps.speed.kmph(),2);sessionFile.print(',');
   if(validGpsUtc()){char utc[24];snprintf(utc,sizeof(utc),"%04d-%02d-%02d %02d:%02d:%02d",gps.date.year(),gps.date.month(),gps.date.day(),gps.time.hour(),gps.time.minute(),gps.time.second());sessionFile.print(utc);}
