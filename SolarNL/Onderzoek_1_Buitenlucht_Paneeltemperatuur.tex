@@ -95,21 +95,21 @@ waarin \(T_m\) de moduletemperatuur (\(^\circ\mathrm{C}\)) is, \(T_a\) de buiten
 
 De vergelijking maakt de verwachte samenhang concreet. Bij gelijke instraling en windsnelheid bestaat \(T_m\) uit de buitenluchttemperatuur plus een temperatuurtoename door de geabsorbeerde straling. In die vereenvoudigde situatie verschuift \(T_m\) dus mee wanneer \(T_a\) verandert. Tegelijk bepaalt de verhouding tussen instraling en warmteafvoer hoe groot het verschil \(T_m-T_a\) is. Meer instraling vergroot dat verschil doorgaans; sterkere warmteafvoer, bijvoorbeeld door wind, verkleint het. Dit verklaart waarom twee meetmomenten met dezelfde buitenluchttemperatuur toch verschillende paneeltemperaturen kunnen hebben.
 
-Bailek et al. onderzochten regressiemodellen voor de temperatuur aan de achterzijde van PV-modules en namen zowel buitenluchttemperatuur als zonnestraling mee als verklarende variabelen [6]. Hun aanpak ondersteunt daarmee de keuze om buitenluchttemperatuur als hoofdvariabele te onderzoeken en instraling te betrekken bij de interpretatie van het temperatuurverschil tussen paneel en lucht. Voor het Solar Field kan de lokale instralingsmeting alleen als numerieke instraling worden behandeld als de meeteenheid, kalibratie en oriëntatie zijn vastgesteld. Tot dat moment beschrijft zij hoogstens een lokale indicatie van veranderende instraling; zij is geen bevestigde \(G_{\mathrm{POA}}\)-waarde.
+Bailek et al. onderzochten regressiemodellen voor de temperatuur aan de achterzijde van PV-modules en namen zowel buitenluchttemperatuur als zonnestraling mee als verklarende variabelen [3]. Hun aanpak ondersteunt daarmee de keuze om buitenluchttemperatuur als hoofdvariabele te onderzoeken en instraling te betrekken bij de interpretatie van het temperatuurverschil tussen paneel en lucht. Voor het Solar Field kan de lokale instralingsmeting alleen als numerieke instraling worden behandeld als de meeteenheid, kalibratie en oriëntatie zijn vastgesteld. Tot dat moment beschrijft zij hoogstens een lokale indicatie van veranderende instraling; zij is geen bevestigde \(G_{\mathrm{POA}}\)-waarde.
 
 Het Faiman-model beschrijft een stationaire benadering: de omstandigheden worden verondersteld gedurende de beschouwde tijd ongeveer constant te zijn. Een werkelijk paneel warmt echter niet onmiddellijk op of af wanneer instraling, wind of lucht temperatuur verandert. Bovendien beïnvloeden moduleconstructie en montage de warmteafvoer [1], [2]. Het model vormt hier daarom de natuurkundige onderbouwing voor de verwachte richting en mogelijke verstorende invloeden, niet een directe voorspelling met vastgestelde modelparameters. Ook is de gemeten paneeltemperatuur een sensorwaarde. Een Pt100 meet de temperatuur op de plek waar hij is aangebracht; zonder bevestigde informatie over die plaats kan die waarde niet zonder meer worden gelijkgesteld aan de gemiddelde celtemperatuur van de module.
 
 \subsection{Waarom eerst samenhang en daarna verandering per graad wordt bepaald}
 
-De meetgegevens kunnen eerst laten zien of buitenlucht- en paneeltemperatuur samen bewegen. Pearson-correlatie \(r\) vat de richting en sterkte van een lineair verband samen voor \(n\) gelijktijdige paren \(x_i\) en \(y_i\) [3]:
+De meetgegevens kunnen eerst laten zien of buitenlucht- en paneeltemperatuur samen bewegen. Pearson-correlatie \(r\) vat de richting en sterkte van een lineair verband samen voor \(n\) gelijktijdige paren \(x_i\) en \(y_i\) [4]:
 \begin{equation}
 r=\frac{\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})}
 {\sqrt{\sum_{i=1}^{n}(x_i-\bar{x})^2\sum_{i=1}^{n}(y_i-\bar{y})^2}},
 \label{eq:pearson}
 \end{equation}
-waarbij \(x_i\) de buitenluchttemperatuur is, \(y_i\) de paneeltemperatuur en de balkjes de gemiddelden aanduiden. De waarde ligt tussen \(-1\) en \(+1\). Een positieve waarde betekent dat hogere buitenluchttemperaturen doorgaans samengaan met hogere paneeltemperaturen. Een waarde rond nul betekent dat een lineair patroon beperkt is; een kromlijnig patroon kan dan nog steeds aanwezig zijn [3].
+waarbij \(x_i\) de buitenluchttemperatuur is, \(y_i\) de paneeltemperatuur en de balkjes de gemiddelden aanduiden. De waarde ligt tussen \(-1\) en \(+1\). Een positieve waarde betekent dat hogere buitenluchttemperaturen doorgaans samengaan met hogere paneeltemperaturen. Een waarde rond nul betekent dat een lineair patroon beperkt is; een kromlijnig patroon kan dan nog steeds aanwezig zijn [4].
 
-Omdat de natuurkundige relatie niet noodzakelijk een rechte lijn hoeft te vormen, wordt Pearson aangevuld met Spearman-rangcorrelatie \(\rho_s\) [4]:
+Omdat de natuurkundige relatie niet noodzakelijk een rechte lijn hoeft te vormen, wordt Pearson aangevuld met Spearman-rangcorrelatie \(\rho_s\) [5]:
 \begin{equation}
 \rho_s=\operatorname{corr}\!\left(\operatorname{rank}(x_i),\operatorname{rank}(y_i)\right).
 \label{eq:spearman}
@@ -121,7 +121,7 @@ Correlatie geeft bovendien geen verandering in graden. Daarvoor is de regressieh
 T_{m,i}=\beta_0+\beta_1T_{a,i}+\varepsilon_i,
 \label{eq:ols}
 \end{equation}
-waarbij \(\beta_0\) het intercept is, \(\beta_1\) de geschatte gemiddelde verandering in paneeltemperatuur per \(1\,^\circ\mathrm{C}\) verandering in buitenluchttemperatuur en \(\varepsilon_i\) het residu: het verschil tussen de gemeten waarde en de waarde die het model voorspelt. De kleinste-kwadratenmethode kiest de regressielijn waarbij de som van de gekwadrateerde residuen zo klein mogelijk is [5]. De helling, in \(^\circ\mathrm{C}/^\circ\mathrm{C}\), beantwoordt daarmee hoeveel de paneeltemperatuur in de meetreeks gemiddeld verandert per graad buitenlucht.
+waarbij \(\beta_0\) het intercept is, \(\beta_1\) de geschatte gemiddelde verandering in paneeltemperatuur per \(1\,^\circ\mathrm{C}\) verandering in buitenluchttemperatuur en \(\varepsilon_i\) het residu: het verschil tussen de gemeten waarde en de waarde die het model voorspelt. De kleinste-kwadratenmethode kiest de regressielijn waarbij de som van de gekwadrateerde residuen zo klein mogelijk is [6]. De helling, in \(^\circ\mathrm{C}/^\circ\mathrm{C}\), beantwoordt daarmee hoeveel de paneeltemperatuur in de meetreeks gemiddeld verandert per graad buitenlucht.
 
 \subsection{Waarom tijdstip en instraling bij de interpretatie horen}
 
@@ -133,21 +133,21 @@ T_{m,i}=\beta_0+\beta_1T_{a,i}+\beta_2G_i+
 \end{equation}
 Hier is \(G_i\) de lokale instralingsvariabele en is \(I_{h,i}\) een indicatorvariabele: een variabele met waarde 0 of 1 die aangeeft of meting \(i\) in tijdsblok \(h\) valt. De coëfficiënt \(\beta_1\) beschrijft dan de samenhang tussen buitenlucht- en paneeltemperatuur bij gelijke waarden van de opgenomen tijds- en instralingsvariabelen. Dit heet een conditionele associatie. Door de eenvoudige en uitgebreide helling naast elkaar te zetten, wordt zichtbaar of de ruwe relatie verandert wanneer deze gemeten omstandigheden worden meegewogen. Een onbekend gekalibreerde instralingssensor kan daarbij alleen als proxy dienen; de absolute waarde kan dan niet als fysische instraling worden uitgelegd.
 
-De tijdsvolgorde is ook van belang voor de onzekerheid. Metingen die kort na elkaar zijn verzameld, delen vaak vrijwel dezelfde weersomstandigheden en kunnen daardoor op elkaar lijken. Ze zijn dan niet gelijk aan evenveel onafhankelijke herhalingen. De analyse moet daarom rekening houden met de meetfrequentie en samenhang in de tijd. Bij regressieschattingen wordt een 95%-betrouwbaarheidsinterval gerapporteerd. Dit interval geeft de onzekerheid rond de geschatte helling weer; onder de modelaannames zouden intervallen die op dezelfde manier uit herhaalde steekproeven worden berekend in ongeveer 95% van de gevallen de werkelijke parameter bevatten. Het interval is niet het bereik waarbinnen 95% van de meetpunten ligt [5].
+De tijdsvolgorde is ook van belang voor de onzekerheid. Metingen die kort na elkaar zijn verzameld, delen vaak vrijwel dezelfde weersomstandigheden en kunnen daardoor op elkaar lijken. Ze zijn dan niet gelijk aan evenveel onafhankelijke herhalingen. De analyse moet daarom rekening houden met de meetfrequentie en samenhang in de tijd. Bij regressieschattingen wordt een 95%-betrouwbaarheidsinterval gerapporteerd. Dit interval geeft de onzekerheid rond de geschatte helling weer; onder de modelaannames zouden intervallen die op dezelfde manier uit herhaalde steekproeven worden berekend in ongeveer 95% van de gevallen de werkelijke parameter bevatten. Het interval is niet het bereik waarbinnen 95% van de meetpunten ligt [6].
 
 \subsection{Verwachting voor dit onderzoek}
 
-Uit de energiebalans volgt de verwachting dat een hogere buitenluchttemperatuur samengaat met een hogere paneeltemperatuur, wanneer overige omstandigheden vergelijkbaar zijn. De modellen en regressiestudie ondersteunen daarnaast dat instraling mede samenhangt met de paneeltemperatuur [1], [2], [6]. Daarom worden de acht panelen afzonderlijk onderzocht: per paneel worden de correlatie, de eenvoudige regressiehelling en, indien de meetkwaliteit het toelaat, de gecorrigeerde helling bepaald.
+Uit de energiebalans volgt de verwachting dat een hogere buitenluchttemperatuur samengaat met een hogere paneeltemperatuur, wanneer overige omstandigheden vergelijkbaar zijn. De modellen en regressiestudie ondersteunen daarnaast dat instraling mede samenhangt met de paneeltemperatuur [1], [2], [3]. Daarom worden de acht panelen afzonderlijk onderzocht: per paneel worden de correlatie, de eenvoudige regressiehelling en, indien de meetkwaliteit het toelaat, de gecorrigeerde helling bepaald.
 
 De toetsbare verwachting is per paneel een positieve helling (\(H_1:\beta_1>0\)); de nulhypothese is \(H_0:\beta_1=0\). De conclusie steunt niet alleen op een p-waarde, maar op de richting en grootte van de helling, het betrouwbaarheidsinterval en de kwaliteit van de betreffende meetreeks. Omdat de omstandigheden niet experimenteel afzonderlijk zijn ingesteld, blijft de regressie een beschrijving van waargenomen samenhang. De uitkomst kan dus laten zien hoe paneeltemperatuur met buitenluchttemperatuur meebeweegt, maar schrijft een gevonden verschil niet automatisch uitsluitend aan buitenluchttemperatuur toe.
 
 \begin{thebibliography}{9}
 \bibitem{faiman} D. Faiman, ``Assessing the outdoor operating temperature of photovoltaic modules,'' \textit{Progress in Photovoltaics: Research and Applications}, vol. 16, no. 4, pp. 307--315, 2008, doi: 10.1002/pip.813.
 \bibitem{king} D. L. King, E. E. Boyson, and J. A. Kratochvil, \textit{Photovoltaic Array Performance Model}, Sandia National Laboratories, SAND2004-3535, 2004, doi: 10.2172/919131.
+\bibitem{bailek} N. Bailek, K. Bouchouicha, M. A. Hassan, A. Slimani, and B. Jamil, ``Implicit regression-based correlations to predict the back temperature of PV modules in the arid region of south Algeria,'' \textit{Renewable Energy}, vol. 156, pp. 57--67, 2020, doi: 10.1016/j.renene.2020.04.073.
 \bibitem{nistcorr} NIST/SEMATECH, ``Correlation,'' \textit{e-Handbook of Statistical Methods}. [Online]. Available: \url{https://www.itl.nist.gov/div898/handbook/}. Accessed: Nov. 25, 2026.
 \bibitem{spearman} A. R. Samuh, ``A robust Spearman correlation coefficient permutation test,'' \textit{Communications in Statistics---Simulation and Computation}, 2022, doi: 10.1080/03610926.2022.2121144.
 \bibitem{nistreg} NIST/SEMATECH, ``Linear least squares regression'' and ``Computing confidence intervals,'' \textit{e-Handbook of Statistical Methods}. [Online]. Available: \url{https://www.itl.nist.gov/div898/handbook/}. Accessed: Nov. 25, 2026.
-\bibitem{bailek} N. Bailek, K. Bouchouicha, M. A. Hassan, A. Slimani, and B. Jamil, ``Implicit regression-based correlations to predict the back temperature of PV modules in the arid region of south Algeria,'' \textit{Renewable Energy}, vol. 156, pp. 57--67, 2020, doi: 10.1016/j.renene.2020.04.073.
 \end{thebibliography}
 
 \end{document}
